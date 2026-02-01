@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Start Guide - OpenMOA Documentation</title>
+  <meta name="description" content="Get started with OpenMOA in 5 minutes">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="../index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+    
+    <div class="navbar-links">
+      <a href="../index.html" class="navbar-link">Home</a>
+      <a href="index.html" class="navbar-link active">Documentation</a>
+      <a href="../blog/index.html" class="navbar-link">Blog</a>
+      <a href="../contact.html" class="navbar-link">Contact</a>
+    </div>
+    
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+    
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Docs Layout -->
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Getting Started</div>
+        <a href="quickstart.html" class="docs-sidebar-link active">Quick Start Guide</a>
+        <a href="installation.html" class="docs-sidebar-link">Installation</a>
+        <a href="concepts.html" class="docs-sidebar-link">Core Concepts</a>
+      </div>
+      
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Tutorials</div>
+        <a href="tutorials/streams.html" class="docs-sidebar-link">Working with Data Streams</a>
+        <a href="tutorials/classifiers.html" class="docs-sidebar-link">Classification Algorithms</a>
+        <a href="tutorials/drift.html" class="docs-sidebar-link">Concept Drift Detection</a>
+        <a href="tutorials/evaluation.html" class="docs-sidebar-link">Evaluation Methods</a>
+        <a href="tutorials/advanced.html" class="docs-sidebar-link">Advanced Topics</a>
+      </div>
+      
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">API Reference</div>
+        <a href="../api/streams.html" class="docs-sidebar-link">openmoa.streams</a>
+        <a href="../api/classifiers.html" class="docs-sidebar-link">openmoa.classifiers</a>
+        <a href="../api/regressors.html" class="docs-sidebar-link">openmoa.regressors</a>
+        <a href="../api/drift.html" class="docs-sidebar-link">openmoa.drift_detection</a>
+        <a href="../api/evaluation.html" class="docs-sidebar-link">openmoa.evaluation</a>
+        <a href="../api/utils.html" class="docs-sidebar-link">openmoa.utils</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content fade-in">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+        <span class="tag tag-tutorial">5 min read</span>
+      </div>
+      
+      <h1>Quick Start Guide</h1>
+      <p>This guide will help you get started with OpenMOA in just a few minutes. You'll learn how to install the library, create your first data stream, and train an online classifier.</p>
+      
+      <h2>Installation</h2>
+      <p>Install OpenMOA using pip:</p>
+      
+      <pre><code><span class="token-function">pip</span> install openmoa</code></pre>
+      
+      <p>For the latest development version, install directly from GitHub:</p>
+      
+      <pre><code><span class="token-function">pip</span> install git+https://github.com/ZW-SIYUAN/OpenMOA.git</code></pre>
+      
+      <h2>Your First Stream</h2>
+      <p>Let's create a simple data stream using the SEA generator, a classic benchmark for concept drift:</p>
+      
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.streams</span> <span class="token-keyword">import</span> SEAGenerator
+
+<span class="token-comment"># Create a stream with 10% noise</span>
+stream = SEAGenerator(noise_percentage=<span class="token-number">0.1</span>)
+
+<span class="token-comment"># Generate samples one at a time</span>
+<span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-function">range</span>(<span class="token-number">5</span>):
+    X, y = stream.next_sample()
+    <span class="token-function">print</span>(<span class="token-string">f"Sample {i}: features={X}, label={y}"</span>)</code></pre>
+      
+      <h2>Training a Classifier</h2>
+      <p>Now let's train a Hoeffding Tree classifier on the stream:</p>
+      
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.streams</span> <span class="token-keyword">import</span> SEAGenerator
+<span class="token-keyword">from</span> <span class="token-module">openmoa.classifiers</span> <span class="token-keyword">import</span> HoeffdingTree
+
+<span class="token-comment"># Initialize stream and classifier</span>
+stream = SEAGenerator(noise_percentage=<span class="token-number">0.1</span>)
+classifier = HoeffdingTree()
+
+<span class="token-comment"># Train on 1000 samples</span>
+correct = <span class="token-number">0</span>
+<span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-function">range</span>(<span class="token-number">1000</span>):
+    X, y = stream.next_sample()
+    
+    <span class="token-comment"># Predict before training (prequential evaluation)</span>
+    prediction = classifier.predict(X)
+    <span class="token-keyword">if</span> prediction == y:
+        correct += <span class="token-number">1</span>
+    
+    <span class="token-comment"># Train on the sample</span>
+    classifier.partial_fit(X, y)
+
+<span class="token-function">print</span>(<span class="token-string">f"Accuracy: {correct / 1000 * 100:.2f}%"</span>)</code></pre>
+      
+      <h2>Using the Evaluation Framework</h2>
+      <p>OpenMOA provides a built-in evaluation framework for cleaner code:</p>
+      
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.streams</span> <span class="token-keyword">import</span> SEAGenerator
+<span class="token-keyword">from</span> <span class="token-module">openmoa.classifiers</span> <span class="token-keyword">import</span> HoeffdingTree
+<span class="token-keyword">from</span> <span class="token-module">openmoa.evaluation</span> <span class="token-keyword">import</span> prequential_evaluation
+
+<span class="token-comment"># Run prequential evaluation</span>
+results = prequential_evaluation(
+    stream=SEAGenerator(noise_percentage=<span class="token-number">0.1</span>),
+    learner=HoeffdingTree(),
+    max_instances=<span class="token-number">10000</span>,
+    sample_frequency=<span class="token-number">1000</span>
+)
+
+<span class="token-comment"># Print results</span>
+<span class="token-function">print</span>(<span class="token-string">f"Final Accuracy: {results.accuracy():.4f}"</span>)
+<span class="token-function">print</span>(<span class="token-string">f"Total Time: {results.total_time:.2f}s"</span>)</code></pre>
+      
+      <h2>Next Steps</h2>
+      <p>Now that you have the basics, explore these topics:</p>
+      
+      <div class="card-grid" style="margin-top: 24px;">
+        <a href="tutorials/streams.html" class="card" style="text-decoration: none;">
+          <h3 class="card-title">Data Streams</h3>
+          <p class="card-desc">Learn about different stream generators and how to read real data.</p>
+        </a>
+        <a href="tutorials/classifiers.html" class="card" style="text-decoration: none;">
+          <h3 class="card-title">Classifiers</h3>
+          <p class="card-desc">Explore Hoeffding Trees, Adaptive Random Forest, and more.</p>
+        </a>
+        <a href="tutorials/drift.html" class="card" style="text-decoration: none;">
+          <h3 class="card-title">Drift Detection</h3>
+          <p class="card-desc">Handle changing data distributions with drift detectors.</p>
+        </a>
+      </div>
+      
+      <!-- Navigation -->
+      <div style="display: flex; justify-content: space-between; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);">
+        <div></div>
+        <a href="installation.html" class="btn btn-secondary">
+          Next: Installation
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../assets/script.js"></script>
+</body>
+</html>

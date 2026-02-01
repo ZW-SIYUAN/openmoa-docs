@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact - OpenMOA</title>
+  <meta name="description" content="Meet the team behind OpenMOA">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .team-card {
+      padding: 32px;
+      border-radius: 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    
+    .team-card-inner {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .team-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-size: 28px;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      flex-shrink: 0;
+    }
+    
+    .team-info {
+      flex: 1;
+      min-width: 250px;
+    }
+    
+    .team-name {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    
+    .team-role {
+      font-size: 15px;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    .team-affiliation {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    
+    .team-bio {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    
+    .team-awards {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    
+    .team-note {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-style: italic;
+      padding: 12px;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+    }
+    
+    .contact-box {
+      margin-top: 48px;
+      padding: 32px;
+      border-radius: 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    
+    .contact-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+    
+    <div class="navbar-links">
+      <a href="index.html" class="navbar-link">Home</a>
+      <a href="docs/index.html" class="navbar-link">Documentation</a>
+      <a href="blog/index.html" class="navbar-link">Blog</a>
+      <a href="contact.html" class="navbar-link active">Contact</a>
+    </div>
+    
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+    
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+  </nav>
+
+  <div class="page-wrapper">
+    <div class="container-narrow fade-in">
+      <h1 class="page-title">Contact</h1>
+      <p class="page-subtitle">Meet the team behind OpenMOA.</p>
+      
+      <!-- Team Members -->
+      <div class="team-card">
+        <div class="team-card-inner">
+          <div class="team-avatar">ZW</div>
+          <div class="team-info">
+            <h2 class="team-name">Zhili Wang</h2>
+            <p class="team-role">PhD Student</p>
+            <p class="team-affiliation">Department of Data Science, School of Computing, Data Sciences & Physics (CDSP), William & Mary</p>
+            <p class="team-bio">Lead developer of OpenMOA.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="team-card">
+        <div class="team-card-inner">
+          <div class="team-avatar">HG</div>
+          <div class="team-info">
+            <h2 class="team-name">Heitor Murilo Gomes</h2>
+            <p class="team-role">Senior Lecturer (Assistant Professor)</p>
+            <p class="team-affiliation">Victoria University of Wellington, New Zealand</p>
+            <p class="team-bio">Machine Learning Researcher and Data Scientist. Previously Senior Researcher and Co-Director of the AI Institute at the University of Waikato. Research focuses on Adaptive Machine Learning, with emphasis on data stream learning and online continual learning.</p>
+            <p class="team-note">For collaboration opportunities or PhD inquiries, please contact via institutional email.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="team-card">
+        <div class="team-card-inner">
+          <div class="team-avatar">YH</div>
+          <div class="team-info">
+            <h2 class="team-name">Yi He</h2>
+            <p class="team-role">Assistant Professor (PI)</p>
+            <p class="team-affiliation">School of Computing, Data Sciences, and Physics, William & Mary</p>
+            <p class="team-bio">Previously at Old Dominion University (2021). PhD from University of Louisiana at Lafayette (2020) under Dr. Xindong Wu. B.E. from Harbin Institute of Technology (2013). Research interests: data mining, streaming algorithms, graph learning, and AI for conservation.</p>
+            <div class="team-awards">
+              <span class="tag tag-release">IEEE TCII Volunteer Award (2022)</span>
+              <span class="tag tag-tutorial">NSF CRII Award (2023)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Contact Box -->
+      <div class="contact-box">
+        <h3 style="font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 12px;">Get in Touch</h3>
+        <p style="font-size: 15px; color: var(--text-secondary);">Have questions or want to contribute? Reach out through GitHub or open an issue.</p>
+        <div class="contact-buttons">
+          <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn btn-primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+            GitHub Repository
+          </a>
+          <a href="https://github.com/ZW-SIYUAN/OpenMOA/issues" target="_blank" class="btn btn-secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 16v-4M12 8h.01"/>
+            </svg>
+            Open an Issue
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="footer-logo-icon">M</div>
+        <span class="footer-text">© 2025 OpenMOA. Open source under MIT License.</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="footer-link">GitHub</a>
+        <a href="https://openmoa.net" class="footer-link">openmoa.net</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/script.js"></script>
+</body>
+</html>

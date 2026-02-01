@@ -6,1570 +6,424 @@
   <title>OpenMOA - Open-Environmental Massive Online Analysis</title>
   <meta name="description" content="A Python library for Utilitarian Online Learning Task and Streaming Data">
   <meta name="keywords" content="OpenMOA, streaming data, online learning, machine learning, Python, data streams">
-  <meta name="author" content="OpenMOA Team">
   
-  <!-- Open Graph -->
-  <meta property="og:title" content="OpenMOA - Open-Environmental Massive Online Analysis">
-  <meta property="og:description" content="A Python library for Utilitarian Online Learning Task and Streaming Data">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://openmoa.net">
-  
-  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
   
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   
-  <!-- React -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
+  <link rel="stylesheet" href="assets/style.css">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
+    /* Home Page Specific Styles */
+    .hero {
+      min-height: calc(100vh - 64px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: var(--gradient);
+      opacity: 0.12;
+      filter: blur(100px);
+      pointer-events: none;
+    }
+    
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -100px;
+      left: -100px;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: var(--gradient);
+      opacity: 0.08;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+    
+    .hero-content {
+      max-width: 900px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .hero-title {
+      font-size: clamp(40px, 8vw, 72px);
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 24px;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -2px;
+    }
+    
+    .hero-desc {
+      font-size: clamp(16px, 3vw, 20px);
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 40px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .hero-desc strong {
+      color: var(--text);
+    }
+    
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 60px;
+    }
+    
+    .install-box {
+      background: var(--code-bg);
+      border-radius: 12px;
+      padding: 20px 28px;
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .install-box code {
+      color: var(--code-text);
+      font-size: clamp(14px, 2.5vw, 16px);
+      background: none;
       padding: 0;
     }
     
-    html {
-      scroll-behavior: smooth;
+    .install-box .token-gray { color: #94A3B8; }
+    .install-box .token-pink { color: #F472B6; }
+    .install-box .token-purple { color: #A5B4FC; }
+    .install-box .token-green { color: #34D399; }
+    
+    .copy-btn {
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: var(--code-text);
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    .copy-btn:hover {
+      background: rgba(255,255,255,0.2);
     }
     
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+    /* Features Section */
+    .features {
+      padding: 100px 24px;
+      background: var(--bg);
     }
     
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
     
-    .fade-in {
-      animation: fadeIn 0.5s ease-out;
+    .feature-card {
+      padding: 32px;
+      border-radius: 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
     }
     
-    @media (max-width: 768px) {
-      .desktop-nav {
-        display: none !important;
-      }
-      .mobile-menu-btn {
-        display: flex !important;
-      }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--card-shadow);
+      border-color: var(--accent);
     }
     
-    /* Scrollbar styling */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: var(--accent-light);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
     }
     
-    ::-webkit-scrollbar-track {
-      background: transparent;
+    .feature-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+      font-family: 'Space Grotesk', sans-serif;
     }
     
-    ::-webkit-scrollbar-thumb {
-      background: #CBD5E1;
-      border-radius: 4px;
+    .feature-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0;
     }
     
-    ::-webkit-scrollbar-thumb:hover {
-      background: #94A3B8;
+    /* Quick Start Section */
+    .quickstart {
+      padding: 100px 24px;
+      background: var(--bg-secondary);
     }
     
-    .dark-mode ::-webkit-scrollbar-thumb {
-      background: #475569;
-    }
-    
-    .dark-mode ::-webkit-scrollbar-thumb:hover {
-      background: #64748B;
+    .quickstart-content {
+      max-width: 900px;
+      margin: 0 auto;
     }
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  
-  <script type="text/babel">
-    const { useState, useEffect } = React;
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+    
+    <div class="navbar-links">
+      <a href="index.html" class="navbar-link active">Home</a>
+      <a href="docs/index.html" class="navbar-link">Documentation</a>
+      <a href="blog/index.html" class="navbar-link">Blog</a>
+      <a href="contact.html" class="navbar-link">Contact</a>
+    </div>
+    
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+    
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+    
+    <div id="mobile-menu" class="mobile-menu">
+      <a href="index.html" class="navbar-link active">Home</a>
+      <a href="docs/index.html" class="navbar-link">Documentation</a>
+      <a href="blog/index.html" class="navbar-link">Blog</a>
+      <a href="contact.html" class="navbar-link">Contact</a>
+      <div style="display: flex; gap: 8px; margin-top: 8px;">
+        <button onclick="toggleTheme()" class="btn btn-secondary" style="flex:1;">Toggle Theme</button>
+        <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn btn-secondary">GitHub</a>
+      </div>
+    </div>
+  </nav>
 
-    const OpenMOAWebsite = () => {
-      const [currentPage, setCurrentPage] = useState('home');
-      const [darkMode, setDarkMode] = useState(false);
-      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-      const [expandedDoc, setExpandedDoc] = useState(null);
-      const [copied, setCopied] = useState(false);
+  <!-- Hero Section -->
+  <section class="hero page-wrapper">
+    <div class="hero-content fade-in">
+      <div class="badge" style="margin-bottom: 24px;">
+        <span class="badge-dot"></span>
+        v0.1.0 — Now Available
+      </div>
+      
+      <h1 class="hero-title">
+        Open-Environmental <span class="text-gradient">Massive Online Analysis</span>
+      </h1>
+      
+      <p class="hero-desc">
+        A Python library for <strong>Utilitarian Online Learning</strong> and 
+        <strong>Streaming Data</strong>. Build adaptive machine learning 
+        systems that learn continuously from data streams in real-time.
+      </p>
+      
+      <div class="hero-buttons">
+        <a href="docs/index.html" class="btn btn-primary">
+          Get Started
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+        <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn btn-secondary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          View on GitHub
+        </a>
+      </div>
+      
+      <div class="install-box">
+        <code>
+          <span class="token-gray">$</span>
+          <span class="token-pink">pip</span>
+          <span class="token-purple">install</span>
+          <span class="token-green">openmoa</span>
+        </code>
+        <button class="copy-btn" onclick="copyCode(this, 'pip install openmoa')" title="Copy">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
 
-      useEffect(() => {
-        document.body.className = darkMode ? 'dark-mode' : '';
-      }, [darkMode]);
-
-      // Theme colors
-      const theme = {
-        light: {
-          bg: '#FAFBFC',
-          bgSecondary: '#FFFFFF',
-          bgTertiary: '#F3F4F6',
-          text: '#1F2937',
-          textSecondary: '#6B7280',
-          accent: '#0EA5E9',
-          accentHover: '#0284C7',
-          accentLight: '#E0F2FE',
-          border: '#E5E7EB',
-          codeBg: '#1E293B',
-          codeText: '#E2E8F0',
-          gradient: 'linear-gradient(135deg, #0EA5E9 0%, #6366F1 50%, #8B5CF6 100%)',
-          cardShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        },
-        dark: {
-          bg: '#0F172A',
-          bgSecondary: '#1E293B',
-          bgTertiary: '#334155',
-          text: '#F1F5F9',
-          textSecondary: '#94A3B8',
-          accent: '#38BDF8',
-          accentHover: '#7DD3FC',
-          accentLight: '#0C4A6E',
-          border: '#334155',
-          codeBg: '#020617',
-          codeText: '#E2E8F0',
-          gradient: 'linear-gradient(135deg, #38BDF8 0%, #818CF8 50%, #A78BFA 100%)',
-          cardShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3)',
-        }
-      };
-
-      const t = darkMode ? theme.dark : theme.light;
-
-      const copyToClipboard = (text) => {
-        navigator.clipboard.writeText(text);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      };
-
-      // Navigation Component
-      const Navigation = () => (
-        <nav style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '64px',
-          background: darkMode ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: `1px solid ${t.border}`,
-          zIndex: 1000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 24px',
-        }}>
-          {/* Logo */}
-          <div 
-            onClick={() => setCurrentPage('home')}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '12px',
-              cursor: 'pointer',
-            }}
-          >
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '8px',
-              background: t.gradient,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '700',
-              fontSize: '18px',
-              color: '#FFFFFF',
-              fontFamily: "'JetBrains Mono', monospace",
-            }}>
-              M
-            </div>
-            <span style={{
-              fontSize: '20px',
-              fontWeight: '600',
-              color: t.text,
-              fontFamily: "'Space Grotesk', sans-serif",
-              letterSpacing: '-0.5px',
-            }}>
-              OpenMOA
-            </span>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }} className="desktop-nav">
-            {['home', 'documentation', 'blog', 'contact'].map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: currentPage === page ? t.accentLight : 'transparent',
-                  color: currentPage === page ? t.accent : t.textSecondary,
-                  fontSize: '15px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  fontFamily: "'Inter', sans-serif",
-                  textTransform: 'capitalize',
-                }}
-                onMouseEnter={(e) => {
-                  if (currentPage !== page) {
-                    e.target.style.background = t.bgTertiary;
-                    e.target.style.color = t.text;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (currentPage !== page) {
-                    e.target.style.background = 'transparent';
-                    e.target.style.color = t.textSecondary;
-                  }
-                }}
-              >
-                {page}
-              </button>
-            ))}
-            
-            {/* Theme Toggle */}
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              style={{
-                marginLeft: '16px',
-                padding: '8px',
-                borderRadius: '8px',
-                border: `1px solid ${t.border}`,
-                background: t.bgSecondary,
-                color: t.text,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.borderColor = t.accent}
-              onMouseLeave={(e) => e.currentTarget.style.borderColor = t.border}
-              aria-label="Toggle theme"
-            >
-              {darkMode ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="5"/>
-                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-                </svg>
-              ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                </svg>
-              )}
-            </button>
-
-            {/* GitHub Link */}
-            <a
-              href="https://github.com/ZW-SIYUAN/OpenMOA"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                padding: '8px',
-                borderRadius: '8px',
-                border: `1px solid ${t.border}`,
-                background: t.bgSecondary,
-                color: t.text,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textDecoration: 'none',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.borderColor = t.accent}
-              onMouseLeave={(e) => e.currentTarget.style.borderColor = t.border}
-              aria-label="GitHub"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
-              </svg>
-            </a>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="mobile-menu-btn"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{
-              display: 'none',
-              padding: '8px',
-              borderRadius: '8px',
-              border: 'none',
-              background: 'transparent',
-              color: t.text,
-              cursor: 'pointer',
-            }}
-            aria-label="Menu"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              {mobileMenuOpen ? (
-                <path d="M18 6L6 18M6 6l12 12"/>
-              ) : (
-                <path d="M3 12h18M3 6h18M3 18h18"/>
-              )}
+  <!-- Features Section -->
+  <section class="features">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <h2 class="page-title text-center">Why OpenMOA?</h2>
+      <p class="page-subtitle text-center" style="max-width: 600px; margin: 0 auto 60px;">
+        Designed for researchers and practitioners working with streaming data and online learning.
+      </p>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
             </svg>
-          </button>
-
-          {/* Mobile Menu */}
-          {mobileMenuOpen && (
-            <div style={{
-              position: 'absolute',
-              top: '64px',
-              left: 0,
-              right: 0,
-              background: t.bgSecondary,
-              borderBottom: `1px solid ${t.border}`,
-              padding: '16px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px',
-            }}>
-              {['home', 'documentation', 'blog', 'contact'].map((page) => (
-                <button
-                  key={page}
-                  onClick={() => {
-                    setCurrentPage(page);
-                    setMobileMenuOpen(false);
-                  }}
-                  style={{
-                    padding: '12px 16px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    background: currentPage === page ? t.accentLight : 'transparent',
-                    color: currentPage === page ? t.accent : t.text,
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    textTransform: 'capitalize',
-                  }}
-                >
-                  {page}
-                </button>
-              ))}
-              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                <button
-                  onClick={() => setDarkMode(!darkMode)}
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: `1px solid ${t.border}`,
-                    background: t.bgTertiary,
-                    color: t.text,
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                  }}
-                >
-                  {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-                </button>
-                <a
-                  href="https://github.com/ZW-SIYUAN/OpenMOA"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    padding: '12px 20px',
-                    borderRadius: '8px',
-                    border: `1px solid ${t.border}`,
-                    background: t.bgTertiary,
-                    color: t.text,
-                    textDecoration: 'none',
-                    fontSize: '14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}
-                >
-                  GitHub
-                </a>
-              </div>
-            </div>
-          )}
-        </nav>
-      );
-
-      // Home Page
-      const HomePage = () => (
-        <div style={{ paddingTop: '64px' }} className="fade-in">
-          {/* Hero Section */}
-          <section style={{
-            minHeight: 'calc(100vh - 64px)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '80px 24px',
-            background: darkMode 
-              ? 'radial-gradient(ellipse at top, #1E293B 0%, #0F172A 70%)'
-              : 'radial-gradient(ellipse at top, #F0F9FF 0%, #FAFBFC 70%)',
-            position: 'relative',
-            overflow: 'hidden',
-          }}>
-            {/* Background decoration */}
-            <div style={{
-              position: 'absolute',
-              top: '-200px',
-              right: '-200px',
-              width: '600px',
-              height: '600px',
-              borderRadius: '50%',
-              background: t.gradient,
-              opacity: darkMode ? 0.1 : 0.15,
-              filter: 'blur(100px)',
-              pointerEvents: 'none',
-            }} />
-            <div style={{
-              position: 'absolute',
-              bottom: '-100px',
-              left: '-100px',
-              width: '400px',
-              height: '400px',
-              borderRadius: '50%',
-              background: t.gradient,
-              opacity: darkMode ? 0.08 : 0.1,
-              filter: 'blur(80px)',
-              pointerEvents: 'none',
-            }} />
-
-            <div style={{
-              maxWidth: '900px',
-              textAlign: 'center',
-              position: 'relative',
-              zIndex: 1,
-            }}>
-              {/* Badge */}
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '6px 16px',
-                borderRadius: '20px',
-                background: t.accentLight,
-                color: t.accent,
-                fontSize: '14px',
-                fontWeight: '500',
-                marginBottom: '24px',
-                fontFamily: "'Inter', sans-serif",
-              }}>
-                <span style={{
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  background: '#10B981',
-                  animation: 'pulse 2s infinite',
-                }} />
-                v0.1.0 — Now Available
-              </div>
-
-              <h1 style={{
-                fontSize: 'clamp(40px, 8vw, 72px)',
-                fontWeight: '700',
-                color: t.text,
-                lineHeight: '1.1',
-                marginBottom: '24px',
-                fontFamily: "'Space Grotesk', sans-serif",
-                letterSpacing: '-2px',
-              }}>
-                Open-Environmental{' '}
-                <span style={{
-                  background: t.gradient,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}>
-                  Massive Online Analysis
-                </span>
-              </h1>
-
-              <p style={{
-                fontSize: 'clamp(16px, 3vw, 20px)',
-                color: t.textSecondary,
-                lineHeight: '1.7',
-                marginBottom: '40px',
-                maxWidth: '700px',
-                margin: '0 auto 40px',
-                fontFamily: "'Inter', sans-serif",
-              }}>
-                A Python library for <strong style={{ color: t.text }}>Utilitarian Online Learning</strong> and{' '}
-                <strong style={{ color: t.text }}>Streaming Data</strong>. Build adaptive machine learning 
-                systems that learn continuously from data streams in real-time.
-              </p>
-
-              {/* CTA Buttons */}
-              <div style={{
-                display: 'flex',
-                gap: '16px',
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-                marginBottom: '60px',
-              }}>
-                <button
-                  onClick={() => setCurrentPage('documentation')}
-                  style={{
-                    padding: '14px 32px',
-                    borderRadius: '10px',
-                    border: 'none',
-                    background: t.gradient,
-                    color: '#FFFFFF',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                    boxShadow: '0 4px 14px rgba(14, 165, 233, 0.4)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(14, 165, 233, 0.5)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(14, 165, 233, 0.4)';
-                  }}
-                >
-                  Get Started
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                  </svg>
-                </button>
-                <a
-                  href="https://github.com/ZW-SIYUAN/OpenMOA"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    padding: '14px 32px',
-                    borderRadius: '10px',
-                    border: `2px solid ${t.border}`,
-                    background: t.bgSecondary,
-                    color: t.text,
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    textDecoration: 'none',
-                    transition: 'all 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = t.accent;
-                    e.currentTarget.style.background = t.bgTertiary;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = t.border;
-                    e.currentTarget.style.background = t.bgSecondary;
-                  }}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
-                  </svg>
-                  View on GitHub
-                </a>
-              </div>
-
-              {/* Code Installation */}
-              <div style={{
-                background: t.codeBg,
-                borderRadius: '12px',
-                padding: '20px 28px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '16px',
-                boxShadow: darkMode 
-                  ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)' 
-                  : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-              }}>
-                <code style={{
-                  color: t.codeText,
-                  fontSize: 'clamp(14px, 2.5vw, 16px)',
-                  fontFamily: "'JetBrains Mono', monospace",
-                }}>
-                  <span style={{ color: '#94A3B8' }}>$</span>{' '}
-                  <span style={{ color: '#F472B6' }}>pip</span>{' '}
-                  <span style={{ color: '#A5B4FC' }}>install</span>{' '}
-                  <span style={{ color: '#34D399' }}>openmoa</span>
-                </code>
-                <button
-                  onClick={() => copyToClipboard('pip install openmoa')}
-                  style={{
-                    padding: '8px',
-                    borderRadius: '6px',
-                    border: 'none',
-                    background: 'rgba(255,255,255,0.1)',
-                    color: copied ? '#34D399' : t.codeText,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-                  title="Copy to clipboard"
-                >
-                  {copied ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                  ) : (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-          </section>
-
-          {/* Features Section */}
-          <section style={{
-            padding: '100px 24px',
-            background: t.bg,
-          }}>
-            <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-              <h2 style={{
-                fontSize: 'clamp(28px, 5vw, 36px)',
-                fontWeight: '700',
-                color: t.text,
-                textAlign: 'center',
-                marginBottom: '16px',
-                fontFamily: "'Space Grotesk', sans-serif",
-              }}>
-                Why OpenMOA?
-              </h2>
-              <p style={{
-                fontSize: '18px',
-                color: t.textSecondary,
-                textAlign: 'center',
-                marginBottom: '60px',
-                maxWidth: '600px',
-                margin: '0 auto 60px',
-              }}>
-                Designed for researchers and practitioners working with streaming data and online learning.
-              </p>
-
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '24px',
-              }}>
-                {[
-                  {
-                    icon: (
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                      </svg>
-                    ),
-                    title: 'Real-time Learning',
-                    description: 'Process data streams instantly with adaptive algorithms that learn incrementally without storing historical data.',
-                  },
-                  {
-                    icon: (
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 6v6l4 2"/>
-                      </svg>
-                    ),
-                    title: 'Concept Drift Detection',
-                    description: 'Automatically detect and adapt to changes in data distribution over time with built-in drift detectors.',
-                  },
-                  {
-                    icon: (
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                      </svg>
-                    ),
-                    title: 'Modular Architecture',
-                    description: 'Combine classifiers, regressors, drift detectors, and evaluators with a clean, extensible API design.',
-                  },
-                  {
-                    icon: (
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-                        <line x1="12" y1="22.08" x2="12" y2="12"/>
-                      </svg>
-                    ),
-                    title: 'Scikit-learn Compatible',
-                    description: 'Familiar API patterns that integrate seamlessly with the Python scientific computing ecosystem.',
-                  },
-                  {
-                    icon: (
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-                      </svg>
-                    ),
-                    title: 'Extensive Algorithms',
-                    description: 'Hoeffding Trees, Adaptive Random Forest, ADWIN, DDM, and many more state-of-the-art streaming algorithms.',
-                  },
-                  {
-                    icon: (
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                      </svg>
-                    ),
-                    title: 'Rich Documentation',
-                    description: 'Comprehensive tutorials, API references, and real-world examples to get you started quickly.',
-                  },
-                ].map((feature, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      padding: '32px',
-                      borderRadius: '16px',
-                      background: t.bgSecondary,
-                      border: `1px solid ${t.border}`,
-                      transition: 'all 0.3s ease',
-                      cursor: 'default',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-4px)';
-                      e.currentTarget.style.boxShadow = t.cardShadow;
-                      e.currentTarget.style.borderColor = t.accent;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                      e.currentTarget.style.borderColor = t.border;
-                    }}
-                  >
-                    <div style={{
-                      width: '56px',
-                      height: '56px',
-                      borderRadius: '12px',
-                      background: t.accentLight,
-                      color: t.accent,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: '20px',
-                    }}>
-                      {feature.icon}
-                    </div>
-                    <h3 style={{
-                      fontSize: '20px',
-                      fontWeight: '600',
-                      color: t.text,
-                      marginBottom: '12px',
-                      fontFamily: "'Space Grotesk', sans-serif",
-                    }}>
-                      {feature.title}
-                    </h3>
-                    <p style={{
-                      fontSize: '15px',
-                      color: t.textSecondary,
-                      lineHeight: '1.6',
-                    }}>
-                      {feature.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Quick Example Section */}
-          <section style={{
-            padding: '100px 24px',
-            background: t.bgSecondary,
-          }}>
-            <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-              <h2 style={{
-                fontSize: 'clamp(28px, 5vw, 36px)',
-                fontWeight: '700',
-                color: t.text,
-                textAlign: 'center',
-                marginBottom: '16px',
-                fontFamily: "'Space Grotesk', sans-serif",
-              }}>
-                Quick Start
-              </h2>
-              <p style={{
-                fontSize: '18px',
-                color: t.textSecondary,
-                textAlign: 'center',
-                marginBottom: '40px',
-              }}>
-                Get up and running in minutes with this simple example.
-              </p>
-
-              <div style={{
-                background: t.codeBg,
-                borderRadius: '16px',
-                overflow: 'hidden',
-                boxShadow: darkMode 
-                  ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)' 
-                  : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-              }}>
-                <div style={{
-                  padding: '12px 20px',
-                  background: 'rgba(255,255,255,0.05)',
-                  borderBottom: '1px solid rgba(255,255,255,0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#FF5F56' }} />
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#FFBD2E' }} />
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#27CA40' }} />
-                  <span style={{ marginLeft: '12px', color: '#64748B', fontSize: '13px', fontFamily: "'JetBrains Mono', monospace" }}>
-                    example.py
-                  </span>
-                </div>
-                <pre style={{
-                  padding: '24px',
-                  margin: 0,
-                  overflow: 'auto',
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: 'clamp(12px, 2vw, 14px)',
-                  lineHeight: '1.7',
-                }}>
-                  <code style={{ color: t.codeText }}>
-                    <span style={{ color: '#C792EA' }}>from</span> <span style={{ color: '#82AAFF' }}>openmoa.streams</span> <span style={{ color: '#C792EA' }}>import</span> SEAGenerator{'\n'}
-                    <span style={{ color: '#C792EA' }}>from</span> <span style={{ color: '#82AAFF' }}>openmoa.classifiers</span> <span style={{ color: '#C792EA' }}>import</span> HoeffdingTree{'\n'}
-                    <span style={{ color: '#C792EA' }}>from</span> <span style={{ color: '#82AAFF' }}>openmoa.evaluation</span> <span style={{ color: '#C792EA' }}>import</span> prequential_evaluation{'\n'}
-                    {'\n'}
-                    <span style={{ color: '#676E95' }}># Create a data stream</span>{'\n'}
-                    stream = SEAGenerator(noise_percentage=<span style={{ color: '#F78C6C' }}>0.1</span>){'\n'}
-                    {'\n'}
-                    <span style={{ color: '#676E95' }}># Initialize the classifier</span>{'\n'}
-                    classifier = HoeffdingTree(){'\n'}
-                    {'\n'}
-                    <span style={{ color: '#676E95' }}># Run prequential evaluation</span>{'\n'}
-                    results = prequential_evaluation({'\n'}
-                    {'    '}stream=stream,{'\n'}
-                    {'    '}learner=classifier,{'\n'}
-                    {'    '}max_instances=<span style={{ color: '#F78C6C' }}>10000</span>,{'\n'}
-                    {'    '}sample_frequency=<span style={{ color: '#F78C6C' }}>1000</span>{'\n'}
-                    ){'\n'}
-                    {'\n'}
-                    <span style={{ color: '#89DDFF' }}>print</span>(<span style={{ color: '#C3E88D' }}>f"Accuracy: </span><span style={{ color: '#82AAFF' }}>{'{'}results.accuracy(){'}'}</span><span style={{ color: '#C3E88D' }}>"</span>)
-                  </code>
-                </pre>
-              </div>
-            </div>
-          </section>
+          </div>
+          <h3 class="feature-title">Real-time Learning</h3>
+          <p class="feature-desc">Process data streams instantly with adaptive algorithms that learn incrementally without storing historical data.</p>
         </div>
-      );
-
-      // Documentation Page
-      const DocumentationPage = () => {
-        const tutorials = [
-          { id: 'quickstart', title: 'Quick Start Guide', desc: 'Get started with OpenMOA in 5 minutes', time: '5 min' },
-          { id: 'streams', title: 'Working with Data Streams', desc: 'Learn how to create and manage streaming data', time: '15 min' },
-          { id: 'classifiers', title: 'Classification Algorithms', desc: 'Explore Hoeffding Trees and ensemble methods', time: '20 min' },
-          { id: 'drift', title: 'Concept Drift Detection', desc: 'Detect and adapt to distribution changes', time: '15 min' },
-          { id: 'evaluation', title: 'Evaluation Methods', desc: 'Prequential evaluation and metrics for streams', time: '10 min' },
-          { id: 'advanced', title: 'Advanced Topics', desc: 'Custom learners, parallel processing, and more', time: '25 min' },
-        ];
-
-        const apiModules = [
-          { name: 'openmoa.streams', desc: 'Data stream generators and readers' },
-          { name: 'openmoa.classifiers', desc: 'Online classification algorithms' },
-          { name: 'openmoa.regressors', desc: 'Online regression algorithms' },
-          { name: 'openmoa.drift_detection', desc: 'Drift detection methods' },
-          { name: 'openmoa.evaluation', desc: 'Evaluation and metrics' },
-          { name: 'openmoa.utils', desc: 'Utility functions and helpers' },
-        ];
-
-        return (
-          <div style={{ paddingTop: '64px', minHeight: '100vh', background: t.bg }} className="fade-in">
-            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '60px 24px' }}>
-              <h1 style={{
-                fontSize: 'clamp(32px, 6vw, 42px)',
-                fontWeight: '700',
-                color: t.text,
-                marginBottom: '16px',
-                fontFamily: "'Space Grotesk', sans-serif",
-              }}>
-                Documentation
-              </h1>
-              <p style={{
-                fontSize: '18px',
-                color: t.textSecondary,
-                marginBottom: '50px',
-                maxWidth: '600px',
-              }}>
-                Everything you need to build streaming machine learning applications with OpenMOA.
-              </p>
-
-              {/* Tutorials Section */}
-              <section style={{ marginBottom: '60px' }}>
-                <h2 style={{
-                  fontSize: '24px',
-                  fontWeight: '600',
-                  color: t.text,
-                  marginBottom: '24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  fontFamily: "'Space Grotesk', sans-serif",
-                }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="2">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                  </svg>
-                  Tutorials
-                </h2>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                  gap: '16px',
-                }}>
-                  {tutorials.map((tutorial) => (
-                    <div
-                      key={tutorial.id}
-                      onClick={() => setExpandedDoc(expandedDoc === tutorial.id ? null : tutorial.id)}
-                      style={{
-                        padding: '24px',
-                        borderRadius: '12px',
-                        background: t.bgSecondary,
-                        border: `1px solid ${expandedDoc === tutorial.id ? t.accent : t.border}`,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                      }}
-                      onMouseEnter={(e) => {
-                        if (expandedDoc !== tutorial.id) {
-                          e.currentTarget.style.borderColor = t.accent;
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (expandedDoc !== tutorial.id) {
-                          e.currentTarget.style.borderColor = t.border;
-                        }
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <h3 style={{
-                            fontSize: '17px',
-                            fontWeight: '600',
-                            color: t.text,
-                            marginBottom: '8px',
-                          }}>
-                            {tutorial.title}
-                          </h3>
-                          <p style={{
-                            fontSize: '14px',
-                            color: t.textSecondary,
-                            marginBottom: expandedDoc === tutorial.id ? '16px' : 0,
-                          }}>
-                            {tutorial.desc}
-                          </p>
-                        </div>
-                        <span style={{
-                          padding: '4px 10px',
-                          borderRadius: '6px',
-                          background: t.bgTertiary,
-                          color: t.textSecondary,
-                          fontSize: '13px',
-                          whiteSpace: 'nowrap',
-                          marginLeft: '12px',
-                          flexShrink: 0,
-                        }}>
-                          {tutorial.time}
-                        </span>
-                      </div>
-                      {expandedDoc === tutorial.id && (
-                        <div style={{
-                          paddingTop: '16px',
-                          borderTop: `1px solid ${t.border}`,
-                          marginTop: '16px',
-                        }}>
-                          <p style={{ color: t.textSecondary, fontSize: '14px', lineHeight: '1.6' }}>
-                            Tutorial content will be displayed here. This section will contain step-by-step 
-                            instructions, code examples, and explanations.
-                          </p>
-                          <button style={{
-                            marginTop: '16px',
-                            padding: '10px 20px',
-                            borderRadius: '8px',
-                            border: 'none',
-                            background: t.accent,
-                            color: '#FFFFFF',
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            cursor: 'pointer',
-                            transition: 'opacity 0.2s',
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
-                          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                          >
-                            Start Tutorial →
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* API Reference Section */}
-              <section>
-                <h2 style={{
-                  fontSize: '24px',
-                  fontWeight: '600',
-                  color: t.text,
-                  marginBottom: '24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  fontFamily: "'Space Grotesk', sans-serif",
-                }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="2">
-                    <polyline points="16 18 22 12 16 6"/>
-                    <polyline points="8 6 2 12 8 18"/>
-                  </svg>
-                  API Reference
-                </h2>
-                <div style={{
-                  background: t.bgSecondary,
-                  borderRadius: '12px',
-                  border: `1px solid ${t.border}`,
-                  overflow: 'hidden',
-                }}>
-                  {apiModules.map((module, idx) => (
-                    <div
-                      key={module.name}
-                      style={{
-                        padding: '20px 24px',
-                        borderBottom: idx < apiModules.length - 1 ? `1px solid ${t.border}` : 'none',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s ease',
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = t.bgTertiary}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <div>
-                        <code style={{
-                          fontSize: '15px',
-                          fontWeight: '600',
-                          color: t.accent,
-                          fontFamily: "'JetBrains Mono', monospace",
-                        }}>
-                          {module.name}
-                        </code>
-                        <p style={{
-                          fontSize: '14px',
-                          color: t.textSecondary,
-                          marginTop: '4px',
-                        }}>
-                          {module.desc}
-                        </p>
-                      </div>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.textSecondary} strokeWidth="2">
-                        <path d="M9 18l6-6-6-6"/>
-                      </svg>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
           </div>
-        );
-      };
-
-      // Blog Page
-      const BlogPage = () => {
-        const posts = [
-          {
-            id: 1,
-            title: 'Introducing OpenMOA v0.1.0',
-            date: 'January 2025',
-            category: 'Release',
-            excerpt: 'We are excited to announce the first public release of OpenMOA, a Python library designed for streaming data analysis and online machine learning.',
-            readTime: '5 min read',
-          },
-          {
-            id: 2,
-            title: 'Understanding Concept Drift in Data Streams',
-            date: 'January 2025',
-            category: 'Tutorial',
-            excerpt: 'Learn about the different types of concept drift and how OpenMOA helps you detect and adapt to changes in your data distribution.',
-            readTime: '8 min read',
-          },
-          {
-            id: 3,
-            title: 'Benchmarking Hoeffding Trees vs Adaptive Random Forest',
-            date: 'December 2024',
-            category: 'Research',
-            excerpt: 'A comprehensive comparison of two popular streaming classification algorithms on various synthetic and real-world datasets.',
-            readTime: '12 min read',
-          },
-          {
-            id: 4,
-            title: 'Best Practices for Streaming ML Pipelines',
-            date: 'December 2024',
-            category: 'Guide',
-            excerpt: 'Practical tips and patterns for building robust, production-ready streaming machine learning systems with OpenMOA.',
-            readTime: '10 min read',
-          },
-        ];
-
-        const categoryColors = {
-          'Release': { bg: darkMode ? '#064E3B' : '#DCFCE7', text: darkMode ? '#34D399' : '#166534' },
-          'Tutorial': { bg: darkMode ? '#1E3A5F' : '#DBEAFE', text: darkMode ? '#60A5FA' : '#1E40AF' },
-          'Research': { bg: darkMode ? '#4C1D95' : '#F3E8FF', text: darkMode ? '#A78BFA' : '#7C3AED' },
-          'Guide': { bg: darkMode ? '#78350F' : '#FEF3C7', text: darkMode ? '#FBBF24' : '#B45309' },
-        };
-
-        return (
-          <div style={{ paddingTop: '64px', minHeight: '100vh', background: t.bg }} className="fade-in">
-            <div style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 24px' }}>
-              <h1 style={{
-                fontSize: 'clamp(32px, 6vw, 42px)',
-                fontWeight: '700',
-                color: t.text,
-                marginBottom: '16px',
-                fontFamily: "'Space Grotesk', sans-serif",
-              }}>
-                Blog
-              </h1>
-              <p style={{
-                fontSize: '18px',
-                color: t.textSecondary,
-                marginBottom: '50px',
-              }}>
-                Updates, tutorials, and insights from the OpenMOA team.
-              </p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                {posts.map((post) => (
-                  <article
-                    key={post.id}
-                    style={{
-                      padding: '32px',
-                      borderRadius: '16px',
-                      background: t.bgSecondary,
-                      border: `1px solid ${t.border}`,
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = t.accent;
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = t.cardShadow;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = t.border;
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
-                      <span style={{
-                        padding: '4px 12px',
-                        borderRadius: '6px',
-                        background: categoryColors[post.category].bg,
-                        color: categoryColors[post.category].text,
-                        fontSize: '13px',
-                        fontWeight: '500',
-                      }}>
-                        {post.category}
-                      </span>
-                      <span style={{ color: t.textSecondary, fontSize: '14px' }}>
-                        {post.date}
-                      </span>
-                      <span style={{ color: t.textSecondary, fontSize: '14px' }}>
-                        •
-                      </span>
-                      <span style={{ color: t.textSecondary, fontSize: '14px' }}>
-                        {post.readTime}
-                      </span>
-                    </div>
-                    <h2 style={{
-                      fontSize: 'clamp(20px, 4vw, 24px)',
-                      fontWeight: '600',
-                      color: t.text,
-                      marginBottom: '12px',
-                      fontFamily: "'Space Grotesk', sans-serif",
-                    }}>
-                      {post.title}
-                    </h2>
-                    <p style={{
-                      fontSize: '16px',
-                      color: t.textSecondary,
-                      lineHeight: '1.6',
-                    }}>
-                      {post.excerpt}
-                    </p>
-                    <div style={{
-                      marginTop: '20px',
-                      color: t.accent,
-                      fontSize: '15px',
-                      fontWeight: '500',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                    }}>
-                      Read more
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      };
-
-      // Contact Page
-      const ContactPage = () => {
-        const team = [
-          {
-            name: 'Zhili Wang',
-            role: 'PhD Student',
-            affiliation: 'Department of Data Science, School of Computing, Data Sciences & Physics (CDSP), William & Mary',
-            description: 'Lead developer of OpenMOA.',
-          },
-          {
-            name: 'Heitor Murilo Gomes',
-            role: 'Senior Lecturer (Assistant Professor)',
-            affiliation: 'Victoria University of Wellington, New Zealand',
-            description: 'Machine Learning Researcher and Data Scientist. Previously Senior Researcher and Co-Director of the AI Institute at the University of Waikato. Research focuses on Adaptive Machine Learning, with emphasis on data stream learning and online continual learning.',
-            note: 'For collaboration opportunities or PhD inquiries, please contact via institutional email.',
-          },
-          {
-            name: 'Yi He',
-            role: 'Assistant Professor (PI)',
-            affiliation: 'School of Computing, Data Sciences, and Physics, William & Mary',
-            description: 'Previously at Old Dominion University (2021). PhD from University of Louisiana at Lafayette (2020) under Dr. Xindong Wu. B.E. from Harbin Institute of Technology (2013). Research interests: data mining, streaming algorithms, graph learning, and AI for conservation.',
-            awards: ['IEEE TCII Volunteer Award (2022)', 'NSF CRII Award (2023)'],
-          },
-        ];
-
-        return (
-          <div style={{ paddingTop: '64px', minHeight: '100vh', background: t.bg }} className="fade-in">
-            <div style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 24px' }}>
-              <h1 style={{
-                fontSize: 'clamp(32px, 6vw, 42px)',
-                fontWeight: '700',
-                color: t.text,
-                marginBottom: '16px',
-                fontFamily: "'Space Grotesk', sans-serif",
-              }}>
-                Contact
-              </h1>
-              <p style={{
-                fontSize: '18px',
-                color: t.textSecondary,
-                marginBottom: '50px',
-              }}>
-                Meet the team behind OpenMOA.
-              </p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                {team.map((member, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      padding: '32px',
-                      borderRadius: '16px',
-                      background: t.bgSecondary,
-                      border: `1px solid ${t.border}`,
-                    }}
-                  >
-                    <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-                      {/* Avatar */}
-                      <div style={{
-                        width: '80px',
-                        height: '80px',
-                        borderRadius: '50%',
-                        background: t.gradient,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: '#FFFFFF',
-                        fontSize: '28px',
-                        fontWeight: '600',
-                        fontFamily: "'Space Grotesk', sans-serif",
-                        flexShrink: 0,
-                      }}>
-                        {member.name.split(' ').map(n => n[0]).join('')}
-                      </div>
-                      
-                      <div style={{ flex: 1, minWidth: '250px' }}>
-                        <h2 style={{
-                          fontSize: '22px',
-                          fontWeight: '600',
-                          color: t.text,
-                          marginBottom: '4px',
-                          fontFamily: "'Space Grotesk', sans-serif",
-                        }}>
-                          {member.name}
-                        </h2>
-                        <p style={{
-                          fontSize: '15px',
-                          color: t.accent,
-                          fontWeight: '500',
-                          marginBottom: '8px',
-                        }}>
-                          {member.role}
-                        </p>
-                        <p style={{
-                          fontSize: '14px',
-                          color: t.textSecondary,
-                          marginBottom: '16px',
-                        }}>
-                          {member.affiliation}
-                        </p>
-                        <p style={{
-                          fontSize: '15px',
-                          color: t.text,
-                          lineHeight: '1.6',
-                          marginBottom: member.awards ? '16px' : '0',
-                        }}>
-                          {member.description}
-                        </p>
-                        
-                        {member.awards && (
-                          <div style={{ marginBottom: '16px' }}>
-                            <p style={{ fontSize: '14px', color: t.textSecondary, marginBottom: '8px' }}>
-                              Awards:
-                            </p>
-                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                              {member.awards.map((award, i) => (
-                                <span
-                                  key={i}
-                                  style={{
-                                    padding: '4px 12px',
-                                    borderRadius: '6px',
-                                    background: t.accentLight,
-                                    color: t.accent,
-                                    fontSize: '13px',
-                                  }}
-                                >
-                                  {award}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {member.note && (
-                          <p style={{
-                            fontSize: '14px',
-                            color: t.textSecondary,
-                            fontStyle: 'italic',
-                            marginTop: '12px',
-                            padding: '12px',
-                            background: t.bgTertiary,
-                            borderRadius: '8px',
-                          }}>
-                            {member.note}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* General Contact */}
-              <div style={{
-                marginTop: '48px',
-                padding: '32px',
-                borderRadius: '16px',
-                background: t.bgSecondary,
-                border: `1px solid ${t.border}`,
-                textAlign: 'center',
-              }}>
-                <h3 style={{
-                  fontSize: '20px',
-                  fontWeight: '600',
-                  color: t.text,
-                  marginBottom: '12px',
-                }}>
-                  Get in Touch
-                </h3>
-                <p style={{
-                  fontSize: '15px',
-                  color: t.textSecondary,
-                  marginBottom: '24px',
-                }}>
-                  Have questions or want to contribute? Reach out through GitHub or open an issue.
-                </p>
-                <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <a
-                    href="https://github.com/ZW-SIYUAN/OpenMOA"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      padding: '12px 24px',
-                      borderRadius: '10px',
-                      background: t.gradient,
-                      color: '#FFFFFF',
-                      fontSize: '15px',
-                      fontWeight: '500',
-                      textDecoration: 'none',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      transition: 'opacity 0.2s',
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
-                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
-                    </svg>
-                    GitHub Repository
-                  </a>
-                  <a
-                    href="https://github.com/ZW-SIYUAN/OpenMOA/issues"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      padding: '12px 24px',
-                      borderRadius: '10px',
-                      border: `2px solid ${t.border}`,
-                      background: t.bgSecondary,
-                      color: t.text,
-                      fontSize: '15px',
-                      fontWeight: '500',
-                      textDecoration: 'none',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      transition: 'all 0.2s',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = t.accent;
-                      e.currentTarget.style.background = t.bgTertiary;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = t.border;
-                      e.currentTarget.style.background = t.bgSecondary;
-                    }}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10"/>
-                      <path d="M12 16v-4M12 8h.01"/>
-                    </svg>
-                    Open an Issue
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      };
-
-      // Footer
-      const Footer = () => (
-        <footer style={{
-          padding: '48px 24px',
-          background: t.bgSecondary,
-          borderTop: `1px solid ${t.border}`,
-        }}>
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '24px',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '8px',
-                background: t.gradient,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: '700',
-                fontSize: '16px',
-                color: '#FFFFFF',
-              }}>
-                M
-              </div>
-              <span style={{ color: t.textSecondary, fontSize: '14px' }}>
-                © 2025 OpenMOA. Open source under MIT License.
-              </span>
-            </div>
-            <div style={{ display: 'flex', gap: '24px' }}>
-              <a 
-                href="https://github.com/ZW-SIYUAN/OpenMOA" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                style={{ color: t.textSecondary, textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.color = t.accent}
-                onMouseLeave={(e) => e.currentTarget.style.color = t.textSecondary}
-              >
-                GitHub
-              </a>
-              <a 
-                href="https://openmoa.net" 
-                style={{ color: t.textSecondary, textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.color = t.accent}
-                onMouseLeave={(e) => e.currentTarget.style.color = t.textSecondary}
-              >
-                openmoa.net
-              </a>
-            </div>
-          </div>
-        </footer>
-      );
-
-      // Render current page
-      const renderPage = () => {
-        switch (currentPage) {
-          case 'home': return <HomePage />;
-          case 'documentation': return <DocumentationPage />;
-          case 'blog': return <BlogPage />;
-          case 'contact': return <ContactPage />;
-          default: return <HomePage />;
-        }
-      };
-
-      return (
-        <div style={{
-          minHeight: '100vh',
-          background: t.bg,
-          color: t.text,
-          fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-          transition: 'background 0.3s ease, color 0.3s ease',
-        }}>
-          <Navigation />
-          {renderPage()}
-          <Footer />
+          <h3 class="feature-title">Concept Drift Detection</h3>
+          <p class="feature-desc">Automatically detect and adapt to changes in data distribution over time with built-in drift detectors.</p>
         </div>
-      );
-    };
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Modular Architecture</h3>
+          <p class="feature-desc">Combine classifiers, regressors, drift detectors, and evaluators with a clean, extensible API design.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Scikit-learn Compatible</h3>
+          <p class="feature-desc">Familiar API patterns that integrate seamlessly with the Python scientific computing ecosystem.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Extensive Algorithms</h3>
+          <p class="feature-desc">Hoeffding Trees, Adaptive Random Forest, ADWIN, DDM, and many more state-of-the-art streaming algorithms.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Rich Documentation</h3>
+          <p class="feature-desc">Comprehensive tutorials, API references, and real-world examples to get you started quickly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<OpenMOAWebsite />);
-  </script>
+  <!-- Quick Start Section -->
+  <section class="quickstart">
+    <div class="quickstart-content">
+      <h2 class="page-title text-center">Quick Start</h2>
+      <p class="page-subtitle text-center" style="margin: 0 auto 40px;">
+        Get up and running in minutes with this simple example.
+      </p>
+      
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-dot red"></span>
+          <span class="code-block-dot yellow"></span>
+          <span class="code-block-dot green"></span>
+          <span class="code-block-title">example.py</span>
+        </div>
+        <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.streams</span> <span class="token-keyword">import</span> SEAGenerator
+<span class="token-keyword">from</span> <span class="token-module">openmoa.classifiers</span> <span class="token-keyword">import</span> HoeffdingTree
+<span class="token-keyword">from</span> <span class="token-module">openmoa.evaluation</span> <span class="token-keyword">import</span> prequential_evaluation
+
+<span class="token-comment"># Create a data stream</span>
+stream = SEAGenerator(noise_percentage=<span class="token-number">0.1</span>)
+
+<span class="token-comment"># Initialize the classifier</span>
+classifier = HoeffdingTree()
+
+<span class="token-comment"># Run prequential evaluation</span>
+results = prequential_evaluation(
+    stream=stream,
+    learner=classifier,
+    max_instances=<span class="token-number">10000</span>,
+    sample_frequency=<span class="token-number">1000</span>
+)
+
+<span class="token-function">print</span>(<span class="token-string">f"Accuracy: {results.accuracy()}"</span>)</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="footer-logo-icon">M</div>
+        <span class="footer-text">© 2025 OpenMOA. Open source under MIT License.</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="footer-link">GitHub</a>
+        <a href="https://openmoa.net" class="footer-link">openmoa.net</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/script.js"></script>
 </body>
 </html>
