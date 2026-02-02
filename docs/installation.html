@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Installation - OpenMOA Documentation</title>
+  <meta name="description" content="Install OpenMOA and set up your environment">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .prereq-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .prereq-card {
+      padding: 20px;
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    .prereq-card h4 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+    .prereq-card ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .prereq-card li {
+      margin-bottom: 4px;
+    }
+    .env-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+    .env-table th, .env-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .env-table th {
+      background: var(--bg-tertiary);
+      font-weight: 600;
+      color: var(--text);
+    }
+    .env-table td {
+      color: var(--text-secondary);
+    }
+    .env-table code {
+      font-size: 13px;
+    }
+    .troubleshoot-item {
+      padding: 16px 20px;
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      border-left: 4px solid var(--accent);
+      margin-bottom: 16px;
+    }
+    .troubleshoot-item strong {
+      color: var(--text);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .troubleshoot-item p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .dep-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .dep-item {
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    .dep-item code {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .dep-item span {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="../index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+    
+    <div class="navbar-links">
+      <a href="../index.html" class="navbar-link">Home</a>
+      <a href="index.html" class="navbar-link active">Documentation</a>
+      <a href="../blog/index.html" class="navbar-link">Blog</a>
+      <a href="../contact.html" class="navbar-link">Contact</a>
+    </div>
+    
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+    
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Docs Layout -->
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Getting Started</div>
+        <a href="quickstart.html" class="docs-sidebar-link">Quick Start Guide</a>
+        <a href="installation.html" class="docs-sidebar-link active">Installation</a>
+        <a href="concepts.html" class="docs-sidebar-link">Core Concepts</a>
+      </div>
+      
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Tutorials</div>
+        <a href="tutorials/streams.html" class="docs-sidebar-link">Working with Data Streams</a>
+        <a href="tutorials/classifiers.html" class="docs-sidebar-link">Classification Algorithms</a>
+        <a href="tutorials/drift.html" class="docs-sidebar-link">Concept Drift Detection</a>
+        <a href="tutorials/evaluation.html" class="docs-sidebar-link">Evaluation Methods</a>
+        <a href="tutorials/advanced.html" class="docs-sidebar-link">Advanced Topics</a>
+      </div>
+      
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">API Reference</div>
+        <a href="../api/streams.html" class="docs-sidebar-link">openmoa.streams</a>
+        <a href="../api/classifiers.html" class="docs-sidebar-link">openmoa.classifiers</a>
+        <a href="../api/regressors.html" class="docs-sidebar-link">openmoa.regressors</a>
+        <a href="../api/drift.html" class="docs-sidebar-link">openmoa.drift_detection</a>
+        <a href="../api/evaluation.html" class="docs-sidebar-link">openmoa.evaluation</a>
+        <a href="../api/utils.html" class="docs-sidebar-link">openmoa.utils</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content fade-in">
+      <h1>Installation</h1>
+      <p>Install OpenMOA and set up your environment for streaming machine learning.</p>
+      
+      <!-- Prerequisites -->
+      <h2 id="prerequisites">Prerequisites</h2>
+      
+      <div class="prereq-grid">
+        <div class="prereq-card">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            Python
+          </h4>
+          <ul>
+            <li>Minimum: Python ≥ 3.9</li>
+            <li>Recommended: Python 3.11</li>
+            <li>Tested: Python 3.10, 3.11, 3.12</li>
+          </ul>
+        </div>
+        
+        <div class="prereq-card">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+              <rect x="4" y="4" width="16" height="16" rx="2"/>
+              <path d="M9 9h6v6H9z"/>
+            </svg>
+            Java (Required)
+          </h4>
+          <ul>
+            <li>OpenJDK or Oracle JDK</li>
+            <li>Verify: <code>java -version</code></li>
+            <li>Set <code>JAVA_HOME</code> if needed</li>
+          </ul>
+        </div>
+        
+        <div class="prereq-card">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+            PyTorch (Optional)
+          </h4>
+          <ul>
+            <li>Only for deep learning algorithms</li>
+            <li>Not needed for Hoeffding Tree, FOBOS, etc.</li>
+            <li>Required for <code>TorchClassifyStream</code></li>
+          </ul>
+        </div>
+      </div>
+      
+      <p style="font-size: 14px; color: var(--text-secondary); background: var(--bg-tertiary); padding: 12px 16px; border-radius: 8px;">
+        <strong>Note:</strong> OpenMOA uses the MOA (Massive Online Analysis) Java framework under the hood, bridged via JPype1. This is why Java is required.
+      </p>
+      
+      <!-- Quick Install -->
+      <h2 id="quick-install">Quick Install (User)</h2>
+      
+      <pre><code><span class="token-comment"># Step 1: Verify Java environment</span>
+java -version
+
+<span class="token-comment"># Step 2: (Optional) Create virtual environment</span>
+conda create -n openmoa python=3.11
+conda activate openmoa
+
+<span class="token-comment"># Step 3: (Optional) Install PyTorch CPU version</span>
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+<span class="token-comment"># Step 4: Install OpenMOA</span>
+pip install openmoa
+
+<span class="token-comment"># Step 5: Verify installation</span>
+python -c "import openmoa; print(openmoa.__version__)"</code></pre>
+      
+      <p>During installation, two build scripts run automatically:</p>
+      <ul>
+        <li><strong>Download MOA JAR</strong> (<code>moa.jar</code>) — The core MOA Java engine</li>
+        <li><strong>Generate Python stubs</strong> — For IDE autocompletion support</li>
+      </ul>
+      
+      <!-- Developer Install -->
+      <h2 id="developer-install">Developer Install</h2>
+      
+      <pre><code><span class="token-comment"># Step 1: Install Java and PyTorch (same as above)</span>
+
+<span class="token-comment"># Step 2: Install Pandoc (required for documentation)</span>
+<span class="token-comment"># Ubuntu:</span>
+sudo apt-get install -y pandoc
+<span class="token-comment"># macOS:</span>
+brew install pandoc
+<span class="token-comment"># conda:</span>
+conda install -c conda-forge pandoc
+
+<span class="token-comment"># Step 3: Clone repository</span>
+git clone https://github.com/ZW-SIYUAN/OpenMOA.git
+cd OpenMOA
+
+<span class="token-comment"># Step 4: Editable install with dev dependencies</span>
+pip install --editable ".[dev,doc]"</code></pre>
+      
+      <p><strong>Available invoke commands for developers:</strong></p>
+      
+      <div class="dep-list">
+        <div class="dep-item">
+          <code>invoke build.download-moa</code>
+          <span>Manually download MOA JAR</span>
+        </div>
+        <div class="dep-item">
+          <code>invoke build.stubs</code>
+          <span>Regenerate type stubs</span>
+        </div>
+        <div class="dep-item">
+          <code>invoke test.pytest</code>
+          <span>Run unit tests</span>
+        </div>
+        <div class="dep-item">
+          <code>invoke test.nb</code>
+          <span>Run notebook tests</span>
+        </div>
+        <div class="dep-item">
+          <code>invoke docs.build</code>
+          <span>Build Sphinx documentation</span>
+        </div>
+        <div class="dep-item">
+          <code>invoke lint</code>
+          <span>Code quality checks</span>
+        </div>
+      </div>
+      
+      <!-- Docker Install -->
+      <h2 id="docker-install">Docker Install</h2>
+      
+      <pre><code>cd docker
+docker compose build
+docker compose up
+<span class="token-comment"># Access Jupyter at http://localhost:8888</span></code></pre>
+      
+      <p>The Docker image is based on <code>jupyter/base-notebook</code> and includes OpenJDK 8, PyTorch CPU, and OpenMOA pre-installed.</p>
+      
+      <!-- Environment Variables -->
+      <h2 id="environment-variables">Environment Variables</h2>
+      
+      <table class="env-table">
+        <thead>
+          <tr>
+            <th>Variable</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>OPENMOA_DATASETS_DIR</code></td>
+            <td><code>./data</code></td>
+            <td>Dataset auto-download/storage directory</td>
+          </tr>
+          <tr>
+            <td><code>OPENMOA_JVM_ARGS</code></td>
+            <td><code>-Xmx8g -Xss10M</code></td>
+            <td>JVM memory and stack size parameters</td>
+          </tr>
+          <tr>
+            <td><code>OPENMOA_MOA_JAR</code></td>
+            <td><code>&lt;package&gt;/jar/moa.jar</code></td>
+            <td>Custom MOA JAR path (advanced)</td>
+          </tr>
+          <tr>
+            <td><code>JAVA_HOME</code></td>
+            <td>Auto-detected</td>
+            <td>Specify Java installation path</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- Verify Installation -->
+      <h2 id="verify-installation">Verify Installation</h2>
+      
+      <pre><code><span class="token-keyword">import</span> <span class="token-module">openmoa</span>
+<span class="token-function">print</span>(openmoa.__version__)      <span class="token-comment"># Print version</span>
+
+<span class="token-comment"># Quick test: load built-in dataset and read one instance</span>
+<span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> ElectricityTiny
+stream = ElectricityTiny()
+instance = stream.next_instance()
+<span class="token-function">print</span>(<span class="token-string">f"Features: {instance.x}"</span>)
+<span class="token-function">print</span>(<span class="token-string">f"Label: {instance.y_label}"</span>)</code></pre>
+      
+      <p>If the above code runs without errors, installation is successful.</p>
+      
+      <!-- Core Dependencies -->
+      <h2 id="core-dependencies">Core Dependencies</h2>
+      
+      <div class="dep-list">
+        <div class="dep-item">
+          <code>jpype1 >= 1.5.1</code>
+          <span>Python-Java bridge for MOA</span>
+        </div>
+        <div class="dep-item">
+          <code>numpy</code>
+          <span>Numerical computation</span>
+        </div>
+        <div class="dep-item">
+          <code>pandas</code>
+          <span>Data processing and output</span>
+        </div>
+        <div class="dep-item">
+          <code>scikit-learn</code>
+          <span>ML tools and sklearn wrappers</span>
+        </div>
+        <div class="dep-item">
+          <code>matplotlib / seaborn</code>
+          <span>Visualization</span>
+        </div>
+        <div class="dep-item">
+          <code>tqdm</code>
+          <span>Progress bars</span>
+        </div>
+        <div class="dep-item">
+          <code>click</code>
+          <span>CLI tools</span>
+        </div>
+      </div>
+      
+      <!-- Troubleshooting -->
+      <h2 id="troubleshooting">Troubleshooting</h2>
+      
+      <div class="troubleshoot-item">
+        <strong>OpenmoaImportError: Could not find Java</strong>
+        <p>Install Java and ensure <code>java -version</code> runs correctly, or set the <code>JAVA_HOME</code> environment variable.</p>
+      </div>
+      
+      <div class="troubleshoot-item">
+        <strong>JVM out of memory</strong>
+        <p>Increase memory allocation: <code>export OPENMOA_JVM_ARGS="-Xmx16g -Xss10M"</code></p>
+      </div>
+      
+      <div class="troubleshoot-item">
+        <strong>Dataset download failed</strong>
+        <p>Check your network connection, or manually download the dataset and place it in the <code>OPENMOA_DATASETS_DIR</code> directory.</p>
+      </div>
+      
+      <!-- Navigation -->
+      <div style="display: flex; justify-content: space-between; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);">
+        <a href="quickstart.html" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Previous: Quick Start
+        </a>
+        <a href="concepts.html" class="btn btn-secondary">
+          Next: Core Concepts
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../assets/script.js"></script>
+</body>
+</html>

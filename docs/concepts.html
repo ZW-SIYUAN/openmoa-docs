@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Core Concepts - OpenMOA Documentation</title>
+  <meta name="description" content="Understand streams, online learning, and drift detection in OpenMOA">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .concept-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+    .concept-table th, .concept-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .concept-table th {
+      background: var(--bg-tertiary);
+      font-weight: 600;
+      color: var(--text);
+    }
+    .concept-table td {
+      color: var(--text-secondary);
+    }
+    .concept-table code {
+      font-size: 13px;
+    }
+    .architecture-box {
+      background: var(--code-bg);
+      border-radius: 12px;
+      padding: 24px;
+      overflow-x: auto;
+      margin: 24px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--code-text);
+    }
+    .protocol-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+    }
+    .protocol-box pre {
+      margin: 0;
+      background: var(--code-bg);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .detector-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .detector-item {
+      padding: 16px;
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    .detector-item strong {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+    .detector-item span {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .wrapper-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+    .wrapper-table th, .wrapper-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .wrapper-table th {
+      background: var(--bg-tertiary);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="../index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+    
+    <div class="navbar-links">
+      <a href="../index.html" class="navbar-link">Home</a>
+      <a href="index.html" class="navbar-link active">Documentation</a>
+      <a href="../blog/index.html" class="navbar-link">Blog</a>
+      <a href="../contact.html" class="navbar-link">Contact</a>
+    </div>
+    
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+    
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Docs Layout -->
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Getting Started</div>
+        <a href="quickstart.html" class="docs-sidebar-link">Quick Start Guide</a>
+        <a href="installation.html" class="docs-sidebar-link">Installation</a>
+        <a href="concepts.html" class="docs-sidebar-link active">Core Concepts</a>
+      </div>
+      
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Tutorials</div>
+        <a href="tutorials/streams.html" class="docs-sidebar-link">Working with Data Streams</a>
+        <a href="tutorials/classifiers.html" class="docs-sidebar-link">Classification Algorithms</a>
+        <a href="tutorials/drift.html" class="docs-sidebar-link">Concept Drift Detection</a>
+        <a href="tutorials/evaluation.html" class="docs-sidebar-link">Evaluation Methods</a>
+        <a href="tutorials/advanced.html" class="docs-sidebar-link">Advanced Topics</a>
+      </div>
+      
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">API Reference</div>
+        <a href="../api/streams.html" class="docs-sidebar-link">openmoa.streams</a>
+        <a href="../api/classifiers.html" class="docs-sidebar-link">openmoa.classifiers</a>
+        <a href="../api/regressors.html" class="docs-sidebar-link">openmoa.regressors</a>
+        <a href="../api/drift.html" class="docs-sidebar-link">openmoa.drift_detection</a>
+        <a href="../api/evaluation.html" class="docs-sidebar-link">openmoa.evaluation</a>
+        <a href="../api/utils.html" class="docs-sidebar-link">openmoa.utils</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content fade-in">
+      <h1>Core Concepts</h1>
+      <p>Understand streams, online learning, and drift detection — the foundations of OpenMOA.</p>
+      
+      <!-- Overview -->
+      <p style="background: var(--bg-tertiary); padding: 16px 20px; border-radius: 8px; font-size: 15px; line-height: 1.7;">
+        OpenMOA is a machine learning framework designed for <strong>data streams</strong>. Unlike traditional batch learning where all data is available upfront, stream learning processes data that arrives one instance at a time, cannot be revisited, and whose distribution may change over time. OpenMOA is built around four core abstractions: <strong>Stream</strong>, <strong>Instance</strong>, <strong>Learner</strong>, and <strong>Evaluator</strong>.
+      </p>
+      
+      <!-- Stream -->
+      <h2 id="stream">1. Stream — Data Stream</h2>
+      <p>The <code>Stream</code> is the fundamental abstraction in OpenMOA. All data sources implement the Stream interface, providing iterator-based access to instances one at a time.</p>
+      
+      <h4>Core Interface Methods:</h4>
+      <pre><code><span class="token-keyword">class</span> <span class="token-module">Stream</span>(ABC):
+    <span class="token-keyword">def</span> <span class="token-function">next_instance</span>(self) -> Instance:
+        <span class="token-string">"""Return the next instance from the stream"""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">has_more_instances</span>(self) -> bool:
+        <span class="token-string">"""Check if more instances are available"""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">get_schema</span>(self) -> Schema:
+        <span class="token-string">"""Return stream schema (num features, classes, etc.)"""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">restart</span>(self):
+        <span class="token-string">"""Reset stream to the beginning"""</span></code></pre>
+      
+      <p>Stream also implements Python's Iterator protocol, supporting <code>for instance in stream:</code> syntax.</p>
+      
+      <h4>Built-in Stream Types:</h4>
+      <table class="concept-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>ARFFStream</code></td>
+            <td>Load from ARFF files</td>
+            <td><code>ARFFStream("data.arff")</code></td>
+          </tr>
+          <tr>
+            <td><code>CSVStream</code></td>
+            <td>Load from CSV files</td>
+            <td><code>CSVStream("data.csv")</code></td>
+          </tr>
+          <tr>
+            <td><code>LibsvmStream</code></td>
+            <td>Load from LibSVM format (sparse)</td>
+            <td><code>LibsvmStream("data.libsvm")</code></td>
+          </tr>
+          <tr>
+            <td><code>NumpyStream</code></td>
+            <td>Create from NumPy arrays</td>
+            <td><code>NumpyStream(X, y)</code></td>
+          </tr>
+          <tr>
+            <td><code>MOAStream</code></td>
+            <td>Wrap MOA Java stream objects</td>
+            <td>For MOA generators</td>
+          </tr>
+          <tr>
+            <td><code>ConcatStream</code></td>
+            <td>Concatenate multiple streams</td>
+            <td><code>ConcatStream([s1, s2])</code></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h4>Built-in Datasets (Auto-download):</h4>
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Electricity, RCV1, Magic04
+
+stream = Electricity()  <span class="token-comment"># Auto-downloads on first use</span></code></pre>
+      <p>Includes binary classification (Australian, Spambase, Adult, RCV1), multi-class (DryBean, Optdigits), and regression (Bike, Fried) tasks.</p>
+      
+      <!-- Schema -->
+      <h2 id="schema">2. Schema — Stream Structure</h2>
+      <p>The <code>Schema</code> describes metadata about a stream — it's the bridge between streams and learners.</p>
+      
+      <pre><code>schema = stream.get_schema()
+
+schema.get_num_attributes()  <span class="token-comment"># Number of features (excluding target)</span>
+schema.get_num_classes()     <span class="token-comment"># Number of classes (classification)</span>
+schema.is_classification()   <span class="token-comment"># Is this a classification task?</span>
+schema.is_regression()       <span class="token-comment"># Is this a regression task?</span>
+schema.get_label_values()    <span class="token-comment"># List of possible class labels</span></code></pre>
+      
+      <p>Schema is passed to learners during initialization to ensure model structure matches the data.</p>
+      
+      <!-- Instance -->
+      <h2 id="instance">3. Instance — Data Point</h2>
+      <p>Each data point read from a stream is an <code>Instance</code> object.</p>
+      
+      <h4>Classification Instance (LabeledInstance):</h4>
+      <pre><code>instance = stream.next_instance()
+instance.x        <span class="token-comment"># numpy.ndarray — feature vector</span>
+instance.y_index  <span class="token-comment"># int — class index (0, 1, 2, ...)</span>
+instance.y_label  <span class="token-comment"># str — class label ("positive", "negative", ...)</span></code></pre>
+      
+      <h4>Regression Instance (RegressionInstance):</h4>
+      <pre><code>instance.x        <span class="token-comment"># numpy.ndarray — feature vector</span>
+instance.y_value  <span class="token-comment"># float — target continuous value</span></code></pre>
+      
+      <!-- Learner -->
+      <h2 id="learner">4. Learner — Online Learner</h2>
+      <p>All learners follow a unified <code>train</code> + <code>predict</code> interface.</p>
+      
+      <h4>Classifier Base Class:</h4>
+      <pre><code><span class="token-keyword">class</span> <span class="token-module">Classifier</span>(ABC):
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, schema: Schema, random_seed: int = <span class="token-number">1</span>): ...
+    
+    <span class="token-keyword">def</span> <span class="token-function">train</span>(self, instance: LabeledInstance) -> None:
+        <span class="token-string">"""Incrementally train on a single instance"""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">predict</span>(self, instance: Instance) -> int:
+        <span class="token-string">"""Return predicted class index"""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">predict_proba</span>(self, instance: Instance) -> np.ndarray:
+        <span class="token-string">"""Return probability distribution over classes"""</span></code></pre>
+      
+      <h4>Regressor Base Class:</h4>
+      <pre><code><span class="token-keyword">class</span> <span class="token-module">Regressor</span>(ABC):
+    <span class="token-keyword">def</span> <span class="token-function">train</span>(self, instance: RegressionInstance) -> None: ...
+    <span class="token-keyword">def</span> <span class="token-function">predict</span>(self, instance: RegressionInstance) -> float: ...</code></pre>
+      
+      <h4>Learner Sources:</h4>
+      <table class="concept-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>MOA Algorithms</td>
+            <td>Java implementation via JPype</td>
+            <td><code>HoeffdingTree</code>, <code>NaiveBayes</code></td>
+          </tr>
+          <tr>
+            <td>Native Python</td>
+            <td>Pure Python/NumPy implementation</td>
+            <td><code>FOBOSClassifier</code>, <code>FTRLClassifier</code></td>
+          </tr>
+          <tr>
+            <td>Scikit-learn Wrappers</td>
+            <td>Wrap sklearn models with <code>partial_fit</code></td>
+            <td><code>SKClassifier(SGDClassifier())</code></td>
+          </tr>
+          <tr>
+            <td>Batch Learners</td>
+            <td>Support mini-batch training</td>
+            <td>Inherit <code>BatchClassifier</code></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- Online Learning Protocol -->
+      <h2 id="protocol">5. Online Learning Protocol</h2>
+      <p>OpenMOA uses the <strong>Prequential (Test-Then-Train)</strong> evaluation protocol. For each arriving instance:</p>
+      
+      <div class="protocol-box">
+        <pre><code><span class="token-keyword">for</span> instance <span class="token-keyword">in</span> stream:
+    <span class="token-comment"># ① Predict with current model</span>
+    prediction = learner.predict(instance)
+    
+    <span class="token-comment"># ② Record result (correct/incorrect)</span>
+    evaluator.update(truth, prediction)
+    
+    <span class="token-comment"># ③ Train on the instance</span>
+    learner.train(instance)</code></pre>
+      </div>
+      
+      <p>This ensures each instance is evaluated <em>before</em> being used for training — the standard evaluation paradigm for stream learning.</p>
+      
+      <h4>Using the Built-in Evaluation Function:</h4>
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.evaluation</span> <span class="token-keyword">import</span> prequential_evaluation
+
+results = prequential_evaluation(
+    stream=stream,
+    learner=learner,
+    max_instances=<span class="token-number">10000</span>,
+    window_size=<span class="token-number">1000</span>     <span class="token-comment"># Sliding window size</span>
+)
+
+<span class="token-function">print</span>(results.cumulative.accuracy())   <span class="token-comment"># Cumulative accuracy</span>
+<span class="token-function">print</span>(results.windowed.accuracy())     <span class="token-comment"># Sliding window accuracy</span></code></pre>
+      
+      <!-- Evaluator -->
+      <h2 id="evaluator">6. Evaluator</h2>
+      <p><code>ClassificationEvaluator</code> tracks the following metrics:</p>
+      <ul>
+        <li><code>accuracy()</code> — Accuracy</li>
+        <li><code>kappa()</code> — Cohen's Kappa (handles class imbalance)</li>
+        <li><code>precision()</code> / <code>recall()</code> / <code>f1_score()</code> — Classification metrics</li>
+        <li><code>metrics_dict()</code> — Get all metrics at once</li>
+      </ul>
+      
+      <h4>Two Evaluation Modes:</h4>
+      <table class="concept-table">
+        <thead>
+          <tr>
+            <th>Mode</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Cumulative</strong></td>
+            <td>Overall metrics computed from the first instance</td>
+          </tr>
+          <tr>
+            <td><strong>Windowed</strong></td>
+            <td>Metrics based on only the last N instances — reflects recent performance</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <p><code>RegressionEvaluator</code> metrics: MSE, RMSE, MAE, R²</p>
+      
+      <!-- Drift Detection -->
+      <h2 id="drift-detection">7. Drift Detection</h2>
+      <p>In real data streams, the statistical distribution may change over time (<strong>concept drift</strong>). OpenMOA provides drift detectors to monitor these changes.</p>
+      
+      <h4>Drift Detector Interface:</h4>
+      <pre><code><span class="token-keyword">class</span> <span class="token-module">BaseDriftDetector</span>(ABC):
+    <span class="token-keyword">def</span> <span class="token-function">add_element</span>(self, element: float) -> None:
+        <span class="token-string">"""Input an observation (usually prediction error: 0 or 1)"""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">detected_change</span>(self) -> bool:
+        <span class="token-string">"""Has drift been detected?"""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">detected_warning</span>(self) -> bool:
+        <span class="token-string">"""Is the detector in warning zone?"""</span></code></pre>
+      
+      <h4>Built-in Detectors:</h4>
+      <div class="detector-grid">
+        <div class="detector-item">
+          <strong>ADWIN</strong>
+          <span>Adaptive Windowing — detects sub-window mean differences</span>
+        </div>
+        <div class="detector-item">
+          <strong>DDM</strong>
+          <span>Drift Detection Method — monitors error rate statistics</span>
+        </div>
+        <div class="detector-item">
+          <strong>EDDM</strong>
+          <span>Early DDM — improved sensitivity to gradual drift</span>
+        </div>
+        <div class="detector-item">
+          <strong>HDDM_A / HDDM_W</strong>
+          <span>Hoeffding DDM — based on Hoeffding bounds</span>
+        </div>
+        <div class="detector-item">
+          <strong>PageHinkley</strong>
+          <span>Page-Hinkley Test — sequential analysis</span>
+        </div>
+        <div class="detector-item">
+          <strong>CUSUM</strong>
+          <span>Cumulative Sum — control chart method</span>
+        </div>
+      </div>
+      
+      <h4>Usage Example:</h4>
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.drift.detectors</span> <span class="token-keyword">import</span> ADWIN
+
+detector = ADWIN(delta=<span class="token-number">0.002</span>)
+
+<span class="token-keyword">for</span> instance <span class="token-keyword">in</span> stream:
+    prediction = learner.predict(instance)
+    is_correct = (prediction == instance.y_index)
+    
+    detector.add_element(<span class="token-number">1</span> - is_correct)  <span class="token-comment"># Input error</span>
+    
+    <span class="token-keyword">if</span> detector.detected_change():
+        <span class="token-function">print</span>(<span class="token-string">"Drift detected! Consider resetting the learner."</span>)
+        learner = create_new_learner()  <span class="token-comment"># Reset model</span>
+    
+    learner.train(instance)</code></pre>
+      
+      <!-- Stream Wrappers -->
+      <h2 id="stream-wrappers">8. Stream Wrappers — Feature Space Evolution</h2>
+      <p>A unique feature of OpenMOA is simulating <strong>feature space drift</strong> (changing feature dimensions) through Stream Wrappers.</p>
+      
+      <h4>Two Approaches:</h4>
+      <table class="wrapper-table">
+        <thead>
+          <tr>
+            <th>Approach</th>
+            <th>Output Dimension</th>
+            <th>Missing Representation</th>
+            <th>Suitable Algorithms</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>OpenFeatureStream</code></td>
+            <td>Variable length</td>
+            <td>Not in vector</td>
+            <td>Sparse-aware (FOBOS, ORF3V)</td>
+          </tr>
+          <tr>
+            <td><code>TrapezoidalStream</code> / <code>CapriciousStream</code> / <code>EvolvableStream</code></td>
+            <td>Fixed length</td>
+            <td>NaN placeholder</td>
+            <td>Missing value handling (OVFM)</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h4>Three Evolution Patterns:</h4>
+      <table class="concept-table">
+        <thead>
+          <tr>
+            <th>Pattern</th>
+            <th>Full Name</th>
+            <th>Behavior</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>TDS</strong></td>
+            <td>Trapezoidal Data Stream</td>
+            <td>Features "born" gradually, dimension monotonically increases</td>
+          </tr>
+          <tr>
+            <td><strong>CDS</strong></td>
+            <td>Capricious Data Stream</td>
+            <td>Features randomly appear/disappear at each timestep</td>
+          </tr>
+          <tr>
+            <td><strong>EDS</strong></td>
+            <td>Evolvable Data Stream</td>
+            <td>Feature space replaces in segments with transition periods</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h4>Combined Usage:</h4>
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Magic04
+<span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> ShuffledStream, OpenFeatureStream
+
+<span class="token-comment"># Layer 1: Shuffle to remove label ordering bias</span>
+base = ShuffledStream(Magic04(), random_seed=<span class="token-number">42</span>)
+
+<span class="token-comment"># Layer 2: Inject TDS feature evolution</span>
+stream = OpenFeatureStream(
+    base, evolution_pattern=<span class="token-string">"tds"</span>, tds_mode=<span class="token-string">"ordered"</span>,
+    total_instances=<span class="token-number">19020</span>, random_seed=<span class="token-number">42</span>
+)</code></pre>
+      
+      <!-- Architecture -->
+      <h2 id="architecture">9. Architecture Overview</h2>
+      
+      <div class="architecture-box">
+<pre>                    ┌─────────────────────┐
+                    │     Datasets        │
+                    │  (Auto-download)    │
+                    └────────┬────────────┘
+                             │
+                    ┌────────▼────────────┐
+                    │   Stream Layer      │
+                    │ ARFF/CSV/LibSVM/    │
+                    │ Numpy/MOA Generator │
+                    └────────┬────────────┘
+                             │
+                    ┌────────▼────────────┐
+                    │  Stream Wrappers    │
+                    │ Shuffle / TDS /     │
+                    │ CDS / EDS           │
+                    └────────┬────────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              │              │              │
+     ┌────────▼──────┐ ┌────▼─────┐ ┌──────▼───────┐
+     │  MOA Learners │ │  Python  │ │   Sklearn    │
+     │ (Java/JPype)  │ │ Learners │ │   Wrappers   │
+     └────────┬──────┘ └────┬─────┘ └──────┬───────┘
+              │              │              │
+              └──────────────┼──────────────┘
+                             │
+                    ┌────────▼────────────┐
+                    │    Evaluation       │
+                    │ Prequential / Drift │
+                    │ Classification /    │
+                    │ Regression          │
+                    └─────────────────────┘</pre>
+      </div>
+      
+      <!-- Navigation -->
+      <div style="display: flex; justify-content: space-between; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);">
+        <a href="installation.html" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Previous: Installation
+        </a>
+        <a href="tutorials/streams.html" class="btn btn-secondary">
+          Next: Working with Streams
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../assets/script.js"></script>
+</body>
+</html>
