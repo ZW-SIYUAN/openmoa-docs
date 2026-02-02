@@ -13,91 +13,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="../assets/style.css">
-  <style>
-    .concept-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 24px 0;
-      font-size: 14px;
-    }
-    .concept-table th, .concept-table td {
-      padding: 12px 16px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
-    .concept-table th {
-      background: var(--bg-tertiary);
-      font-weight: 600;
-      color: var(--text);
-    }
-    .concept-table td {
-      color: var(--text-secondary);
-    }
-    .concept-table code {
-      font-size: 13px;
-    }
-    .architecture-box {
-      background: var(--code-bg);
-      border-radius: 12px;
-      padding: 24px;
-      overflow-x: auto;
-      margin: 24px 0;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--code-text);
-    }
-    .protocol-box {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      margin: 24px 0;
-    }
-    .protocol-box pre {
-      margin: 0;
-      background: var(--code-bg);
-      border-radius: 8px;
-      padding: 16px;
-    }
-    .detector-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 12px;
-      margin: 24px 0;
-    }
-    .detector-item {
-      padding: 16px;
-      border-radius: 8px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-    }
-    .detector-item strong {
-      display: block;
-      color: var(--accent);
-      margin-bottom: 4px;
-      font-size: 14px;
-    }
-    .detector-item span {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-    .wrapper-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 24px 0;
-      font-size: 14px;
-    }
-    .wrapper-table th, .wrapper-table td {
-      padding: 12px 16px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
-    .wrapper-table th {
-      background: var(--bg-tertiary);
-      font-weight: 600;
-    }
-  </style>
 </head>
 <body>
   <!-- Navigation -->
@@ -171,7 +86,7 @@
       <p>Understand streams, online learning, and drift detection — the foundations of OpenMOA.</p>
       
       <!-- Overview -->
-      <p style="background: var(--bg-tertiary); padding: 16px 20px; border-radius: 8px; font-size: 15px; line-height: 1.7;">
+      <p class="intro-box">
         OpenMOA is a machine learning framework designed for <strong>data streams</strong>. Unlike traditional batch learning where all data is available upfront, stream learning processes data that arrives one instance at a time, cannot be revisited, and whose distribution may change over time. OpenMOA is built around four core abstractions: <strong>Stream</strong>, <strong>Instance</strong>, <strong>Learner</strong>, and <strong>Evaluator</strong>.
       </p>
       
@@ -560,7 +475,7 @@ stream = OpenFeatureStream(
       </div>
       
       <!-- Navigation -->
-      <div style="display: flex; justify-content: space-between; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);">
+      <div class="docs-nav">
         <a href="installation.html" class="btn btn-secondary">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
