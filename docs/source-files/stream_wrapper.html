@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stream Wrapper Deep Dive - OpenMOA Documentation</title>
+  <meta name="description" content="Deep analysis of stream_wrapper.py — the core decorator module for simulating feature space evolution in OpenMOA">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/style.css">
+
+  <style>
+    /* ================================================================
+       Stream Wrapper Page — Scoped Styles
+       ================================================================ */
+
+    /* --- Table of Contents --- */
+    .sw-toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+      margin: 24px 0 32px;
+    }
+    .sw-toc a {
+      display: block;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .sw-toc a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .sw-toc a span {
+      color: var(--accent);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    /* --- File path badge --- */
+    .sw-filepath {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: var(--code-bg);
+      color: var(--code-text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    .sw-filepath svg {
+      flex-shrink: 0;
+    }
+
+    /* --- Class cards --- */
+    .sw-class-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .sw-class-card {
+      padding: 20px;
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+    .sw-class-card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--card-shadow);
+    }
+    .sw-class-card h4 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      color: var(--accent);
+      margin-bottom: 4px;
+      margin-top: 0;
+    }
+    .sw-class-card .sw-inherit {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .sw-class-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.6;
+    }
+    .sw-class-card .sw-lines {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-tertiary);
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-secondary);
+      margin-top: 10px;
+    }
+
+    /* --- Pattern visualisation --- */
+    .sw-pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .sw-pattern-card {
+      padding: 20px;
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    .sw-pattern-card h4 {
+      margin: 0 0 4px;
+      font-size: 15px;
+    }
+    .sw-pattern-card .sw-pattern-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    .sw-pattern-card pre {
+      margin: 0;
+      padding: 14px;
+      font-size: 12px;
+      line-height: 1.5;
+      border-radius: 8px;
+    }
+
+    /* --- Comparison highlight --- */
+    .sw-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    @media (max-width: 720px) {
+      .sw-compare { grid-template-columns: 1fr; }
+    }
+    .sw-compare-box {
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+    .sw-compare-box h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+    }
+    .sw-compare-box .sw-label {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .sw-label-variable {
+      background: #DBEAFE;
+      color: #1E40AF;
+    }
+    .sw-label-fixed {
+      background: #F3E8FF;
+      color: #7C3AED;
+    }
+    [data-theme="dark"] .sw-label-variable {
+      background: #1E3A5F;
+      color: #60A5FA;
+    }
+    [data-theme="dark"] .sw-label-fixed {
+      background: #4C1D95;
+      color: #A78BFA;
+    }
+
+    /* --- Method table --- */
+    .sw-method-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+    .sw-method-table th,
+    .sw-method-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .sw-method-table th {
+      background: var(--bg-tertiary);
+      font-weight: 600;
+      color: var(--text);
+      font-size: 13px;
+    }
+    .sw-method-table td {
+      color: var(--text-secondary);
+    }
+    .sw-method-table code {
+      font-size: 13px;
+    }
+    .sw-method-table .sw-vis-pub  { color: #10B981; font-weight: 600; }
+    .sw-method-table .sw-vis-priv { color: #F59E0B; font-weight: 600; }
+
+    /* --- Param table --- */
+    .sw-param-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+    .sw-param-table th,
+    .sw-param-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .sw-param-table th {
+      background: var(--bg-tertiary);
+      font-weight: 600;
+      color: var(--text);
+      font-size: 13px;
+    }
+    .sw-param-table td {
+      color: var(--text-secondary);
+    }
+    .sw-param-table code {
+      font-size: 13px;
+    }
+
+    /* --- Problem-solution grid --- */
+    .sw-problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .sw-problem-item {
+      padding: 16px;
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+    }
+    .sw-problem-item strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+    .sw-problem-item span {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* --- Tip / Warning / Note boxes --- */
+    .sw-tip {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .sw-tip-info {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      color: var(--text-secondary);
+    }
+    .sw-tip-warn {
+      background: #FEF3C7;
+      border-left: 4px solid #F59E0B;
+      color: #92400E;
+    }
+    [data-theme="dark"] .sw-tip-warn {
+      background: #78350F33;
+      border-left-color: #FBBF24;
+      color: #FDE68A;
+    }
+    .sw-tip strong {
+      color: var(--text);
+    }
+    [data-theme="dark"] .sw-tip-warn strong {
+      color: #FBBF24;
+    }
+
+    /* --- Design pattern badges --- */
+    .sw-dp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+      margin: 24px 0;
+    }
+    .sw-dp-card {
+      padding: 18px;
+      border-radius: 10px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    .sw-dp-card h4 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      color: var(--accent);
+    }
+    .sw-dp-card p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* --- Issue cards --- */
+    .sw-issue {
+      padding: 18px 20px;
+      border-radius: 10px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .sw-issue h4 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+    .sw-issue .sw-risk {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .sw-risk-med { background: #FEF3C7; color: #B45309; }
+    .sw-risk-low { background: #DBEAFE; color: #1E40AF; }
+    [data-theme="dark"] .sw-risk-med { background: #78350F; color: #FBBF24; }
+    [data-theme="dark"] .sw-risk-low { background: #1E3A5F; color: #60A5FA; }
+
+    /* --- Inline separator --- */
+    .sw-sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 36px 0;
+    }
+
+    /* --- Anchor link styling --- */
+    .docs-content h2[id] {
+      scroll-margin-top: 80px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="../../index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+
+    <div class="navbar-links">
+      <a href="../../index.html" class="navbar-link">Home</a>
+      <a href="../index.html" class="navbar-link active">Documentation</a>
+      <a href="../../blog/index.html" class="navbar-link">Blog</a>
+      <a href="../../contact.html" class="navbar-link">Contact</a>
+    </div>
+
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Docs Layout -->
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Getting Started</div>
+        <a href="../quickstart.html" class="docs-sidebar-link">Quick Start Guide</a>
+        <a href="../installation.html" class="docs-sidebar-link">Installation</a>
+        <a href="../concepts.html" class="docs-sidebar-link">Core Concepts</a>
+      </div>
+
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Tutorials</div>
+        <a href="../tutorials/streams.html" class="docs-sidebar-link">Working with Data Streams</a>
+        <a href="../tutorials/classifiers.html" class="docs-sidebar-link">Classification Algorithms</a>
+        <a href="../tutorials/drift.html" class="docs-sidebar-link">Concept Drift Detection</a>
+        <a href="../tutorials/evaluation.html" class="docs-sidebar-link">Evaluation Methods</a>
+        <a href="../tutorials/advanced.html" class="docs-sidebar-link">Advanced Topics</a>
+      </div>
+
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Source Deep Dive</div>
+        <a href="stream_wrapper.html" class="docs-sidebar-link active">stream_wrapper.py</a>
+      </div>
+
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">API Reference</div>
+        <a href="../../api/streams.html" class="docs-sidebar-link">openmoa.streams</a>
+        <a href="../../api/classifiers.html" class="docs-sidebar-link">openmoa.classifiers</a>
+        <a href="../../api/regressors.html" class="docs-sidebar-link">openmoa.regressors</a>
+        <a href="../../api/drift.html" class="docs-sidebar-link">openmoa.drift_detection</a>
+        <a href="../../api/evaluation.html" class="docs-sidebar-link">openmoa.evaluation</a>
+        <a href="../../api/utils.html" class="docs-sidebar-link">openmoa.utils</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content fade-in">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+        <span class="tag tag-research">Deep Dive</span>
+        <span class="tag tag-guide">~20 min read</span>
+      </div>
+
+      <h1>Stream Wrapper</h1>
+      <p>Deep analysis of <code>stream_wrapper.py</code> &mdash; the core decorator module that transforms static datasets into dynamically evolving feature-space data streams.</p>
+
+      <div class="sw-filepath">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+        src/openmoa/stream/stream_wrapper.py
+      </div>
+
+      <!-- Table of Contents -->
+      <div class="sw-toc">
+        <a href="#overview"><span>1.</span> Overview &amp; Purpose</a>
+        <a href="#architecture"><span>2.</span> Architecture Position</a>
+        <a href="#classes"><span>3.</span> Class Reference</a>
+        <a href="#patterns"><span>4.</span> Evolution Patterns</a>
+        <a href="#dataflow"><span>5.</span> Data Flow</a>
+        <a href="#core-logic"><span>6.</span> Core Logic Walkthrough</a>
+        <a href="#design"><span>7.</span> Design &amp; Techniques</a>
+        <a href="#examples"><span>8.</span> Usage Examples</a>
+        <a href="#issues"><span>9.</span> Known Issues</a>
+        <a href="#reference"><span>10.</span> Quick Reference</a>
+      </div>
+
+      <!-- ================================================================ -->
+      <!-- 1. Overview -->
+      <!-- ================================================================ -->
+      <h2 id="overview">1. Overview &amp; Purpose</h2>
+
+      <p class="intro-box">
+        <code>stream_wrapper.py</code> is the <strong>core decorator module</strong> of the OpenMOA stream processing framework. It provides a suite of Stream Wrappers that convert <strong>static, fixed-dimensional datasets</strong> into <strong>dynamic data streams with evolving feature spaces</strong> &mdash; simulating real-world <strong>feature drift</strong> scenarios for online learning benchmarks.
+      </p>
+
+      <h3>Problems Solved</h3>
+      <div class="sw-problem-grid">
+        <div class="sw-problem-item">
+          <strong>Label Sorting Bias</strong>
+          <span><code>ShuffledStream</code> randomizes instance order to remove inherent label ordering</span>
+        </div>
+        <div class="sw-problem-item">
+          <strong>Varying Dimensionality</strong>
+          <span><code>OpenFeatureStream</code> outputs variable-length vectors with global index mapping</span>
+        </div>
+        <div class="sw-problem-item">
+          <strong>Gradual Feature Arrival (TDS)</strong>
+          <span><code>TrapezoidalStream</code> simulates features "born" progressively over time</span>
+        </div>
+        <div class="sw-problem-item">
+          <strong>Random Feature Absence (CDS)</strong>
+          <span><code>CapriciousStream</code> simulates stochastic feature availability via Bernoulli trials</span>
+        </div>
+        <div class="sw-problem-item">
+          <strong>Feature Segment Evolution (EDS)</strong>
+          <span><code>EvolvableStream</code> replaces entire feature partitions across time segments</span>
+        </div>
+        <div class="sw-problem-item">
+          <strong>Index Shift Problem</strong>
+          <span><code>feature_indices</code> metadata ensures learners map local positions to global feature IDs</span>
+        </div>
+      </div>
+
+      <hr class="sw-sep">
+
+      <!-- ================================================================ -->
+      <!-- 2. Architecture -->
+      <!-- ================================================================ -->
+      <h2 id="architecture">2. Architecture Position</h2>
+      <p>Stream wrappers sit between the base stream layer and the learner layer, acting as transparent decorators that enrich the data pipeline:</p>
+
+      <div class="architecture-box">
+<pre>                     ┌─────────────────────────┐
+                     │       Datasets           │
+                     │   (UCI / MOA / Custom)    │
+                     └────────────┬──────────────┘
+                                  │
+                     ┌────────────▼──────────────┐
+                     │      Base Streams         │
+                     │  ARFF / CSV / LibSVM /    │
+                     │  Numpy / MOA Generator    │
+                     └────────────┬──────────────┘
+                                  │
+              ┌───────────────────▼───────────────────┐
+              │                                       │
+              │         Stream Wrappers  ★            │
+              │                                       │
+              │   ShuffledStream   OpenFeatureStream   │
+              │   TrapezoidalStream  CapriciousStream  │
+              │   EvolvableStream                      │
+              │                                       │
+              └───────────────────┬───────────────────┘
+                                  │
+                    ┌─────────────┼─────────────┐
+                    │             │             │
+           ┌───────▼───────┐ ┌───▼────┐ ┌──────▼──────┐
+           │  MOA Learners │ │ Python │ │   Sklearn   │
+           │  (Java/JPype) │ │Learners│ │   Wrappers  │
+           └───────┬───────┘ └───┬────┘ └──────┬──────┘
+                    │             │             │
+                    └─────────────┼─────────────┘
+                                  │
+                     ┌────────────▼──────────────┐
+                     │       Evaluation          │
+                     │  Prequential / Holdout /  │
+                     │  Classification / Drift   │
+                     └───────────────────────────┘</pre>
+      </div>
+
+      <hr class="sw-sep">
+
+      <!-- ================================================================ -->
+      <!-- 3. Class Reference -->
+      <!-- ================================================================ -->
+      <h2 id="classes">3. Class Reference</h2>
+      <p>The module defines five wrapper classes, all inheriting from the <code>Stream</code> abstract base class:</p>
+
+      <div class="sw-class-grid">
+        <div class="sw-class-card">
+          <h4>OpenFeatureStream</h4>
+          <div class="sw-inherit">extends Stream</div>
+          <p>Variable-length output wrapper supporting 6 evolution modes (pyramid, incremental, decremental, TDS, CDS, EDS). Attaches <code>feature_indices</code> metadata to each instance.</p>
+          <div class="sw-lines">Lines 7–288</div>
+        </div>
+        <div class="sw-class-card">
+          <h4>TrapezoidalStream</h4>
+          <div class="sw-inherit">extends Stream</div>
+          <p>Fixed-dimension + NaN-fill TDS simulator. Features appear gradually based on a priority ranking; inactive positions filled with <code>np.nan</code>.</p>
+          <div class="sw-lines">Lines 290–457</div>
+        </div>
+        <div class="sw-class-card">
+          <h4>CapriciousStream</h4>
+          <div class="sw-inherit">extends Stream</div>
+          <p>Fixed-dimension + NaN-fill CDS simulator. Each feature undergoes independent Bernoulli trial at every timestep to determine availability.</p>
+          <div class="sw-lines">Lines 460–572</div>
+        </div>
+        <div class="sw-class-card">
+          <h4>EvolvableStream</h4>
+          <div class="sw-inherit">extends Stream</div>
+          <p>Fixed-dimension + NaN-fill EDS simulator. Feature space is partitioned and activated in segments with configurable overlap transitions.</p>
+          <div class="sw-lines">Lines 576–772</div>
+        </div>
+        <div class="sw-class-card">
+          <h4>ShuffledStream</h4>
+          <div class="sw-inherit">extends Stream</div>
+          <p>In-memory buffer + random shuffle wrapper. Loads all instances at init, then serves them in randomized order to eliminate label sorting bias.</p>
+          <div class="sw-lines">Lines 776–836</div>
+        </div>
+      </div>
+
+      <!-- Two-approach comparison -->
+      <h3>Two Approaches: Variable vs. Fixed Dimension</h3>
+      <div class="sw-compare">
+        <div class="sw-compare-box">
+          <h4>OpenFeatureStream</h4>
+          <span class="sw-label sw-label-variable">Variable Dimension</span>
+          <table class="sw-method-table" style="margin: 0;">
+            <tbody>
+              <tr><td>Output dimension</td><td>= number of active features</td></tr>
+              <tr><td>Missing features</td><td>Not in vector at all</td></tr>
+              <tr><td><code>feature_indices</code></td><td>Attached as metadata</td></tr>
+              <tr><td>Target algorithms</td><td>Sparse-aware (FOBOS, ORF3V)</td></tr>
+              <tr style="border-bottom: none;"><td>Memory efficiency</td><td>Higher (short vectors)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sw-compare-box">
+          <h4>Trapezoidal / Capricious / Evolvable</h4>
+          <span class="sw-label sw-label-fixed">Fixed Dimension</span>
+          <table class="sw-method-table" style="margin: 0;">
+            <tbody>
+              <tr><td>Output dimension</td><td>= d_max (constant)</td></tr>
+              <tr><td>Missing features</td><td><code>np.nan</code> placeholder</td></tr>
+              <tr><td><code>feature_indices</code></td><td>Not provided</td></tr>
+              <tr><td>Target algorithms</td><td>NaN-handling (OVFM, OSLMF)</td></tr>
+              <tr style="border-bottom: none;"><td>Memory efficiency</td><td>Lower (full-length vectors)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <hr class="sw-sep">
+
+      <!-- ================================================================ -->
+      <!-- 4. Evolution Patterns -->
+      <!-- ================================================================ -->
+      <h2 id="patterns">4. Evolution Patterns</h2>
+      <p>Six distinct evolution patterns are supported, each modelling a different real-world feature drift scenario:</p>
+
+      <!-- Deterministic patterns -->
+      <h3>4.1 Dimension-Schedule Patterns</h3>
+      <p>These three patterns use a pre-computed dimension schedule &mdash; the number of active features varies deterministically with time.</p>
+
+      <div class="sw-pattern-grid">
+        <div class="sw-pattern-card">
+          <h4>Pyramid</h4>
+          <div class="sw-pattern-sub">Features increase then decrease symmetrically</div>
+          <pre><code><span class="token-comment">Dimension over time:</span>
+d_max ─      ╱╲
+            ╱  ╲
+d_min ─ ___╱    ╲___
+        0   T/2   T</code></pre>
+        </div>
+        <div class="sw-pattern-card">
+          <h4>Incremental</h4>
+          <div class="sw-pattern-sub">Features appear monotonically over time</div>
+          <pre><code><span class="token-comment">Dimension over time:</span>
+d_max ─           ___
+                 ╱
+               ╱
+d_min ─ _____╱
+        0           T</code></pre>
+        </div>
+        <div class="sw-pattern-card">
+          <h4>Decremental</h4>
+          <div class="sw-pattern-sub">Features disappear monotonically over time</div>
+          <pre><code><span class="token-comment">Dimension over time:</span>
+d_max ─ ___
+           ╲
+             ╲
+d_min ─       ╲_____
+        0           T</code></pre>
+        </div>
+      </div>
+
+      <p>For each timestep, the target dimension <code>d(t)</code> is computed via <code>np.linspace</code>, and the specific feature subset is determined by the <code>feature_selection</code> strategy:</p>
+
+      <table class="concept-table">
+        <thead>
+          <tr><th>Strategy</th><th>Selection Rule</th><th>Example (d=3, d_max=10)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>prefix</code></td><td>First d features</td><td>[0, 1, 2]</td></tr>
+          <tr><td><code>suffix</code></td><td>Last d features</td><td>[7, 8, 9]</td></tr>
+          <tr><td><code>random</code></td><td>Random d features (seeded)</td><td>[2, 5, 8]</td></tr>
+        </tbody>
+      </table>
+
+      <!-- TDS -->
+      <h3>4.2 Trapezoidal Data Stream (TDS)</h3>
+      <p>Each feature is assigned a <strong>birth time</strong>. Features become active once the stream passes their birth time, and remain active permanently &mdash; so dimensionality increases monotonically.</p>
+
+      <div class="architecture-box">
+<pre><span class="token-comment">TDS Ordered Mode (d_max=10, total_instances=1000)</span>
+
+Feature:     0  1  2  3  4  5  6  7  8  9
+Birth time:  0  0  0  100 100 200 200 300 300 400
+             |________|________|________|________|
+              Bucket 0  Bucket 1 Bucket 2 Bucket 3
+
+Timeline:
+t = 0     active = [0, 1, 2]                          3 features
+t = 150   active = [0, 1, 2, 3, 4]                    5 features
+t = 350   active = [0, 1, 2, 3, 4, 5, 6, 7]           8 features
+t = 500   active = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]    all 10</pre>
+      </div>
+
+      <div class="sw-tip sw-tip-info">
+        <strong>Two TDS modes:</strong> <code>random</code> shuffles the feature birth order randomly; <code>ordered</code> assigns births sequentially by feature index. Both divide the timeline into 10 buckets and distribute features evenly.
+      </div>
+
+      <!-- CDS -->
+      <h3>4.3 Capricious Data Stream (CDS)</h3>
+      <p>At each timestep, every feature independently undergoes a Bernoulli trial with probability <code>missing_ratio</code> of being absent. This produces truly stochastic feature availability:</p>
+
+      <pre><code><span class="token-comment"># For each timestep t:</span>
+rng_t = np.random.RandomState(random_seed + t)  <span class="token-comment"># deterministic per t</span>
+mask = rng_t.rand(d_max) > missing_ratio         <span class="token-comment"># Bernoulli trial</span>
+indices = np.where(mask)[<span class="token-number">0</span>]                     <span class="token-comment"># active features</span>
+<span class="token-keyword">if</span> <span class="token-function">len</span>(indices) == <span class="token-number">0</span>:
+    indices = np.array([<span class="token-number">0</span>])                     <span class="token-comment"># safety: at least 1 feature</span></code></pre>
+
+      <div class="sw-tip sw-tip-info">
+        <strong>Reproducibility:</strong> Each timestep uses <code>random_seed + t</code> as its seed, ensuring the same pattern across runs while keeping consecutive timesteps independent.
+      </div>
+
+      <!-- EDS -->
+      <h3>4.4 Evolvable Data Stream (EDS)</h3>
+      <p>The feature space is partitioned into <code>n_segments</code> groups. The stream alternates between <strong>stable periods</strong> (single partition active) and <strong>overlap transitions</strong> (two adjacent partitions active simultaneously):</p>
+
+      <div class="architecture-box">
+<pre><span class="token-comment">EDS (n_segments=3, overlap_ratio=1.0, total=1000)</span>
+<span class="token-comment">L = 1000 / (3 + 1.0 * 2) = 200</span>
+
+Stage 0  (t = 0–199)   P0 active        [0, 1, 2, 3]
+Stage 1  (t = 200–399) P0 ∪ P1 active   [0, 1, 2, 3, 4, 5, 6]   ← overlap
+Stage 2  (t = 400–599) P1 active        [4, 5, 6]
+Stage 3  (t = 600–799) P1 ∪ P2 active   [4, 5, 6, 7, 8, 9]      ← overlap
+Stage 4  (t = 800–999) P2 active        [7, 8, 9]
+
+Visual timeline:
+  P0    ████████
+  P0∪P1         ████████
+  P1                    ████████
+  P1∪P2                         ████████
+  P2                                    ████████
+        --------+--------+--------+--------+--------→ t
+        0      200      400      600      800     1000</pre>
+      </div>
+
+      <p>The overlap period length is controlled by <code>overlap_ratio</code> relative to the stable period length <code>L</code>:</p>
+      <pre><code><span class="token-comment"># Stable period length calculation:</span>
+L = total_instances / (n_segments + overlap_ratio * (n_segments - <span class="token-number">1</span>))</code></pre>
+
+      <hr class="sw-sep">
+
+      <!-- ================================================================ -->
+      <!-- 5. Data Flow -->
+      <!-- ================================================================ -->
+      <h2 id="dataflow">5. Data Flow</h2>
+      <p>The typical pipeline stacks <code>ShuffledStream</code> for order randomization, then <code>OpenFeatureStream</code> for feature evolution:</p>
+
+      <div class="architecture-box">
+<pre><span class="token-comment">Complete Data Flow (TDS mode example)</span>
+
+  Disk (.arff/.csv/.libsvm)
+         │
+         ▼
+  ┌─────────────────────────────────────────────────────────┐
+  │  openmoa.datasets.Magic04()                             │
+  │  → instance.x = [v0, v1, v2, ..., v9]   (fixed 10-d)  │
+  └──────────────────────┬──────────────────────────────────┘
+                         │
+  ┌──────────────────────▼──────────────────────────────────┐
+  │  ShuffledStream(base, random_seed=42)                   │
+  │  → Loads ALL instances into memory                      │
+  │  → Shuffles index array                                 │
+  │  → Output: same instances, random order                 │
+  └──────────────────────┬──────────────────────────────────┘
+                         │
+  ┌──────────────────────▼──────────────────────────────────┐
+  │  OpenFeatureStream(base, evolution_pattern="tds", ...)  │
+  │                                                         │
+  │  t=0:   x=[v0,v1]          feature_indices=[0,1]       │
+  │  t=300: x=[v0,v1,..,v4]    feature_indices=[0,1,2,3,4] │
+  │  t=900: x=[v0,v1,..,v9]    feature_indices=[0,..,9]    │
+  └──────────────────────┬──────────────────────────────────┘
+                         │
+  ┌──────────────────────▼──────────────────────────────────┐
+  │  FOBOSClassifier                                        │
+  │                                                         │
+  │  _get_sparse_x(instance):                               │
+  │    → detects instance.feature_indices                   │
+  │    → returns (indices=[0,1,2,3,4], values=[v0,..,v4])   │
+  │                                                         │
+  │  train():                                               │
+  │    → W[[0,1,2,3,4]] -= eta * grad * values              │
+  │    → sparse update: only touched rows change            │
+  └─────────────────────────────────────────────────────────┘</pre>
+      </div>
+
+      <h3>Instance Transformation Detail</h3>
+      <p>Here is what happens inside <code>OpenFeatureStream.next_instance()</code> for a single call:</p>
+
+      <pre><code><span class="token-comment"># Input from base_stream:</span>
+x_full = [<span class="token-number">0.1</span>, <span class="token-number">0.2</span>, <span class="token-number">0.3</span>, <span class="token-number">0.4</span>, <span class="token-number">0.5</span>, <span class="token-number">0.6</span>]  <span class="token-comment"># 6-dimensional</span>
+y_index = <span class="token-number">1</span>
+
+<span class="token-comment"># Step 1: Determine active features at time t</span>
+active_indices = _get_active_indices(t=<span class="token-number">100</span>)  <span class="token-comment"># → [1, 3, 5]  (TDS mode)</span>
+
+<span class="token-comment"># Step 2: Slice the feature vector</span>
+x_subset = x_full[active_indices]             <span class="token-comment"># → [0.2, 0.4, 0.6]  (3-d)</span>
+
+<span class="token-comment"># Step 3: Build new instance with metadata</span>
+new_instance.x = [<span class="token-number">0.2</span>, <span class="token-number">0.4</span>, <span class="token-number">0.6</span>]              <span class="token-comment"># physical 3-d vector</span>
+new_instance.y_index = <span class="token-number">1</span>
+new_instance.feature_indices = [<span class="token-number">1</span>, <span class="token-number">3</span>, <span class="token-number">5</span>]     <span class="token-comment"># ← global IDs for learner</span></code></pre>
+
+      <div class="sw-tip sw-tip-info">
+        <strong>Index Shift Problem:</strong> Although the physical vector is <code>[0.2, 0.4, 0.6]</code> at positions 0, 1, 2 &mdash; the <code>feature_indices=[1,3,5]</code> tells the learner these correspond to <strong>global features 1, 3, 5</strong>. Weight updates target <code>W[[1,3,5]]</code> instead of <code>W[[0,1,2]]</code>.
+      </div>
+
+      <hr class="sw-sep">
+
+      <!-- ================================================================ -->
+      <!-- 6. Core Logic Walkthrough -->
+      <!-- ================================================================ -->
+      <h2 id="core-logic">6. Core Logic Walkthrough</h2>
+
+      <h3>6.1 OpenFeatureStream._get_active_indices(t)</h3>
+      <p>This is the <strong>decision engine</strong> of the entire module. Given a timestep <code>t</code>, it returns the array of active global feature IDs:</p>
+
+      <pre><code><span class="token-keyword">def</span> <span class="token-function">_get_active_indices</span>(self, t: int) -> np.ndarray:
+    <span class="token-comment"># 1. Deterministic patterns: direct table lookup</span>
+    <span class="token-keyword">if</span> self.evolution_pattern <span class="token-keyword">in</span> [<span class="token-string">"pyramid"</span>, <span class="token-string">"incremental"</span>, <span class="token-string">"decremental"</span>]:
+        <span class="token-keyword">return</span> self._feature_indices_cache[t]
+
+    <span class="token-comment"># 2. TDS: all features whose birth_time ≤ t</span>
+    <span class="token-keyword">elif</span> self.evolution_pattern == <span class="token-string">"tds"</span>:
+        <span class="token-keyword">return</span> np.where(self._feature_offsets <= t)[<span class="token-number">0</span>]
+
+    <span class="token-comment"># 3. CDS: Bernoulli trial per feature</span>
+    <span class="token-keyword">elif</span> self.evolution_pattern == <span class="token-string">"cds"</span>:
+        rng_t = np.random.RandomState(self.random_seed + t)
+        mask = rng_t.rand(self.d_max) > self.missing_ratio
+        indices = np.where(mask)[<span class="token-number">0</span>]
+        <span class="token-keyword">if</span> <span class="token-function">len</span>(indices) == <span class="token-number">0</span>:
+            indices = np.array([<span class="token-number">0</span>])  <span class="token-comment"># safety fallback</span>
+        <span class="token-keyword">return</span> indices
+
+    <span class="token-comment"># 4. EDS: find current stage, return partition(s)</span>
+    <span class="token-keyword">elif</span> self.evolution_pattern == <span class="token-string">"eds"</span>:
+        stage_idx = <span class="token-number">0</span>
+        <span class="token-keyword">for</span> i, boundary <span class="token-keyword">in</span> <span class="token-function">enumerate</span>(self._eds_boundaries):
+            <span class="token-keyword">if</span> t < boundary:
+                stage_idx = i
+                <span class="token-keyword">break</span>
+        <span class="token-keyword">if</span> stage_idx % <span class="token-number">2</span> == <span class="token-number">0</span>:       <span class="token-comment"># even = stable</span>
+            <span class="token-keyword">return</span> self._eds_partitions[stage_idx // <span class="token-number">2</span>]
+        <span class="token-keyword">else</span>:                        <span class="token-comment"># odd  = overlap</span>
+            prev = (stage_idx - <span class="token-number">1</span>) // <span class="token-number">2</span>
+            <span class="token-keyword">return</span> np.sort(np.concatenate([
+                self._eds_partitions[prev],
+                self._eds_partitions[prev + <span class="token-number">1</span>]
+            ]))</code></pre>
+
+      <div class="sw-tip sw-tip-info">
+        <strong>Pure Function:</strong> For identical <code>t</code> and constructor parameters, this method always returns the same result &mdash; making the entire stream <strong>fully reproducible</strong>.
+      </div>
+
+      <h3>6.2 OpenFeatureStream Constructor Parameters</h3>
+      <table class="sw-param-table">
+        <thead>
+          <tr><th>Parameter</th><th>Type</th><th>Range</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>base_stream</code></td><td><code>Stream</code></td><td>&mdash;</td><td>&mdash;</td>
+            <td>The underlying data source to wrap</td>
+          </tr>
+          <tr>
+            <td><code>d_min</code></td><td><code>int</code></td><td>[1, d_max]</td><td>2</td>
+            <td>Minimum number of active features</td>
+          </tr>
+          <tr>
+            <td><code>d_max</code></td><td><code>int</code></td><td>[d_min, original_d]</td><td>None = original_d</td>
+            <td>Maximum feature space dimension</td>
+          </tr>
+          <tr>
+            <td><code>evolution_pattern</code></td><td><code>Literal</code></td><td>pyramid / incremental / decremental / tds / cds / eds</td><td>"pyramid"</td>
+            <td>Evolution strategy</td>
+          </tr>
+          <tr>
+            <td><code>total_instances</code></td><td><code>int</code></td><td>&gt; 0</td><td>10000</td>
+            <td>Stream length for timeline calculation</td>
+          </tr>
+          <tr>
+            <td><code>feature_selection</code></td><td><code>Literal</code></td><td>prefix / suffix / random</td><td>"prefix"</td>
+            <td>How to select features in deterministic modes</td>
+          </tr>
+          <tr>
+            <td><code>missing_ratio</code></td><td><code>float</code></td><td>[0.0, 1.0)</td><td>0.0</td>
+            <td>CDS feature absence probability</td>
+          </tr>
+          <tr>
+            <td><code>tds_mode</code></td><td><code>Literal</code></td><td>random / ordered</td><td>"random"</td>
+            <td>TDS feature birth ordering</td>
+          </tr>
+          <tr>
+            <td><code>n_segments</code></td><td><code>int</code></td><td>&ge; 2</td><td>2</td>
+            <td>EDS partition count</td>
+          </tr>
+          <tr>
+            <td><code>overlap_ratio</code></td><td><code>float</code></td><td>&ge; 0</td><td>1.0</td>
+            <td>EDS overlap-to-stable period ratio</td>
+          </tr>
+          <tr>
+            <td><code>random_seed</code></td><td><code>int</code></td><td>&mdash;</td><td>42</td>
+            <td>Random seed for reproducibility</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>6.3 Method Reference — OpenFeatureStream</h3>
+      <table class="sw-method-table">
+        <thead>
+          <tr><th>Method</th><th>Visibility</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>__init__</code></td><td><span class="sw-vis-pub">Public</span></td><td>Validate params, pre-compute schedules per pattern</td></tr>
+          <tr><td><code>_generate_dimension_schedule</code></td><td><span class="sw-vis-priv">Private</span></td><td>Generate per-timestep target dimension array</td></tr>
+          <tr><td><code>_generate_feature_indices</code></td><td><span class="sw-vis-priv">Private</span></td><td>Pre-compute feature index list for each timestep</td></tr>
+          <tr><td><code>_generate_tds_offsets</code></td><td><span class="sw-vis-priv">Private</span></td><td>Assign "birth time" to each feature (TDS)</td></tr>
+          <tr><td><code>_generate_eds_partitions</code></td><td><span class="sw-vis-priv">Private</span></td><td>Divide feature space into n disjoint subsets (EDS)</td></tr>
+          <tr><td><code>_calculate_eds_boundaries</code></td><td><span class="sw-vis-priv">Private</span></td><td>Compute EDS stage time boundaries</td></tr>
+          <tr><td><code>_get_active_indices</code></td><td><span class="sw-vis-priv">Private</span></td><td>Core engine: return active feature IDs for time t</td></tr>
+          <tr><td><code>next_instance</code></td><td><span class="sw-vis-pub">Public</span></td><td>Return next evolved instance with metadata</td></tr>
+          <tr><td><code>has_more_instances</code></td><td><span class="sw-vis-pub">Public</span></td><td>Check if more instances are available</td></tr>
+          <tr><td><code>restart</code></td><td><span class="sw-vis-pub">Public</span></td><td>Reset stream state to beginning</td></tr>
+          <tr><td><code>get_schema</code></td><td><span class="sw-vis-pub">Public</span></td><td>Return original Schema</td></tr>
+          <tr><td><code>get_moa_stream</code></td><td><span class="sw-vis-pub">Public</span></td><td>Returns None (pure Python implementation)</td></tr>
+        </tbody>
+      </table>
+
+      <hr class="sw-sep">
+
+      <!-- ================================================================ -->
+      <!-- 7. Design & Techniques -->
+      <!-- ================================================================ -->
+      <h2 id="design">7. Design Patterns &amp; Technical Highlights</h2>
+
+      <div class="sw-dp-grid">
+        <div class="sw-dp-card">
+          <h4>Decorator Pattern</h4>
+          <p>All wrappers accept a <code>base_stream</code> and can be nested: <code>OpenFeatureStream(ShuffledStream(Magic04()))</code>. Extends behaviour without modifying the source.</p>
+        </div>
+        <div class="sw-dp-card">
+          <h4>Strategy Pattern</h4>
+          <p>The <code>evolution_pattern</code> parameter selects algorithms at init time. Both initialization and runtime logic dispatch based on the chosen strategy.</p>
+        </div>
+        <div class="sw-dp-card">
+          <h4>Template Method</h4>
+          <p>All wrappers share the <code>Stream</code> ABC interface: <code>next_instance()</code>, <code>has_more_instances()</code>, <code>get_schema()</code>, <code>restart()</code>.</p>
+        </div>
+        <div class="sw-dp-card">
+          <h4>Pre-computation</h4>
+          <p>Dimension schedules and index caches are computed during <code>__init__</code>, reducing per-instance cost to O(1) table lookups for deterministic patterns.</p>
+        </div>
+        <div class="sw-dp-card">
+          <h4>Dynamic Attributes</h4>
+          <p><code>feature_indices</code> is attached to instances at runtime via Python&rsquo;s dynamic attribute mechanism. Downstream checks via <code>hasattr()</code>.</p>
+        </div>
+        <div class="sw-dp-card">
+          <h4>Defensive Programming</h4>
+          <p>Parameter validation, out-of-bounds guards, empty-result fallbacks (<code>at least 1 feature</code>), and safe time indexing with <code>min(t, T-1)</code>.</p>
+        </div>
+      </div>
+
+      <h3>Reproducibility Mechanism</h3>
+      <pre><code><span class="token-comment"># Global random state (for shuffle, TDS offsets, EDS partitions)</span>
+self._rng = np.random.RandomState(random_seed)
+
+<span class="token-comment"># Per-timestep local state (for CDS mode — independent across t)</span>
+rng_t = np.random.RandomState(self.random_seed + t)
+mask = rng_t.rand(self.d_max) > self.missing_ratio</code></pre>
+      <p>Using <code>np.random.RandomState</code> instead of global <code>np.random</code> isolates the wrapper from external random calls, ensuring deterministic reproducibility.</p>
+
+      <h3>Performance Characteristics</h3>
+      <table class="concept-table">
+        <thead>
+          <tr><th>Operation</th><th>Init Cost</th><th>Per-Instance Cost</th><th>Memory</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Pyramid / Inc / Dec</td><td>O(T)</td><td>O(1) lookup</td><td>O(T &middot; d_max)</td></tr>
+          <tr><td>TDS</td><td>O(d_max)</td><td>O(d_max) scan</td><td>O(d_max)</td></tr>
+          <tr><td>CDS</td><td>O(1)</td><td>O(d_max) Bernoulli</td><td>O(1)</td></tr>
+          <tr><td>EDS</td><td>O(d_max + n)</td><td>O(n) boundary scan</td><td>O(d_max)</td></tr>
+          <tr><td>ShuffledStream</td><td>O(N) load all</td><td>O(1) index</td><td>O(N) instances</td></tr>
+        </tbody>
+      </table>
+
+      <hr class="sw-sep">
+
+      <!-- ================================================================ -->
+      <!-- 8. Usage Examples -->
+      <!-- ================================================================ -->
+      <h2 id="examples">8. Usage Examples</h2>
+
+      <h3>8.1 TDS Mode — Online Learning Pipeline</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-dot red"></span>
+          <span class="code-block-dot yellow"></span>
+          <span class="code-block-dot green"></span>
+          <span class="code-block-title">tds_pipeline.py</span>
+        </div>
+        <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Magic04
+<span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> ShuffledStream, OpenFeatureStream
+<span class="token-keyword">from</span> <span class="token-module">openmoa.classifier._fobos_classifier</span> <span class="token-keyword">import</span> FOBOSClassifier
+
+<span class="token-comment"># 1. Load dataset and shuffle</span>
+base = ShuffledStream(Magic04(), random_seed=<span class="token-number">42</span>)
+n_total = base.get_num_instances()  <span class="token-comment"># 19020</span>
+
+<span class="token-comment"># 2. Wrap with TDS evolution</span>
+stream = OpenFeatureStream(
+    base_stream=base,
+    evolution_pattern=<span class="token-string">"tds"</span>,
+    tds_mode=<span class="token-string">"ordered"</span>,
+    d_min=<span class="token-number">2</span>,
+    total_instances=n_total,
+    random_seed=<span class="token-number">42</span>
+)
+
+<span class="token-comment"># 3. Initialize learner</span>
+schema = stream.get_schema()
+learner = FOBOSClassifier(
+    schema=schema,
+    alpha=<span class="token-number">1.0</span>,
+    lambda_=<span class="token-number">0.0001</span>,
+    regularization=<span class="token-string">"l1"</span>
+)
+
+<span class="token-comment"># 4. Test-Then-Train loop</span>
+correct = <span class="token-number">0</span>
+total = <span class="token-number">0</span>
+<span class="token-keyword">while</span> stream.has_more_instances():
+    instance = stream.next_instance()
+
+    <span class="token-comment"># Observe feature evolution</span>
+    <span class="token-function">print</span>(<span class="token-string">f"t={total}: dim={len(instance.x)}, indices={instance.feature_indices}"</span>)
+
+    pred = learner.predict(instance)
+    <span class="token-keyword">if</span> pred == instance.y_index:
+        correct += <span class="token-number">1</span>
+    learner.train(instance)
+    total += <span class="token-number">1</span>
+
+<span class="token-function">print</span>(<span class="token-string">f"Accuracy: {correct / total:.4f}"</span>)</code></pre>
+      </div>
+
+      <h3>8.2 CDS Mode — Random Feature Absence</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-dot red"></span>
+          <span class="code-block-dot yellow"></span>
+          <span class="code-block-dot green"></span>
+          <span class="code-block-title">cds_example.py</span>
+        </div>
+        <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Magic04
+<span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> ShuffledStream, OpenFeatureStream
+
+stream = OpenFeatureStream(
+    base_stream=ShuffledStream(Magic04()),
+    evolution_pattern=<span class="token-string">"cds"</span>,
+    missing_ratio=<span class="token-number">0.4</span>,          <span class="token-comment"># 40% feature absence</span>
+    total_instances=<span class="token-number">19020</span>,
+    random_seed=<span class="token-number">42</span>
+)
+
+<span class="token-comment"># Observe the stochastic missing pattern</span>
+<span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-function">range</span>(<span class="token-number">5</span>):
+    inst = stream.next_instance()
+    all_features = <span class="token-function">set</span>(<span class="token-function">range</span>(<span class="token-number">10</span>))
+    present = <span class="token-function">set</span>(inst.feature_indices.tolist())
+    <span class="token-function">print</span>(<span class="token-string">f"t={i}: present={sorted(present)}, missing={sorted(all_features - present)}"</span>)
+
+<span class="token-comment"># Output example:</span>
+<span class="token-comment"># t=0: present=[0,2,4,5,7,9], missing=[1,3,6,8]</span>
+<span class="token-comment"># t=1: present=[1,2,3,6,8,9], missing=[0,4,5,7]</span>
+<span class="token-comment"># t=2: present=[0,1,3,5,6,7,8], missing=[2,4,9]</span></code></pre>
+      </div>
+
+      <h3>8.3 EDS Mode — Segmented Evolution</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-dot red"></span>
+          <span class="code-block-dot yellow"></span>
+          <span class="code-block-dot green"></span>
+          <span class="code-block-title">eds_example.py</span>
+        </div>
+        <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Magic04
+<span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> ShuffledStream, OpenFeatureStream
+
+stream = OpenFeatureStream(
+    base_stream=ShuffledStream(Magic04()),
+    evolution_pattern=<span class="token-string">"eds"</span>,
+    n_segments=<span class="token-number">3</span>,           <span class="token-comment"># 3 feature partitions</span>
+    overlap_ratio=<span class="token-number">0.5</span>,      <span class="token-comment"># overlap = 0.5 × stable period</span>
+    total_instances=<span class="token-number">1000</span>,
+    random_seed=<span class="token-number">42</span>
+)
+
+<span class="token-comment"># Track stage transitions</span>
+prev_key = <span class="token-keyword">None</span>
+<span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-function">range</span>(<span class="token-number">1000</span>):
+    inst = stream.next_instance()
+    <span class="token-keyword">if</span> inst <span class="token-keyword">is</span> <span class="token-keyword">None</span>:
+        <span class="token-keyword">break</span>
+    key = <span class="token-function">tuple</span>(inst.feature_indices)
+    <span class="token-keyword">if</span> key != prev_key:
+        <span class="token-function">print</span>(<span class="token-string">f"t={i}: New stage → features={key}"</span>)
+        prev_key = key</code></pre>
+      </div>
+
+      <h3>8.4 NaN-based Approach (TrapezoidalStream)</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-dot red"></span>
+          <span class="code-block-dot yellow"></span>
+          <span class="code-block-dot green"></span>
+          <span class="code-block-title">nan_approach.py</span>
+        </div>
+        <pre><code><span class="token-keyword">import</span> <span class="token-module">numpy</span> <span class="token-keyword">as</span> np
+<span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Magic04
+<span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> ShuffledStream, TrapezoidalStream
+
+<span class="token-comment"># Fixed dimension + NaN approach</span>
+stream = TrapezoidalStream(
+    base_stream=ShuffledStream(Magic04()),
+    evolution_mode=<span class="token-string">"ordered"</span>,
+    total_instances=<span class="token-number">1000</span>
+)
+
+inst = stream.next_instance()
+<span class="token-function">print</span>(<span class="token-string">f"Vector:   {inst.x}"</span>)           <span class="token-comment"># Full 10-d, some NaN</span>
+<span class="token-function">print</span>(<span class="token-string">f"NaN count: {np.isnan(inst.x).sum()}"</span>)
+<span class="token-function">print</span>(<span class="token-string">f"Has feature_indices: {hasattr(inst, 'feature_indices')}"</span>)  <span class="token-comment"># False</span></code></pre>
+      </div>
+
+      <hr class="sw-sep">
+
+      <!-- ================================================================ -->
+      <!-- 9. Known Issues -->
+      <!-- ================================================================ -->
+      <h2 id="issues">9. Known Issues &amp; Improvement Suggestions</h2>
+
+      <div class="sw-issue">
+        <h4>ShuffledStream Memory Consumption</h4>
+        <span class="sw-risk sw-risk-med">Medium Risk</span>
+        <p>All instances are loaded into memory at init. For GB-scale datasets, this will cause out-of-memory errors. Consider reservoir sampling or chunk-based shuffling for large-scale use.</p>
+        <pre><code><span class="token-comment"># Current: loads everything</span>
+<span class="token-keyword">while</span> base_stream.has_more_instances():
+    self._instances.append(base_stream.next_instance())
+
+<span class="token-comment"># Suggestion: reservoir sampling or memory-mapped approach</span></code></pre>
+      </div>
+
+      <div class="sw-issue">
+        <h4>CDS Fallback Bias</h4>
+        <span class="sw-risk sw-risk-low">Low Risk</span>
+        <p>When <code>missing_ratio</code> is close to 1.0, the safety fallback always selects feature 0. This over-emphasizes a single feature.</p>
+        <pre><code><span class="token-comment"># Current:</span>
+<span class="token-keyword">if</span> <span class="token-function">len</span>(indices) == <span class="token-number">0</span>:
+    indices = np.array([<span class="token-number">0</span>])          <span class="token-comment"># always feature 0</span>
+
+<span class="token-comment"># Suggested:</span>
+<span class="token-keyword">if</span> <span class="token-function">len</span>(indices) == <span class="token-number">0</span>:
+    indices = np.array([rng_t.randint(<span class="token-number">0</span>, self.d_max)])  <span class="token-comment"># random fallback</span></code></pre>
+      </div>
+
+      <div class="sw-issue">
+        <h4>Schema Inconsistency</h4>
+        <span class="sw-risk sw-risk-low">Low Risk</span>
+        <p><code>get_schema()</code> returns the original d_max-dimensional Schema, but <code>OpenFeatureStream</code> may output vectors as small as d_min. Downstream code relying on Schema dimensions may encounter mismatches.</p>
+      </div>
+
+      <div class="sw-issue">
+        <h4>Magic Number in TDS</h4>
+        <span class="sw-risk sw-risk-low">Low Risk</span>
+        <p>The TDS implementation hard-codes <code>10</code> as the number of time buckets. Consider extracting this as a named constant or parameter for better readability and configurability.</p>
+        <pre><code><span class="token-comment"># Current:</span>
+time_step = self.total_instances // <span class="token-number">10</span>   <span class="token-comment"># why 10?</span>
+
+<span class="token-comment"># Suggested:</span>
+TDS_NUM_BUCKETS = <span class="token-number">10</span>
+time_step = self.total_instances // TDS_NUM_BUCKETS</code></pre>
+      </div>
+
+      <hr class="sw-sep">
+
+      <!-- ================================================================ -->
+      <!-- 10. Quick Reference -->
+      <!-- ================================================================ -->
+      <h2 id="reference">10. Quick Reference</h2>
+
+      <h3>Terminology</h3>
+      <table class="concept-table">
+        <thead>
+          <tr><th>Term</th><th>Full Name</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>TDS</strong></td><td>Trapezoidal Data Stream</td><td>Features appear gradually; dimension grows monotonically</td></tr>
+          <tr><td><strong>CDS</strong></td><td>Capricious Data Stream</td><td>Features randomly present/absent at each timestep</td></tr>
+          <tr><td><strong>EDS</strong></td><td>Evolvable Data Stream</td><td>Feature space replaces in segments with overlap periods</td></tr>
+          <tr><td><strong>Feature Drift</strong></td><td>&mdash;</td><td>Changes in available feature dimensions over time</td></tr>
+          <tr><td><strong>Index Shift</strong></td><td>&mdash;</td><td>Mismatch between local vector position and global feature ID</td></tr>
+          <tr><td><strong>Prequential</strong></td><td>Test-Then-Train</td><td>Evaluate on each instance before using it for training</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Related Files</h3>
+      <table class="concept-table">
+        <thead>
+          <tr><th>File</th><th>Path</th><th>Role</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Stream ABC</td><td><code>src/openmoa/stream/_stream.py</code></td><td>Base class definition</td></tr>
+          <tr><td>Schema</td><td><code>src/openmoa/stream/_stream.py</code></td><td>Stream structure descriptor</td></tr>
+          <tr><td>Instance</td><td><code>src/openmoa/instance.py</code></td><td>Data instance types</td></tr>
+          <tr><td>FOBOS</td><td><code>src/openmoa/classifier/_fobos_classifier.py</code></td><td>Sparse-aware learner example</td></tr>
+          <tr><td>Package init</td><td><code>src/openmoa/stream/__init__.py</code></td><td>Public exports</td></tr>
+          <tr><td>Benchmarks</td><td><code>demo/demo_fobos_benchmark_binary.py</code></td><td>Full usage examples</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Dependencies</h3>
+      <div class="dep-list">
+        <div class="dep-item">
+          <code>numpy</code>
+          <span>&ge; 1.20 &mdash; Array ops, random state</span>
+        </div>
+        <div class="dep-item">
+          <code>typing</code>
+          <span>Built-in &mdash; Literal, Optional, List</span>
+        </div>
+        <div class="dep-item">
+          <code>openmoa.stream.Stream</code>
+          <span>ABC base class</span>
+        </div>
+        <div class="dep-item">
+          <code>openmoa.instance</code>
+          <span>LabeledInstance, RegressionInstance</span>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="docs-nav">
+        <a href="../concepts.html" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Previous: Core Concepts
+        </a>
+        <a href="../tutorials/streams.html" class="btn btn-secondary">
+          Next: Working with Streams
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="footer-logo-icon">M</div>
+        <span class="footer-text">&copy; 2025 OpenMOA. Open source under MIT License.</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="footer-link">GitHub</a>
+        <a href="https://openmoa.net" class="footer-link">openmoa.net</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/script.js"></script>
+</body>
+</html>
