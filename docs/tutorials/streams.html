@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Working with Data Streams - OpenMOA Documentation</title>
+  <meta name="description" content="Learn how to create, transform, and consume data streams in OpenMOA — from built-in datasets and file loading to synthetic generators, concept drift simulation, and feature-evolving streams.">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/style.css">
+
+  <style>
+    /* ================================================================
+       Streams Tutorial Page — Scoped Styles
+       ================================================================ */
+
+    /* --- Table of Contents --- */
+    .st-toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+      margin: 24px 0 32px;
+    }
+    .st-toc a {
+      display: block;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .st-toc a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .st-toc a span {
+      color: var(--accent);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    /* --- Tip / Warning / Note boxes --- */
+    .st-tip {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .st-tip-info {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      color: var(--text-secondary);
+    }
+    .st-tip-warn {
+      background: #FEF3C7;
+      border-left: 4px solid #F59E0B;
+      color: #92400E;
+    }
+    [data-theme="dark"] .st-tip-warn {
+      background: #78350F33;
+      border-left-color: #FBBF24;
+      color: #FDE68A;
+    }
+    .st-tip strong {
+      color: var(--text);
+    }
+    [data-theme="dark"] .st-tip-warn strong {
+      color: #FBBF24;
+    }
+
+    /* --- Dataset cards grid --- */
+    .st-dataset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .st-dataset-card {
+      padding: 20px;
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+    .st-dataset-card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--card-shadow);
+    }
+    .st-dataset-card h4 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      color: var(--accent);
+      margin-bottom: 4px;
+      margin-top: 0;
+    }
+    .st-dataset-card .st-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .st-dataset-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* --- Pattern visualization cards --- */
+    .st-pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .st-pattern-card {
+      padding: 20px;
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    .st-pattern-card h4 {
+      margin: 0 0 4px;
+      font-size: 15px;
+    }
+    .st-pattern-card .st-pattern-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    .st-pattern-card pre {
+      margin: 0;
+      padding: 14px;
+      font-size: 12px;
+      line-height: 1.5;
+      border-radius: 8px;
+    }
+
+    /* --- Comparison boxes --- */
+    .st-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    @media (max-width: 720px) {
+      .st-compare { grid-template-columns: 1fr; }
+    }
+    .st-compare-box {
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+    .st-compare-box h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+    }
+    .st-compare-box .st-label {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .st-label-sparse {
+      background: #DBEAFE;
+      color: #1E40AF;
+    }
+    .st-label-nan {
+      background: #F3E8FF;
+      color: #7C3AED;
+    }
+    [data-theme="dark"] .st-label-sparse {
+      background: #1E3A5F;
+      color: #60A5FA;
+    }
+    [data-theme="dark"] .st-label-nan {
+      background: #4C1D95;
+      color: #A78BFA;
+    }
+
+    /* --- Inline separator --- */
+    .st-sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 36px 0;
+    }
+
+    /* --- Anchor link styling --- */
+    .docs-content h2[id] {
+      scroll-margin-top: 80px;
+    }
+
+    /* --- Drift type badges --- */
+    .st-drift-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+      margin: 24px 0;
+    }
+    .st-drift-card {
+      padding: 18px;
+      border-radius: 10px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    .st-drift-card h4 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      color: var(--accent);
+    }
+    .st-drift-card p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* --- Summary table with wider first column --- */
+    .st-summary-table td:first-child {
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="../../index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+
+    <div class="navbar-links">
+      <a href="../../index.html" class="navbar-link">Home</a>
+      <a href="../index.html" class="navbar-link active">Documentation</a>
+      <a href="../../blog/index.html" class="navbar-link">Blog</a>
+      <a href="../../contact.html" class="navbar-link">Contact</a>
+    </div>
+
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Docs Layout -->
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Getting Started</div>
+        <a href="../quickstart.html" class="docs-sidebar-link">Quick Start Guide</a>
+        <a href="../installation.html" class="docs-sidebar-link">Installation</a>
+        <a href="../concepts.html" class="docs-sidebar-link">Core Concepts</a>
+      </div>
+
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Tutorials</div>
+        <a href="streams.html" class="docs-sidebar-link active">Working with Data Streams</a>
+        <a href="classifiers.html" class="docs-sidebar-link">Classification Algorithms</a>
+        <a href="drift.html" class="docs-sidebar-link">Concept Drift Detection</a>
+        <a href="evaluation.html" class="docs-sidebar-link">Evaluation Methods</a>
+        <a href="advanced.html" class="docs-sidebar-link">Advanced Topics</a>
+      </div>
+
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">API Reference</div>
+        <a href="../../api/streams.html" class="docs-sidebar-link">openmoa.streams</a>
+        <a href="../../api/classifiers.html" class="docs-sidebar-link">openmoa.classifiers</a>
+        <a href="../../api/regressors.html" class="docs-sidebar-link">openmoa.regressors</a>
+        <a href="../../api/drift.html" class="docs-sidebar-link">openmoa.drift_detection</a>
+        <a href="../../api/evaluation.html" class="docs-sidebar-link">openmoa.evaluation</a>
+        <a href="../../api/utils.html" class="docs-sidebar-link">openmoa.utils</a>
+      </div>
+
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Source Deep Dive</div>
+        <a href="../source-files/stream_wrapper.html" class="docs-sidebar-link">stream_wrapper.py</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content fade-in">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+        <span class="tag tag-tutorial">Tutorial</span>
+        <span class="tag tag-guide">~20 min read</span>
+      </div>
+
+      <h1>Working with Data Streams</h1>
+      <p>Learn how to create, transform, and consume data streams in OpenMOA &mdash; from built-in benchmark datasets and file loading to synthetic generators, concept drift simulation, and feature-evolving streams.</p>
+
+      <p class="intro-box">
+        In traditional machine learning, we assume access to a complete, static dataset. In streaming machine learning, data arrives <strong>one instance at a time</strong> in a potentially infinite sequence. The model must learn incrementally &mdash; making predictions and updating itself on the fly &mdash; without ever storing the entire dataset in memory. OpenMOA provides a rich, unified <code>Stream</code> API for creating, transforming, and consuming data streams from a variety of sources.
+      </p>
+
+      <!-- Table of Contents -->
+      <div class="st-toc">
+        <a href="#core-concepts"><span>1.</span> Core Concepts</a>
+        <a href="#loading"><span>2.</span> Loading Data Streams</a>
+        <a href="#generators"><span>3.</span> Synthetic Generators</a>
+        <a href="#drift"><span>4.</span> Concept Drift Streams</a>
+        <a href="#composition"><span>5.</span> Stream Composition</a>
+        <a href="#feature-evolving"><span>6.</span> Feature-Evolving Streams</a>
+        <a href="#complete-example"><span>7.</span> Complete Example</a>
+        <a href="#summary"><span>8.</span> Summary</a>
+      </div>
+
+      <!-- ================================================================ -->
+      <!-- 1. Core Concepts -->
+      <!-- ================================================================ -->
+      <h2 id="core-concepts">1. Core Concepts</h2>
+
+      <h3>1.1 What Is a Data Stream?</h3>
+      <p>A data stream is an ordered sequence of instances that arrive over time. Each instance consists of a <strong>feature vector <code>x</code></strong> (an array of numeric or categorical attribute values) and a <strong>label <code>y</code></strong> (a class index for classification or a numeric value for regression).</p>
+
+      <p>In OpenMOA, every data stream inherits from the abstract base class <code>Stream</code> and implements three essential methods:</p>
+
+      <table class="concept-table">
+        <thead>
+          <tr><th>Method</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>next_instance()</code></td><td>Returns the next instance in the stream</td></tr>
+          <tr><td><code>has_more_instances()</code></td><td>Returns <code>True</code> if more instances are available</td></tr>
+          <tr><td><code>get_schema()</code></td><td>Returns a <code>Schema</code> object describing the feature space</td></tr>
+        </tbody>
+      </table>
+
+      <h3>1.2 The Schema Object</h3>
+      <p>A <code>Schema</code> describes the structure of the data &mdash; number and names of attributes, number and names of classes, and whether the task is classification or regression.</p>
+
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Electricity
+
+stream = Electricity()
+schema = stream.get_schema()
+<span class="token-function">print</span>(<span class="token-string">f"Number of attributes: {schema.get_num_attributes()}"</span>)
+<span class="token-function">print</span>(<span class="token-string">f"Number of classes: {schema.get_num_classes()}"</span>)
+<span class="token-function">print</span>(<span class="token-string">f"Is classification: {schema.is_classification()}"</span>)
+<span class="token-function">print</span>(<span class="token-string">f"Is regression: {schema.is_regression()}"</span>)</code></pre>
+
+      <h3>1.3 The Instance Object</h3>
+      <p>When you call <code>next_instance()</code>, you receive either:</p>
+      <ul>
+        <li>A <strong><code>LabeledInstance</code></strong> (classification) with attributes <code>x</code> (numpy array), <code>y_index</code> (integer class index), and <code>y_label</code> (string class name).</li>
+        <li>A <strong><code>RegressionInstance</code></strong> (regression) with attributes <code>x</code> (numpy array) and <code>y_value</code> (float target value).</li>
+      </ul>
+
+      <pre><code>instance = stream.next_instance()
+<span class="token-function">print</span>(<span class="token-string">f"Features: {instance.x}"</span>)
+<span class="token-function">print</span>(<span class="token-string">f"Class index: {instance.y_index}"</span>)
+<span class="token-function">print</span>(<span class="token-string">f"Class label: {instance.y_label}"</span>)</code></pre>
+
+      <h3>1.4 The Test-Then-Train Loop</h3>
+      <p>The fundamental pattern in stream learning is the <strong>test-then-train</strong> (prequential) loop. For each incoming instance, you: <strong>predict</strong> first, <strong>train</strong> with the true label, and <strong>evaluate</strong> the prediction.</p>
+
+      <div class="st-tip st-tip-warn">
+        <strong>Important:</strong> You must never train before testing, as this would leak future information and produce unreliable evaluations.
+      </div>
+
+      <div class="protocol-box">
+        <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Electricity
+<span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> HoeffdingTree
+<span class="token-keyword">from</span> <span class="token-module">openmoa.evaluation</span> <span class="token-keyword">import</span> ClassificationEvaluator
+
+stream = Electricity()
+learner = HoeffdingTree(schema=stream.get_schema())
+evaluator = ClassificationEvaluator(schema=stream.get_schema())
+
+<span class="token-keyword">while</span> stream.has_more_instances():
+    instance = stream.next_instance()
+    prediction = learner.predict(instance)   <span class="token-comment"># Step 1: Test</span>
+    learner.train(instance)                  <span class="token-comment"># Step 2: Train</span>
+    evaluator.update(instance.y_index, prediction)  <span class="token-comment"># Step 3: Evaluate</span>
+
+<span class="token-function">print</span>(<span class="token-string">f"Accuracy: {evaluator.accuracy():.2f}%"</span>)</code></pre>
+      </div>
+
+      <p>Alternatively, you can use the Pythonic iterator pattern:</p>
+
+      <pre><code><span class="token-keyword">for</span> instance <span class="token-keyword">in</span> stream:
+    prediction = learner.predict(instance)
+    learner.train(instance)
+    evaluator.update(instance.y_index, prediction)</code></pre>
+
+      <hr class="st-sep">
+
+      <!-- ================================================================ -->
+      <!-- 2. Loading Data Streams -->
+      <!-- ================================================================ -->
+      <h2 id="loading">2. Loading Data Streams</h2>
+      <p>OpenMOA supports multiple ways to create data streams. This section covers each method with working code examples.</p>
+
+      <h3>2.1 Built-in Datasets</h3>
+      <p>OpenMOA ships with a collection of widely-used benchmark datasets. Simply import the dataset class and instantiate it &mdash; the data will be automatically downloaded if not already present on disk.</p>
+
+      <h4>Classification Datasets</h4>
+      <table class="concept-table">
+        <thead>
+          <tr><th>Dataset</th><th>Instances</th><th>Attributes</th><th>Classes</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Electricity</code></td><td>45,312</td><td>8</td><td>2</td><td>Australian electricity price changes</td></tr>
+          <tr><td><code>Covtype</code></td><td>581,012</td><td>54</td><td>7</td><td>Forest cover type prediction</td></tr>
+          <tr><td><code>Sensor</code></td><td>2,219,803</td><td>5</td><td>54</td><td>Intel Lab indoor sensor data</td></tr>
+          <tr><td><code>Hyper100k</code></td><td>100,000</td><td>10</td><td>2</td><td>Moving hyperplane (synthetic, with drift)</td></tr>
+          <tr><td><code>RBFm_100k</code></td><td>100,000</td><td>10</td><td>5</td><td>Radial Basis Function (synthetic, with drift)</td></tr>
+          <tr><td><code>RTG_2abrupt</code></td><td>100,000</td><td>30</td><td>5</td><td>Random Tree with 2 abrupt drifts</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Regression Datasets</h4>
+      <table class="concept-table">
+        <thead>
+          <tr><th>Dataset</th><th>Instances</th><th>Attributes</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Fried</code></td><td>40,768</td><td>10</td><td>Friedman function-based regression</td></tr>
+          <tr><td><code>Bike</code></td><td>&mdash;</td><td>&mdash;</td><td>Bike sharing demand prediction</td></tr>
+        </tbody>
+      </table>
+
+      <h4>UOL Benchmark Datasets (Binary Classification)</h4>
+      <p>These datasets are specifically used for benchmarking Utilitarian Online Learning algorithms under evolving feature spaces:</p>
+
+      <table class="concept-table">
+        <thead>
+          <tr><th>Dataset</th><th>Instances</th><th>Attributes</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>RCV1</code></td><td>20,242</td><td>~47,000</td><td>Reuters Corpus (sparse, high-dimensional)</td></tr>
+          <tr><td><code>W8a</code></td><td>49,749</td><td>300</td><td>Web data classification</td></tr>
+          <tr><td><code>Adult</code></td><td>32,561</td><td>123</td><td>Census income prediction</td></tr>
+          <tr><td><code>Magic04</code></td><td>19,020</td><td>10</td><td>Gamma telescope signal detection</td></tr>
+          <tr><td><code>Spambase</code></td><td>4,601</td><td>57</td><td>Email spam detection</td></tr>
+          <tr><td><code>Musk</code></td><td>6,598</td><td>166</td><td>Molecule shape classification</td></tr>
+          <tr><td><code>InternetAds</code></td><td>2,359</td><td>1,558</td><td>Online ad detection</td></tr>
+          <tr><td><code>German</code></td><td>1,000</td><td>24</td><td>Credit risk assessment</td></tr>
+          <tr><td><code>Australian</code></td><td>690</td><td>14</td><td>Credit approval</td></tr>
+          <tr><td><code>Ionosphere</code></td><td>351</td><td>34</td><td>Radar signal classification</td></tr>
+          <tr><td><code>SVMGuide3</code></td><td>1,243</td><td>21</td><td>LIBSVM benchmark</td></tr>
+        </tbody>
+      </table>
+
+      <h4>UOL Benchmark Datasets (Multi-Class Classification)</h4>
+      <table class="concept-table">
+        <thead>
+          <tr><th>Dataset</th><th>Instances</th><th>Attributes</th><th>Classes</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>DryBean</code></td><td>13,611</td><td>16</td><td>7</td><td>Dry bean species classification</td></tr>
+          <tr><td><code>Optdigits</code></td><td>5,620</td><td>64</td><td>10</td><td>Handwritten digit recognition</td></tr>
+          <tr><td><code>Frogs</code></td><td>7,195</td><td>22</td><td>4</td><td>Frog species by call features</td></tr>
+          <tr><td><code>Wine</code></td><td>178</td><td>13</td><td>3</td><td>Wine cultivar classification</td></tr>
+          <tr><td><code>Splice</code></td><td>3,190</td><td>60</td><td>3</td><td>DNA splice junction classification</td></tr>
+        </tbody>
+      </table>
+
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Electricity, Fried, Magic04, RCV1
+
+<span class="token-comment"># Classification stream</span>
+elec_stream = Electricity()
+<span class="token-function">print</span>(<span class="token-string">f"Electricity: {len(elec_stream)} instances, {elec_stream.get_schema().get_num_attributes()} features"</span>)
+
+<span class="token-comment"># Regression stream</span>
+fried_stream = Fried()
+
+<span class="token-comment"># UOL benchmark dataset (binary classification)</span>
+magic_stream = Magic04()
+
+<span class="token-comment"># High-dimensional sparse dataset</span>
+rcv1_stream = RCV1()</code></pre>
+
+      <h3>2.2 Streams from Files</h3>
+
+      <h4>ARFF Files</h4>
+      <p>The Attribute-Relation File Format (ARFF) is the native format for MOA and Weka.</p>
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> ARFFStream
+
+stream = ARFFStream(path=<span class="token-string">"path/to/dataset.arff"</span>)</code></pre>
+
+      <h4>CSV Files</h4>
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> CSVStream
+
+stream = CSVStream(
+    csv_file_path=<span class="token-string">"path/to/data.csv"</span>,
+    class_index=-<span class="token-number">1</span>,           <span class="token-comment"># Column index of the target (default: last column)</span>
+    delimiter=<span class="token-string">","</span>,
+    dataset_name=<span class="token-string">"MyDataset"</span>
+)</code></pre>
+
+      <h4>LIBSVM Files</h4>
+      <p>For sparse datasets stored in LIBSVM format (commonly used for large-scale datasets like RCV1):</p>
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> LibsvmStream
+
+stream = LibsvmStream(path=<span class="token-string">"path/to/data.libsvm"</span>)</code></pre>
+
+      <h4>Generic File Loading</h4>
+      <p>OpenMOA also provides a convenience function that auto-detects the format:</p>
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> stream_from_file
+
+stream = stream_from_file(path_to_csv_or_arff=<span class="token-string">"path/to/dataset.arff"</span>)</code></pre>
+
+      <h3>2.3 Streams from NumPy Arrays</h3>
+      <p>If your data is already loaded in Python as NumPy arrays, you can wrap it into a stream directly:</p>
+
+      <pre><code><span class="token-keyword">import</span> <span class="token-module">numpy</span> <span class="token-keyword">as</span> np
+<span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> NumpyStream
+
+X = np.array([[<span class="token-number">1.0</span>, <span class="token-number">2.0</span>, <span class="token-number">3.0</span>],
+              [<span class="token-number">4.0</span>, <span class="token-number">5.0</span>, <span class="token-number">6.0</span>],
+              [<span class="token-number">7.0</span>, <span class="token-number">8.0</span>, <span class="token-number">9.0</span>]])
+y = np.array([<span class="token-number">0</span>, <span class="token-number">1</span>, <span class="token-number">0</span>])
+
+stream = NumpyStream(X, y, dataset_name=<span class="token-string">"MyDataset"</span>)
+<span class="token-keyword">for</span> instance <span class="token-keyword">in</span> stream:
+    <span class="token-function">print</span>(<span class="token-string">f"x={instance.x}, y={instance.y_index}"</span>)</code></pre>
+
+      <p>For regression tasks, simply pass numeric target values:</p>
+      <pre><code>y_reg = np.array([<span class="token-number">1.5</span>, <span class="token-number">3.7</span>, <span class="token-number">2.1</span>])
+stream = NumpyStream(X, y_reg, dataset_name=<span class="token-string">"RegressionData"</span>, target_type=<span class="token-string">"numeric"</span>)</code></pre>
+
+      <h3>2.4 Streams from PyTorch Datasets</h3>
+      <p>OpenMOA seamlessly integrates with PyTorch datasets:</p>
+
+      <pre><code><span class="token-keyword">import</span> <span class="token-module">torch</span>
+<span class="token-keyword">from</span> <span class="token-module">torch.utils.data</span> <span class="token-keyword">import</span> TensorDataset
+<span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> TorchClassifyStream
+
+X = torch.tensor([[<span class="token-number">1.0</span>, <span class="token-number">2.0</span>], [<span class="token-number">3.0</span>, <span class="token-number">4.0</span>], [<span class="token-number">5.0</span>, <span class="token-number">6.0</span>]])
+y = torch.tensor([<span class="token-number">0</span>, <span class="token-number">1</span>, <span class="token-number">2</span>])
+dataset = TensorDataset(X, y)
+
+stream = TorchClassifyStream(
+    dataset=dataset,
+    num_classes=<span class="token-number">3</span>,
+    shuffle=<span class="token-number">True</span>,        <span class="token-comment"># Randomly sample instances</span>
+    shuffle_seed=<span class="token-number">42</span>
+)</code></pre>
+
+      <hr class="st-sep">
+
+      <!-- ================================================================ -->
+      <!-- 3. Synthetic Stream Generators -->
+      <!-- ================================================================ -->
+      <h2 id="generators">3. Synthetic Stream Generators</h2>
+      <p>For controlled experiments, OpenMOA provides synthetic data generators through the MOA backend. These generators produce <strong>infinite</strong> streams with known properties, making them ideal for studying algorithm behavior under specific conditions.</p>
+
+      <h3>3.1 Available Generators</h3>
+      <table class="concept-table">
+        <thead>
+          <tr><th>Generator</th><th>Description</th><th>Attributes</th><th>Classes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>RandomTreeGenerator</code></td><td>Random decision tree structure</td><td>Configurable</td><td>Configurable</td></tr>
+          <tr><td><code>SEA</code></td><td>SEA concepts for concept drift studies</td><td>3</td><td>2</td></tr>
+          <tr><td><code>HyperplaneGenerator</code></td><td>Rotating hyperplane for gradual drift</td><td>Configurable</td><td>2</td></tr>
+          <tr><td><code>AgrawalGenerator</code></td><td>Loan application scenario</td><td>9</td><td>2</td></tr>
+          <tr><td><code>RandomRBFGenerator</code></td><td>Radial Basis Function centroids</td><td>Configurable</td><td>Configurable</td></tr>
+          <tr><td><code>RandomRBFGeneratorDrift</code></td><td>RBF with drifting centroids</td><td>Configurable</td><td>Configurable</td></tr>
+          <tr><td><code>LEDGenerator</code></td><td>LED display digit recognition</td><td>7 (or 24)</td><td>10</td></tr>
+          <tr><td><code>WaveformGenerator</code></td><td>Waveform classification</td><td>21 (or 40)</td><td>3</td></tr>
+          <tr><td><code>STAGGERGenerator</code></td><td>Classic STAGGER concepts</td><td>3</td><td>2</td></tr>
+          <tr><td><code>SineGenerator</code></td><td>Sine-based classification boundary</td><td>2</td><td>2</td></tr>
+          <tr><td><code>HyperplaneGeneratorForRegression</code></td><td>Regression hyperplane generator</td><td>Configurable</td><td>&mdash;</td></tr>
+        </tbody>
+      </table>
+
+      <h3>3.2 Basic Usage</h3>
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream.generator</span> <span class="token-keyword">import</span> RandomTreeGenerator
+
+stream = RandomTreeGenerator(
+    instance_random_seed=<span class="token-number">1</span>,
+    tree_random_seed=<span class="token-number">1</span>,
+    num_classes=<span class="token-number">2</span>,
+    num_nominals=<span class="token-number">5</span>,
+    num_numerics=<span class="token-number">5</span>,
+    max_tree_depth=<span class="token-number">5</span>
+)
+
+<span class="token-comment"># Generators produce infinite streams — use max_instances to limit</span>
+instance = stream.next_instance()
+<span class="token-function">print</span>(<span class="token-string">f"Features: {instance.x}"</span>)
+<span class="token-function">print</span>(<span class="token-string">f"Label: {instance.y_label}"</span>)</code></pre>
+
+      <h3>3.3 Using Generators with Evaluation</h3>
+      <p>Since synthetic generators produce infinite streams, you must specify <code>max_instances</code> when using them with evaluation functions:</p>
+
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream.generator</span> <span class="token-keyword">import</span> SEA
+<span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> HoeffdingTree
+<span class="token-keyword">from</span> <span class="token-module">openmoa.evaluation</span> <span class="token-keyword">import</span> prequential_evaluation
+
+stream = SEA(function=<span class="token-number">1</span>)
+learner = HoeffdingTree(schema=stream.get_schema())
+
+results = prequential_evaluation(
+    stream=stream,
+    learner=learner,
+    window_size=<span class="token-number">1000</span>,
+    max_instances=<span class="token-number">10000</span>
+)
+
+<span class="token-function">print</span>(<span class="token-string">f"Accuracy: {results.cumulative.accuracy():.2f}%"</span>)</code></pre>
+
+      <hr class="st-sep">
+
+      <!-- ================================================================ -->
+      <!-- 4. Concept Drift Streams -->
+      <!-- ================================================================ -->
+      <h2 id="drift">4. Concept Drift Streams</h2>
+      <p>One of the most challenging aspects of data streams is <strong>concept drift</strong> &mdash; when the underlying data distribution changes over time. OpenMOA provides the <code>DriftStream</code> API for composing complex drifting scenarios from simple building blocks.</p>
+
+      <h3>4.1 Types of Concept Drift</h3>
+      <div class="st-drift-grid">
+        <div class="st-drift-card">
+          <h4>Abrupt</h4>
+          <p>Instantaneous change from one concept to another. Width = 1 (default).</p>
+        </div>
+        <div class="st-drift-card">
+          <h4>Gradual</h4>
+          <p>Smooth transition between two concepts over a period. Width &gt; 1.</p>
+        </div>
+        <div class="st-drift-card">
+          <h4>Recurring</h4>
+          <p>A previously seen concept reappears later in the stream. Width is configurable.</p>
+        </div>
+      </div>
+
+      <h3>4.2 Building a DriftStream</h3>
+      <p>The <code>DriftStream</code> API uses a list-based syntax where you alternate between <strong>concepts</strong> (stream generators) and <strong>drift events</strong>:</p>
+
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream.generator</span> <span class="token-keyword">import</span> SEA
+<span class="token-keyword">from</span> <span class="token-module">openmoa.stream.drift</span> <span class="token-keyword">import</span> DriftStream, AbruptDrift, GradualDrift
+
+<span class="token-comment"># Compose a stream with:</span>
+<span class="token-comment">#   SEA(1) → Abrupt drift at t=5000 → SEA(3) → Gradual drift → SEA(1)</span>
+stream = DriftStream(stream=[
+    SEA(function=<span class="token-number">1</span>),
+    AbruptDrift(position=<span class="token-number">5000</span>),
+    SEA(function=<span class="token-number">3</span>),
+    GradualDrift(position=<span class="token-number">10000</span>, width=<span class="token-number">2000</span>),
+    SEA(function=<span class="token-number">1</span>),
+])</code></pre>
+
+      <h3>4.3 Visualizing Drift Effects</h3>
+      <p>The <code>DriftStream</code> object carries drift metadata, which is automatically used by OpenMOA's visualization functions to annotate plots:</p>
+
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> OnlineBagging
+<span class="token-keyword">from</span> <span class="token-module">openmoa.evaluation</span> <span class="token-keyword">import</span> prequential_evaluation
+<span class="token-keyword">from</span> <span class="token-module">openmoa.evaluation.visualization</span> <span class="token-keyword">import</span> plot_windowed_results
+
+learner = OnlineBagging(schema=stream.get_schema(), ensemble_size=<span class="token-number">10</span>)
+
+results = prequential_evaluation(
+    stream=stream,
+    learner=learner,
+    window_size=<span class="token-number">100</span>,
+    max_instances=<span class="token-number">15000</span>
+)
+
+<span class="token-comment"># Drift locations are automatically shown as vertical lines on the plot</span>
+plot_windowed_results(results, metric=<span class="token-string">"accuracy"</span>)</code></pre>
+
+      <h3>4.4 Recurring Concept Drift</h3>
+      <p>OpenMOA provides a dedicated API for recurring concepts, where the same concept may appear multiple times in the stream:</p>
+
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream.drift</span> <span class="token-keyword">import</span> RecurrentConceptDriftStream, AbruptDrift
+<span class="token-keyword">from</span> <span class="token-module">openmoa.stream.generator</span> <span class="token-keyword">import</span> RandomTreeGenerator
+
+concept1 = RandomTreeGenerator(tree_random_seed=<span class="token-number">1</span>)
+concept2 = RandomTreeGenerator(tree_random_seed=<span class="token-number">2</span>)
+concept3 = RandomTreeGenerator(tree_random_seed=<span class="token-number">3</span>)
+
+stream = RecurrentConceptDriftStream(
+    concept_list=[concept1, concept2, concept3],
+    max_recurrences_per_concept=<span class="token-number">2</span>,
+    transition_type_template=AbruptDrift(position=<span class="token-number">2000</span>),
+    concept_name_list=[<span class="token-string">"Concept A"</span>, <span class="token-string">"Concept B"</span>, <span class="token-string">"Concept C"</span>]
+)</code></pre>
+
+      <hr class="st-sep">
+
+      <!-- ================================================================ -->
+      <!-- 5. Stream Composition Utilities -->
+      <!-- ================================================================ -->
+      <h2 id="composition">5. Stream Composition Utilities</h2>
+
+      <h3>5.1 ConcatStream &mdash; Chaining Multiple Streams</h3>
+      <p><code>ConcatStream</code> joins multiple streams end-to-end. When the first stream is exhausted, it seamlessly moves to the next:</p>
+
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> ConcatStream, NumpyStream
+<span class="token-keyword">import</span> <span class="token-module">numpy</span> <span class="token-keyword">as</span> np
+
+stream1 = NumpyStream(np.array([[<span class="token-number">1</span>, <span class="token-number">2</span>], [<span class="token-number">3</span>, <span class="token-number">4</span>]]), np.array([<span class="token-number">0</span>, <span class="token-number">1</span>]))
+stream2 = NumpyStream(np.array([[<span class="token-number">5</span>, <span class="token-number">6</span>], [<span class="token-number">7</span>, <span class="token-number">8</span>]]), np.array([<span class="token-number">1</span>, <span class="token-number">0</span>]))
+
+combined = ConcatStream([stream1, stream2])
+<span class="token-keyword">for</span> instance <span class="token-keyword">in</span> combined:
+    <span class="token-function">print</span>(instance.x, instance.y_index)
+<span class="token-comment"># Output: [1. 2.] 0, [3. 4.] 1, [5. 6.] 1, [7. 8.] 0</span></code></pre>
+
+      <div class="st-tip st-tip-info">
+        <strong>Note:</strong> All streams in a <code>ConcatStream</code> must share the same schema (same number of features and classes).
+      </div>
+
+      <h3>5.2 ShuffledStream &mdash; Randomizing Instance Order</h3>
+      <p>When using static datasets (e.g., UCI datasets like Magic04 or Spambase) for online learning experiments, the original file order may be sorted by label, which creates an unrealistic streaming scenario. <code>ShuffledStream</code> solves this by buffering all instances and presenting them in random order:</p>
+
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> ShuffledStream
+<span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Magic04
+
+base_stream = Magic04()
+
+<span class="token-comment"># Shuffle instance order with a fixed seed for reproducibility</span>
+shuffled = ShuffledStream(base_stream=base_stream, random_seed=<span class="token-number">42</span>)</code></pre>
+
+      <div class="st-tip st-tip-warn">
+        <strong>Warning:</strong> <code>ShuffledStream</code> loads all instances into memory. It is safe for UCI-scale datasets (thousands to tens of thousands of instances), but should NOT be used for massive streams (millions of instances).
+      </div>
+
+      <table class="concept-table">
+        <thead>
+          <tr><th>When to Use</th><th>When NOT to Use</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Static file (CSV, ARFF) that might be sorted by class label</td><td>Data with inherent temporal ordering (e.g., Electricity, Sensor)</td></tr>
+          <tr><td>Simulating a realistic i.i.d. streaming scenario</td><td>Data from synthetic generators (already random)</td></tr>
+          <tr><td>Dataset fits comfortably in memory</td><td>Dataset is too large for memory</td></tr>
+        </tbody>
+      </table>
+
+      <h3>5.3 Restarting Streams</h3>
+      <p>All OpenMOA streams support the <code>restart()</code> method, which resets the stream to read from the beginning. This is useful for running multiple experiments on the same data:</p>
+
+      <pre><code>stream = Electricity()
+
+<span class="token-comment"># First run</span>
+<span class="token-keyword">for</span> instance <span class="token-keyword">in</span> stream:
+    <span class="token-keyword">pass</span>
+
+<span class="token-comment"># Reset and run again</span>
+stream.restart()
+<span class="token-keyword">for</span> instance <span class="token-keyword">in</span> stream:
+    <span class="token-keyword">pass</span></code></pre>
+
+      <div class="st-tip st-tip-info">
+        <strong>Note:</strong> The <code>prequential_evaluation()</code> function automatically calls <code>restart()</code> by default, so you don't need to manually restart streams between evaluations.
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ================================================================ -->
+      <!-- 6. Feature-Evolving Streams -->
+      <!-- ================================================================ -->
+      <h2 id="feature-evolving">6. Feature-Evolving Streams (OpenMOA Exclusive)</h2>
+      <p>This is the <strong>core innovation</strong> of OpenMOA. In real-world applications, the feature space itself can change over time &mdash; new sensors come online, old ones fail, data sources are added or removed. This is fundamentally different from concept drift, where the feature space stays fixed but the relationship between features and labels changes.</p>
+      <p>OpenMOA provides <strong>five specialized stream wrappers</strong> that transform any fixed-feature stream into a stream with evolving features.</p>
+
+      <h3>6.1 Two Representation Strategies</h3>
+      <p>OpenMOA supports two fundamentally different ways to represent instances with missing features:</p>
+
+      <div class="st-compare">
+        <div class="st-compare-box">
+          <h4>Sparse-Aware</h4>
+          <span class="st-label st-label-sparse">Variable Dimension</span>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;"><strong>Wrapper:</strong> <code>OpenFeatureStream</code></p>
+          <p style="font-size: 14px; color: var(--text-secondary);">Subsetted feature vector + global index metadata. Vector size changes over time. Best for algorithms that can handle index-based sparse input (FESL, OASF, RSOL).</p>
+        </div>
+        <div class="st-compare-box">
+          <h4>NaN-Padded</h4>
+          <span class="st-label st-label-nan">Fixed Dimension</span>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;"><strong>Wrappers:</strong> <code>TrapezoidalStream</code>, <code>CapriciousStream</code>, <code>EvolvableStream</code></p>
+          <p style="font-size: 14px; color: var(--text-secondary);">Fixed-size vector with <code>NaN</code> for missing features. Best for algorithms that handle missing values natively (OVFM).</p>
+        </div>
+      </div>
+
+      <h3>6.2 OpenFeatureStream &mdash; The Universal Evolving Stream Wrapper</h3>
+      <p><code>OpenFeatureStream</code> is the most versatile wrapper. It takes any base stream and simulates feature evolution by selecting a subset of features at each time step. The key innovation is attaching <code>feature_indices</code> metadata to each instance, which tells downstream algorithms the <strong>global IDs</strong> of the currently active features.</p>
+
+      <h4>Supported Evolution Patterns</h4>
+
+      <div class="st-pattern-grid">
+        <div class="st-pattern-card">
+          <h4>Pyramid</h4>
+          <div class="st-pattern-sub">Features increase then decrease symmetrically</div>
+          <pre><code><span class="token-comment">Dimension over time:</span>
+d_max ─      /\
+            /  \
+d_min ─ ___/    \___
+        0   T/2   T</code></pre>
+        </div>
+        <div class="st-pattern-card">
+          <h4>Incremental</h4>
+          <div class="st-pattern-sub">Features appear monotonically over time</div>
+          <pre><code><span class="token-comment">Dimension over time:</span>
+d_max ─           ___
+                 /
+               /
+d_min ─ _____/
+        0           T</code></pre>
+        </div>
+        <div class="st-pattern-card">
+          <h4>Decremental</h4>
+          <div class="st-pattern-sub">Features disappear monotonically over time</div>
+          <pre><code><span class="token-comment">Dimension over time:</span>
+d_max ─ ___
+           \
+             \
+d_min ─       \_____
+        0           T</code></pre>
+        </div>
+      </div>
+
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> OpenFeatureStream
+<span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Electricity
+
+base = Electricity()
+
+<span class="token-comment"># Pyramid evolution pattern</span>
+stream = OpenFeatureStream(
+    base_stream=base,
+    evolution_pattern=<span class="token-string">"pyramid"</span>,
+    d_min=<span class="token-number">2</span>,
+    d_max=<span class="token-number">8</span>,
+    total_instances=<span class="token-number">10000</span>,
+    feature_selection=<span class="token-string">"prefix"</span>  <span class="token-comment"># "prefix", "suffix", or "random"</span>
+)
+
+<span class="token-comment"># Incremental evolution pattern</span>
+stream = OpenFeatureStream(
+    base_stream=base,
+    evolution_pattern=<span class="token-string">"incremental"</span>,
+    d_min=<span class="token-number">2</span>,
+    d_max=<span class="token-number">8</span>,
+    total_instances=<span class="token-number">10000</span>
+)</code></pre>
+
+      <h4>TDS (Trapezoidal Data Stream)</h4>
+      <p>Each feature has a distinct &ldquo;birth time.&rdquo; Once a feature appears, it remains available for the rest of the stream. Supports two modes: <code>ordered</code> (features appear sequentially by index) and <code>random</code> (random appearance order).</p>
+
+      <div class="architecture-box">
+<pre><span class="token-comment">TDS Feature Timeline</span>
+
+Time:     0 ──── t1 ──── t2 ──── t3 ────── T
+Feature0: ████████████████████████████████████
+Feature1:        █████████████████████████████
+Feature2:               ████████████████████
+Feature3:                      █████████████</pre>
+      </div>
+
+      <pre><code>stream = OpenFeatureStream(
+    base_stream=base,
+    evolution_pattern=<span class="token-string">"tds"</span>,
+    tds_mode=<span class="token-string">"random"</span>,   <span class="token-comment"># or "ordered"</span>
+    total_instances=<span class="token-number">10000</span>
+)</code></pre>
+
+      <h4>CDS (Capricious Data Stream)</h4>
+      <p>At each time step, every feature independently undergoes a Bernoulli trial. If it &ldquo;fails,&rdquo; the feature is missing for that instance. This produces a stochastic, per-instance pattern of missing features.</p>
+
+      <pre><code>stream = OpenFeatureStream(
+    base_stream=base,
+    evolution_pattern=<span class="token-string">"cds"</span>,
+    missing_ratio=<span class="token-number">0.3</span>,    <span class="token-comment"># 30% probability of each feature being missing</span>
+    total_instances=<span class="token-number">10000</span>
+)</code></pre>
+
+      <h4>EDS (Evolvable Data Stream)</h4>
+      <p>The feature space evolves in <code>n</code> sequential segments with overlapping transition periods. During stable stages only one segment is active; during overlap stages features from two adjacent segments are both active.</p>
+
+      <div class="architecture-box">
+<pre><span class="token-comment">EDS (n_segments=3, overlap_ratio=0.5)</span>
+
+Segment 1:  ██████████████████
+Overlap:            ██████████████████
+Segment 2:                  ██████████████████
+Overlap:                          ██████████████████
+Segment 3:                                ██████████████████</pre>
+      </div>
+
+      <pre><code>stream = OpenFeatureStream(
+    base_stream=base,
+    evolution_pattern=<span class="token-string">"eds"</span>,
+    n_segments=<span class="token-number">3</span>,         <span class="token-comment"># Number of feature partitions</span>
+    overlap_ratio=<span class="token-number">0.5</span>,    <span class="token-comment"># Overlap length relative to stable period</span>
+    total_instances=<span class="token-number">10000</span>
+)</code></pre>
+
+      <h4>Consuming OpenFeatureStream Instances</h4>
+      <p>Each instance from <code>OpenFeatureStream</code> carries a <code>feature_indices</code> attribute containing the global IDs of the currently active features:</p>
+
+      <pre><code>stream = OpenFeatureStream(
+    base_stream=Electricity(),
+    evolution_pattern=<span class="token-string">"pyramid"</span>,
+    d_min=<span class="token-number">2</span>,
+    d_max=<span class="token-number">8</span>,
+    total_instances=<span class="token-number">100</span>
+)
+
+instance = stream.next_instance()
+<span class="token-function">print</span>(<span class="token-string">f"Feature values: {instance.x}"</span>)            <span class="token-comment"># e.g., [0.056, 0.439]  (only active features)</span>
+<span class="token-function">print</span>(<span class="token-string">f"Global indices: {instance.feature_indices}"</span>) <span class="token-comment"># e.g., [0, 1]        (which features these are)</span>
+<span class="token-function">print</span>(<span class="token-string">f"Active dimension: {len(instance.x)}"</span>)       <span class="token-comment"># Changes over time</span></code></pre>
+
+      <h3>6.3 TrapezoidalStream &mdash; NaN-Based Trapezoidal Evolution</h3>
+      <p><code>TrapezoidalStream</code> maintains a <strong>fixed vector size</strong> equal to <code>d_max</code>. Inactive features are filled with <code>np.nan</code>. This is useful for algorithms like OVFM that handle missing values natively without needing index metadata.</p>
+
+      <table class="concept-table">
+        <thead>
+          <tr><th>Mode</th><th>Behavior</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>random</code></td><td>Features appear in random order, linear growth d_min &rarr; d_max</td></tr>
+          <tr><td><code>ordered</code></td><td>Features appear sequentially (0, 1, 2, ...), linear growth</td></tr>
+          <tr><td><code>pyramid</code></td><td>Features appear sequentially, then disappear (d_min &rarr; d_max &rarr; d_min)</td></tr>
+        </tbody>
+      </table>
+
+      <pre><code><span class="token-keyword">import</span> <span class="token-module">numpy</span> <span class="token-keyword">as</span> np
+<span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> TrapezoidalStream
+<span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Spambase
+
+base = Spambase()
+stream = TrapezoidalStream(
+    base_stream=base,
+    d_min=<span class="token-number">5</span>,
+    d_max=<span class="token-number">57</span>,
+    evolution_mode=<span class="token-string">"random"</span>,
+    total_instances=<span class="token-number">4601</span>,
+    random_seed=<span class="token-number">42</span>
+)
+
+instance = stream.next_instance()
+<span class="token-function">print</span>(<span class="token-string">f"Vector size: {len(instance.x)}"</span>)  <span class="token-comment"># Always 57</span>
+<span class="token-function">print</span>(<span class="token-string">f"Active features: {np.count_nonzero(~np.isnan(instance.x))}"</span>)
+<span class="token-function">print</span>(<span class="token-string">f"Missing (NaN) features: {np.count_nonzero(np.isnan(instance.x))}"</span>)</code></pre>
+
+      <h3>6.4 CapriciousStream &mdash; NaN-Based Stochastic Missing Features</h3>
+      <p><code>CapriciousStream</code> simulates the Capricious Data Stream (CDS) paradigm with a fixed-dimension NaN representation. At each time step, each feature has a <code>missing_ratio</code> probability of being replaced with <code>NaN</code>.</p>
+
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> CapriciousStream
+<span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> German
+
+base = German()
+stream = CapriciousStream(
+    base_stream=base,
+    missing_ratio=<span class="token-number">0.5</span>,    <span class="token-comment"># 50% of features missing per instance</span>
+    min_features=<span class="token-number">1</span>,       <span class="token-comment"># At least 1 feature always present</span>
+    total_instances=<span class="token-number">1000</span>,
+    random_seed=<span class="token-number">42</span>
+)
+
+instance = stream.next_instance()
+<span class="token-comment"># instance.x has fixed length d_max, with random NaN entries</span></code></pre>
+
+      <h3>6.5 EvolvableStream &mdash; NaN-Based Multi-Phase Evolution</h3>
+      <p><code>EvolvableStream</code> implements the Evolvable Data Stream (EDS) paradigm with fixed-dimension NaN representation. The feature space evolves through <code>n</code> segments with configurable overlap periods.</p>
+
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> EvolvableStream
+<span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Adult
+
+base = Adult()
+stream = EvolvableStream(
+    base_stream=base,
+    n_segments=<span class="token-number">3</span>,
+    overlap_ratio=<span class="token-number">0.5</span>,
+    total_instances=<span class="token-number">10000</span>,
+    random_seed=<span class="token-number">42</span>
+)
+
+instance = stream.next_instance()
+<span class="token-comment"># instance.x has fixed size, with NaN for features not in the current segment</span></code></pre>
+
+      <h3>6.6 Choosing the Right Wrapper</h3>
+      <table class="concept-table">
+        <thead>
+          <tr><th>Your Algorithm Handles...</th><th>Use This Wrapper</th><th>Representation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Variable-length sparse input with index metadata</td><td><code>OpenFeatureStream</code></td><td>Subsetted vector + <code>feature_indices</code></td></tr>
+          <tr><td>Fixed-dimension input with NaN (TDS paradigm)</td><td><code>TrapezoidalStream</code></td><td>Fixed vector with NaN</td></tr>
+          <tr><td>Fixed-dimension input with NaN (CDS paradigm)</td><td><code>CapriciousStream</code></td><td>Fixed vector with NaN</td></tr>
+          <tr><td>Fixed-dimension input with NaN (EDS paradigm)</td><td><code>EvolvableStream</code></td><td>Fixed vector with NaN</td></tr>
+        </tbody>
+      </table>
+
+      <h3>6.7 Combining Wrappers</h3>
+      <p>You can chain wrappers together. A common pattern is to shuffle a static dataset first, then apply feature evolution:</p>
+
+      <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> ShuffledStream, OpenFeatureStream
+<span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Magic04
+
+<span class="token-comment"># Step 1: Load and shuffle the static dataset</span>
+base = Magic04()
+shuffled = ShuffledStream(base_stream=base, random_seed=<span class="token-number">42</span>)
+
+<span class="token-comment"># Step 2: Apply feature evolution</span>
+evolving_stream = OpenFeatureStream(
+    base_stream=shuffled,
+    evolution_pattern=<span class="token-string">"pyramid"</span>,
+    d_min=<span class="token-number">2</span>,
+    d_max=<span class="token-number">10</span>,
+    total_instances=shuffled.get_num_instances()
+)</code></pre>
+
+      <hr class="st-sep">
+
+      <!-- ================================================================ -->
+      <!-- 7. Complete Example -->
+      <!-- ================================================================ -->
+      <h2 id="complete-example">7. Complete Example: End-to-End Streaming Pipeline</h2>
+      <p>Here is a complete example that demonstrates loading a dataset, applying feature evolution, training an online learner, and evaluating its performance:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-dot red"></span>
+          <span class="code-block-dot yellow"></span>
+          <span class="code-block-dot green"></span>
+          <span class="code-block-title">streaming_pipeline.py</span>
+        </div>
+        <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Electricity
+<span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> OpenFeatureStream
+<span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> OASFClassifier
+<span class="token-keyword">from</span> <span class="token-module">openmoa.evaluation</span> <span class="token-keyword">import</span> ClassificationEvaluator
+
+<span class="token-comment"># 1. Create a base data stream</span>
+base_stream = Electricity()
+schema = base_stream.get_schema()
+
+<span class="token-comment"># 2. Wrap with feature evolution (incremental features)</span>
+evolving_stream = OpenFeatureStream(
+    base_stream=base_stream,
+    evolution_pattern=<span class="token-string">"incremental"</span>,
+    d_min=<span class="token-number">2</span>,
+    total_instances=<span class="token-number">10000</span>
+)
+
+<span class="token-comment"># 3. Create a learner designed for evolving features</span>
+learner = OASFClassifier(schema=schema)
+evaluator = ClassificationEvaluator(schema=schema)
+
+<span class="token-comment"># 4. Test-then-train loop</span>
+<span class="token-keyword">while</span> evolving_stream.has_more_instances():
+    instance = evolving_stream.next_instance()
+    prediction = learner.predict(instance)
+    learner.train(instance)
+    evaluator.update(instance.y_index, prediction)
+
+<span class="token-function">print</span>(<span class="token-string">f"Accuracy under feature evolution: {evaluator.accuracy():.2f}%"</span>)</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ================================================================ -->
+      <!-- 8. Summary -->
+      <!-- ================================================================ -->
+      <h2 id="summary">8. Summary: Stream Types at a Glance</h2>
+
+      <table class="concept-table st-summary-table">
+        <thead>
+          <tr><th>Stream Class</th><th>Source</th><th>Key Feature</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Electricity</code>, <code>Covtype</code>, ...</td><td>Built-in datasets</td><td>Auto-download, ready to use</td></tr>
+          <tr><td><code>ARFFStream</code></td><td>ARFF files</td><td>Native MOA format</td></tr>
+          <tr><td><code>CSVStream</code></td><td>CSV files</td><td>Flexible delimiter and type inference</td></tr>
+          <tr><td><code>LibsvmStream</code></td><td>LIBSVM files</td><td>Sparse format for high-dimensional data</td></tr>
+          <tr><td><code>NumpyStream</code></td><td>NumPy arrays</td><td>Direct from Python objects</td></tr>
+          <tr><td><code>TorchClassifyStream</code></td><td>PyTorch datasets</td><td>Deep learning integration</td></tr>
+          <tr><td><code>RandomTreeGenerator</code>, <code>SEA</code>, ...</td><td>Synthetic generators</td><td>Infinite, configurable streams</td></tr>
+          <tr><td><code>DriftStream</code></td><td>Composite</td><td>Concept drift simulation</td></tr>
+          <tr><td><code>ConcatStream</code></td><td>Composite</td><td>Chain multiple streams</td></tr>
+          <tr><td><code>ShuffledStream</code></td><td>Wrapper</td><td>Randomize instance order</td></tr>
+          <tr><td><code>OpenFeatureStream</code></td><td>Wrapper</td><td>Feature evolution (sparse-aware)</td></tr>
+          <tr><td><code>TrapezoidalStream</code></td><td>Wrapper</td><td>Feature evolution (NaN, TDS)</td></tr>
+          <tr><td><code>CapriciousStream</code></td><td>Wrapper</td><td>Feature evolution (NaN, CDS)</td></tr>
+          <tr><td><code>EvolvableStream</code></td><td>Wrapper</td><td>Feature evolution (NaN, EDS)</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Next Steps</h3>
+      <p>Now that you understand how data streams work in OpenMOA, explore these topics:</p>
+
+      <div class="card-grid" style="margin-top: 24px;">
+        <a href="classifiers.html" class="card" style="text-decoration: none;">
+          <h3 class="card-title">Classification Algorithms</h3>
+          <p class="card-desc">Learn about the 30+ classifiers available, including algorithms designed for evolving feature spaces (FESL, OASF, RSOL, OVFM).</p>
+        </a>
+        <a href="drift.html" class="card" style="text-decoration: none;">
+          <h3 class="card-title">Concept Drift Detection</h3>
+          <p class="card-desc">Discover how to detect and respond to distribution changes using ADWIN, DDM, EDDM, and more.</p>
+        </a>
+        <a href="evaluation.html" class="card" style="text-decoration: none;">
+          <h3 class="card-title">Evaluation Methods</h3>
+          <p class="card-desc">Master prequential evaluation, windowed metrics, and multi-learner comparison.</p>
+        </a>
+      </div>
+
+      <!-- Navigation -->
+      <div class="docs-nav">
+        <a href="../concepts.html" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Previous: Core Concepts
+        </a>
+        <a href="classifiers.html" class="btn btn-secondary">
+          Next: Classification Algorithms
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="footer-logo-icon">M</div>
+        <span class="footer-text">&copy; 2025 OpenMOA. Open source under MIT License.</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="footer-link">GitHub</a>
+        <a href="https://openmoa.net" class="footer-link">openmoa.net</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/script.js"></script>
+</body>
+</html>
