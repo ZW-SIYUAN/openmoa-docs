@@ -372,48 +372,11 @@
     </div>
   </section>
 
-  <!-- Quick Start Section -->
-  <section class="quickstart">
-    <div class="quickstart-content">
-      <h2 class="page-title text-center">Quick Start</h2>
-      <p class="page-subtitle text-center" style="margin: 0 auto 40px;">
-        Get up and running in minutes with this simple example.
-      </p>
-      
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-dot red"></span>
-          <span class="code-block-dot yellow"></span>
-          <span class="code-block-dot green"></span>
-          <span class="code-block-title">example.py</span>
-        </div>
-        <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.streams</span> <span class="token-keyword">import</span> SEAGenerator
-<span class="token-keyword">from</span> <span class="token-module">openmoa.classifiers</span> <span class="token-keyword">import</span> HoeffdingTree
-<span class="token-keyword">from</span> <span class="token-module">openmoa.evaluation</span> <span class="token-keyword">import</span> prequential_evaluation
-
-<span class="token-comment"># Create a data stream</span>
-stream = SEAGenerator(noise_percentage=<span class="token-number">0.1</span>)
-
-<span class="token-comment"># Initialize the classifier</span>
-classifier = HoeffdingTree()
-
-<span class="token-comment"># Run prequential evaluation</span>
-results = prequential_evaluation(
-    stream=stream,
-    learner=classifier,
-    max_instances=<span class="token-number">10000</span>,
-    sample_frequency=<span class="token-number">1000</span>
-)
-
-<span class="token-function">print</span>(<span class="token-string">f"Accuracy: {results.accuracy()}"</span>)</code></pre>
-      </div>
-    </div>
-  </section>
 
   <!-- FESL Quick Start Section -->
   <section class="quickstart">
     <div class="quickstart-content">
-      <h2 class="page-title text-center">Quick Start — FESL Classifier</h2>
+      <h2 class="page-title text-center">Quick Start</h2>
       <p class="page-subtitle text-center" style="margin: 0 auto 40px;">
         Run a binary classification benchmark with evolving feature streams.
       </p>
@@ -428,10 +391,10 @@ results = prequential_evaluation(
         <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Spambase
   <span class="token-keyword">from</span> <span class="token-module">openmoa.classifiers</span> <span class="token-keyword">import</span> FESLClassifier
   <span class="token-keyword">from</span> <span class="token-module">openmoa.streams</span> <span class="token-keyword">import</span> OpenFeatureStream, ShuffledStream
+  <span class="token-keyword">from</span> <span class="token-module">openmoa.evaluation</span> <span class="token-keyword">import</span> prequential_evaluation
   
   <span class="token-comment"># Load and shuffle a static dataset</span>
   base_stream = ShuffledStream(Spambase(), random_seed=<span class="token-number">42</span>)
-  schema = base_stream.get_schema()
   
   <span class="token-comment"># Wrap with Trapezoidal Feature Evolution (TDS)</span>
   stream = OpenFeatureStream(
@@ -443,23 +406,22 @@ results = prequential_evaluation(
   )
   
   <span class="token-comment"># Initialize the FESL classifier</span>
-  learner = FESLClassifier(
-      schema=schema,
+  classifier = FESLClassifier(
+      schema=base_stream.get_schema(),
       alpha=<span class="token-number">1.0</span>,
       lambda_=<span class="token-number">0.1</span>,
       window_size=<span class="token-number">100</span>
   )
   
-  <span class="token-comment"># Prequential evaluation loop</span>
-  correct, total = <span class="token-number">0</span>, <span class="token-number">0</span>
-  <span class="token-keyword">while</span> stream.has_more_instances():
-      inst = stream.next_instance()
-      <span class="token-keyword">if</span> learner.predict(inst) == inst.y_index:
-          correct += <span class="token-number">1</span>
-      learner.train(inst)
-      total += <span class="token-number">1</span>
+  <span class="token-comment"># Run prequential evaluation</span>
+  results = prequential_evaluation(
+      stream=stream,
+      learner=classifier,
+      max_instances=<span class="token-number">10000</span>,
+      sample_frequency=<span class="token-number">1000</span>
+  )
   
-  <span class="token-function">print</span>(<span class="token-string">f"Accuracy: {correct / total:.4f}"</span>)</code></pre>
+  <span class="token-function">print</span>(<span class="token-string">f"Accuracy: {results.accuracy()}"</span>)</code></pre>
       </div>
     </div>
   </section>
