@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classification Algorithms - OpenMOA Documentation</title>
+    <meta name="description"
+        content="A comprehensive guide to OpenMOA's 10 specialized classification algorithms for Utilitarian Online Learning (UOL) in evolving feature spaces.">
+
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="../../assets/style.css">
+
+    <style>
+        /* ================================================================
+       Classifiers Page — Scoped Styles
+       ================================================================ */
+
+        /* --- Table of Contents --- */
+        .st-toc {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 24px 0 32px;
+        }
+
+        .st-toc a {
+            display: block;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .st-toc a:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .st-toc a span {
+            color: var(--accent);
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        /* --- Algorithm Cards/Sections --- */
+        .algo-header {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-top: 40px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .algo-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .algo-badge {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge-linear {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .badge-copula {
+            background: #F3E8FF;
+            color: #7C3AED;
+        }
+
+        .badge-sparse {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-deep {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        [data-theme="dark"] .badge-linear {
+            background: #1E3A5F;
+            color: #60A5FA;
+        }
+
+        [data-theme="dark"] .badge-copula {
+            background: #4C1D95;
+            color: #A78BFA;
+        }
+
+        [data-theme="dark"] .badge-sparse {
+            background: #064E3B;
+            color: #34D399;
+        }
+
+        [data-theme="dark"] .badge-deep {
+            background: #7F1D1D;
+            color: #F87171;
+        }
+
+        /* --- Logic/Flow Lists --- */
+        .logic-list {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0;
+        }
+
+        .logic-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .logic-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* --- Tables --- */
+        .concept-table th,
+        .concept-table td {
+            font-size: 14px;
+        }
+
+        .param-table td:first-child {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+        }
+
+        /* --- Complexity Box --- */
+        .complexity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .complexity-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .complexity-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .complexity-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* --- Tip / Warning / Note boxes --- */
+        .st-tip {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .st-tip-info {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            color: var(--text-secondary);
+        }
+
+        .st-tip-warn {
+            background: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            color: #92400E;
+        }
+
+        [data-theme="dark"] .st-tip-warn {
+            background: #78350F33;
+            border-left-color: #FBBF24;
+            color: #FDE68A;
+        }
+
+        .st-tip strong {
+            color: var(--text);
+        }
+
+        [data-theme="dark"] .st-tip-warn strong {
+            color: #FBBF24;
+        }
+
+        /* --- Inline separator --- */
+        .st-sep {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 36px 0;
+        }
+
+        /* --- Code Block Headers --- */
+        .code-block-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--border);
+            border-radius: 8px 8px 0 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-block-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .red {
+            background: #FF5F56;
+        }
+
+        .yellow {
+            background: #FFBD2E;
+        }
+
+        .green {
+            background: #27C93F;
+        }
+
+        .code-block-title {
+            margin-left: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .code-block pre {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="../../index.html" class="navbar-logo">
+            <div class="navbar-logo-icon">M</div>
+            <span class="navbar-logo-text">OpenMOA</span>
+        </a>
+
+        <div class="navbar-links">
+            <a href="../../index.html" class="navbar-link">Home</a>
+            <a href="../index.html" class="navbar-link active">Documentation</a>
+            <a href="../../blog/index.html" class="navbar-link">Blog</a>
+            <a href="../../contact.html" class="navbar-link">Contact</a>
+        </div>
+
+        <div class="navbar-actions">
+            <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+            </button>
+            <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+            </a>
+        </div>
+
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18M3 6h18M3 18h18" />
+            </svg>
+        </button>
+    </nav>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar">
+            <div class="docs-sidebar-section">
+                <div class="docs-sidebar-title">Getting Started</div>
+                <a href="../quickstart.html" class="docs-sidebar-link">Quick Start Guide</a>
+                <a href="../installation.html" class="docs-sidebar-link">Installation</a>
+                <a href="../concepts.html" class="docs-sidebar-link">Core Concepts</a>
+            </div>
+
+            <div class="docs-sidebar-section">
+                <div class="docs-sidebar-title">Tutorials</div>
+                <a href="streams.html" class="docs-sidebar-link">Working with Data Streams</a>
+                <a href="classifiers.html" class="docs-sidebar-link active">Classification Algorithms</a>
+                <a href="drift.html" class="docs-sidebar-link">Concept Drift Detection</a>
+                <a href="evaluation.html" class="docs-sidebar-link">Evaluation Methods</a>
+                <a href="advanced.html" class="docs-sidebar-link">Advanced Topics</a>
+            </div>
+
+            <div class="docs-sidebar-section">
+                <div class="docs-sidebar-title">API Reference</div>
+                <a href="../../api/streams.html" class="docs-sidebar-link">openmoa.streams</a>
+                <a href="../../api/classifiers.html" class="docs-sidebar-link">openmoa.classifiers</a>
+                <a href="../../api/regressors.html" class="docs-sidebar-link">openmoa.regressors</a>
+                <a href="../../api/drift.html" class="docs-sidebar-link">openmoa.drift_detection</a>
+                <a href="../../api/evaluation.html" class="docs-sidebar-link">openmoa.evaluation</a>
+                <a href="../../api/utils.html" class="docs-sidebar-link">openmoa.utils</a>
+            </div>
+        </aside>
+
+        <main class="docs-content fade-in">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+                <span class="tag tag-tutorial">Tutorial</span>
+                <span class="tag tag-guide">~25 min read</span>
+            </div>
+
+            <h1>Classification Algorithms for Evolving Feature Spaces</h1>
+            <p>A systematic guide to OpenMOA's 10 specialized algorithms for Utilitarian Online Learning (UOL) —
+                learning from data streams where the feature space itself changes over time.</p>
+
+            <p class="intro-box">
+                OpenMOA introduces 10 classification algorithms specifically designed for <strong>Utilitarian Online
+                    Learning (UOL)</strong>. While traditional online learning handles concept drift (distribution
+                changes), UOL addresses the more complex challenge of <strong>feature evolution</strong> (features
+                appearing and disappearing). These algorithms are the core contribution of OpenMOA, built on top of
+                CapyMOA's existing library of traditional online classifiers.
+            </p>
+
+            <div class="st-toc">
+                <a href="#overview"><span>1.</span> Taxonomy & Reference</a>
+                <a href="#fesl"><span>2.</span> FESL</a>
+                <a href="#ovfm"><span>3.</span> OVFM</a>
+                <a href="#oslmf"><span>4.</span> OSLMF</a>
+                <a href="#oasf"><span>5.</span> OASF</a>
+                <a href="#rsol"><span>6.</span> RSOL</a>
+                <a href="#fobos"><span>7.</span> FOBOS</a>
+                <a href="#ftrl"><span>8.</span> FTRL</a>
+                <a href="#old3s"><span>9.</span> OLD3S (Deep)</a>
+                <a href="#orf3v"><span>10.</span> ORF3V (Ensemble)</a>
+                <a href="#owss"><span>11.</span> OWSS (GNN)</a>
+                <a href="#comparison"><span>12.</span> Decision Guide</a>
+            </div>
+
+            <h2 id="overview">1. Taxonomy & Reference</h2>
+
+            <h3>Algorithm Taxonomy</h3>
+            <table class="concept-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Algorithms</th>
+                        <th>Core Technique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Feature Space Mapping</strong></td>
+                        <td><code>FESL</code></td>
+                        <td>Learns a linear mapping between old and new feature spaces</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Copula-based Imputation</strong></td>
+                        <td><code>OVFM</code>, <code>OSLMF</code></td>
+                        <td>Uses Gaussian Copula to model missing features statistically</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sparse Online Optimization</strong></td>
+                        <td><code>OASF</code>, <code>RSOL</code>, <code>FOBOS</code>, <code>FTRL</code></td>
+                        <td>Online convex optimization with sparsity-inducing regularization</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deep / Ensemble Models</strong></td>
+                        <td><code>OLD3S</code>, <code>ORF3V</code>, <code>OWSS</code></td>
+                        <td>Neural networks or ensemble methods for evolving spaces</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Quick Reference</h3>
+            <table class="concept-table">
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Multi-class</th>
+                        <th>Sparse-Aware</th>
+                        <th>NaN-Aware</th>
+                        <th>Deep Learning</th>
+                        <th>Scalable (RCV1)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>FESL</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td>No (OOM)</td>
+                    </tr>
+                    <tr>
+                        <td>OVFM</td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>No (OOM)</td>
+                    </tr>
+                    <tr>
+                        <td>OSLMF</td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>No (OOM)</td>
+                    </tr>
+                    <tr>
+                        <td>OASF</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>RSOL</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>FOBOS</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>FTRL</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>OLD3S</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>Yes (PyTorch)</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>ORF3V</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>OWSS</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td>Yes (PyTorch)</td>
+                        <td>Moderate</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr class="st-sep">
+
+            <div class="algo-header" id="fesl">
+                <h2>2. FESL — Feature Evolvable Streaming Learning</h2>
+                <span class="algo-badge badge-linear">Feature Mapping</span>
+            </div>
+
+            <p><strong>Background:</strong> FESL is the foundational algorithm for learning in evolving feature spaces,
+                proposed at NeurIPS 2017. It addresses the scenario where the entire feature space shifts: the old set
+                of features $S_{old}$ is gradually replaced by a new set $S_{new}$, with a brief overlap period where
+                both are observable.</p>
+
+            <h4>How It Works</h4>
+            <p>FESL maintains two linear models and learns a mapping between them:</p>
+            <ul class="logic-list">
+                <li><strong>Phase 1 (Stable):</strong> Only $S_{old}$ features visible → Train $w_{old}$.</li>
+                <li><strong>Phase 2 (Overlap):</strong> Both $S_{old}$ and $S_{new}$ visible → Train $w_{curr}$ on
+                    $S_{new}$ AND Learn mapping $M: S_{new} \to S_{old}$ via Ridge Regression.</li>
+                <li><strong>Phase 3 (New):</strong> Only $S_{new}$ features visible → Ensemble prediction: $y = \mu_1
+                    \cdot f_{curr}(x) + \mu_2 \cdot f_{old}(M \cdot x)$.</li>
+            </ul>
+
+            <div class="st-tip st-tip-info">
+                <strong>Key Equation:</strong> The mapping matrix $M$ is calculated as $(X_{new}^T X_{new} + \lambda
+                I)^{-1} X_{new}^T X_{old}$.
+            </div>
+
+            <h4>Parameters</h4>
+            <table class="concept-table param-table">
+                <tbody>
+                    <tr>
+                        <td>alpha</td>
+                        <td>float</td>
+                        <td>0.1</td>
+                        <td>Learning rate for SGD weight updates</td>
+                    </tr>
+                    <tr>
+                        <td>lambda_</td>
+                        <td>float</td>
+                        <td>0.1</td>
+                        <td>Ridge regularization strength for mapping matrix M</td>
+                    </tr>
+                    <tr>
+                        <td>window_size</td>
+                        <td>int</td>
+                        <td>100</td>
+                        <td>Buffer size B to accumulate overlap instances for learning M</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Usage</h4>
+            <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> FESLClassifier
+
+learner = FESLClassifier(
+    schema=stream.get_schema(),
+    alpha=<span class="token-number">0.1</span>,
+    lambda_=<span class="token-number">0.1</span>,
+    window_size=<span class="token-number">100</span>
+)</code></pre>
+
+            <div class="complexity-grid">
+                <div class="complexity-item">
+                    <div class="complexity-label">Per-Instance Training</div>
+                    <div class="complexity-val">O(d) SGD update</div>
+                </div>
+                <div class="complexity-item">
+                    <div class="complexity-label">Mapping Learning</div>
+                    <div class="complexity-val">O(B·d² + d³)</div>
+                </div>
+                <div class="complexity-item">
+                    <div class="complexity-label">Memory</div>
+                    <div class="complexity-val">O(d_old × d_new)</div>
+                </div>
+            </div>
+
+            <div class="st-tip st-tip-warn">
+                <strong>Limitation:</strong> The mapping matrix $M$ has size $d_{old} \times d_{new}$. For RCV1 (~47k
+                features), this requires ~17 GB RAM, causing OOM on standard machines.
+            </div>
+
+            <hr class="st-sep">
+
+            <div class="algo-header" id="ovfm">
+                <h2>3. OVFM — Online Variable Feature Spaces with Mixed Data</h2>
+                <span class="algo-badge badge-copula">Gaussian Copula</span>
+            </div>
+
+            <p><strong>Background:</strong> OVFM addresses the challenge of learning when features randomly appear and
+                disappear, and the data contains both continuous and ordinal types. It uses a Gaussian Copula model to
+                statistically impute missing features, then trains an ensemble of two classifiers.</p>
+
+            <h4>How It Works</h4>
+            <ul class="logic-list">
+                <li>Detect Feature Types (Continuous vs Ordinal).</li>
+                <li>Update Marginal Distributions via sliding window ECDF.</li>
+                <li><strong>EM Algorithm:</strong> Impute missing latent values $Z$ (E-step) and update correlation
+                    matrix $\Sigma$ (M-step).</li>
+                <li>Train two classifiers: $w_{obs}$ on observed features and $w_{lat}$ on latent (copula-transformed)
+                    features.</li>
+            </ul>
+
+            <h4>Parameters</h4>
+            <table class="concept-table param-table">
+                <tbody>
+                    <tr>
+                        <td>window_size</td>
+                        <td>int</td>
+                        <td>200</td>
+                        <td>Sliding window for marginal ECDF estimation</td>
+                    </tr>
+                    <tr>
+                        <td>batch_size</td>
+                        <td>int</td>
+                        <td>50</td>
+                        <td>Mini-batch size for EM updates</td>
+                    </tr>
+                    <tr>
+                        <td>decay_coef</td>
+                        <td>float</td>
+                        <td>0.5</td>
+                        <td>Exponential decay for Sigma update</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Usage</h4>
+            <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> OVFMClassifier
+
+learner = OVFMClassifier(
+    schema=stream.get_schema(),
+    window_size=<span class="token-number">200</span>,
+    batch_size=<span class="token-number">50</span>,
+    max_ord_levels=<span class="token-number">14</span>
+)</code></pre>
+
+            <div class="st-tip st-tip-warn">
+                <strong>Dependency:</strong> Requires <code>statsmodels</code> for Empirical CDF calculation.
+            </div>
+
+            <hr class="st-sep">
+
+            <div class="algo-header" id="oslmf">
+                <h2>4. OSLMF — Online Semi-supervised Learning</h2>
+                <span class="algo-badge badge-copula">Copula + Semi-Supervised</span>
+            </div>
+
+            <p><strong>Background:</strong> OSLMF extends the Copula-based approach of OVFM with semi-supervised
+                learning capabilities. When labeled data is scarce, it uses Density Peak Clustering to propagate labels
+                from labeled to unlabeled instances in the latent space.</p>
+
+            <h4>Key Components</h4>
+            <ul>
+                <li><strong>Gaussian Copula:</strong> Handles mixed data types and missing features (same as OVFM).</li>
+                <li><strong>Density Peak Clustering:</strong> Propagates labels to unlabeled instances by finding
+                    nearest higher-density neighbors in the latent space.</li>
+                <li><strong>Dual Classifier Ensemble:</strong> Combines observed-space and latent-space predictions.
+                </li>
+            </ul>
+
+            <h4>Usage</h4>
+            <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> OSLMFClassifier
+
+learner = OSLMFClassifier(
+    schema=stream.get_schema(),
+    window_size=<span class="token-number">200</span>,
+    buffer_size=<span class="token-number">200</span>,
+    ensemble_weight=<span class="token-number">0.5</span>
+)</code></pre>
+
+            <hr class="st-sep">
+
+            <div class="algo-header" id="oasf">
+                <h2>5. OASF — Online Active Sparse Feature Learning</h2>
+                <span class="algo-badge badge-sparse">Sparse Opt</span>
+            </div>
+
+            <p><strong>Background:</strong> OASF is designed for streams where features incrementally appear or
+                disappear. It uses Passive-Aggressive (PA) updates with group sparsity regularization via the
+                $L_{1,2}$-norm, automatically selecting important features over time.</p>
+
+            <h4>How It Works</h4>
+            <p>OASF uses a sliding window $W$ storing the last $L$ weight vectors. The $L_{1,2}$-norm operates on rows
+                of $W$ (one row per feature), zeroing out features whose weights have been consistently weak across the
+                window.</p>
+
+            <h4>Parameters</h4>
+            <table class="concept-table param-table">
+                <tbody>
+                    <tr>
+                        <td>lambda_param</td>
+                        <td>float</td>
+                        <td>0.01</td>
+                        <td>$L_{1,2}$-norm sparsity regularization</td>
+                    </tr>
+                    <tr>
+                        <td>mu</td>
+                        <td>float</td>
+                        <td>1.0</td>
+                        <td>PA smoothness parameter</td>
+                    </tr>
+                    <tr>
+                        <td>L</td>
+                        <td>int</td>
+                        <td>100</td>
+                        <td>Sliding window size</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Usage</h4>
+            <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> OASFClassifier
+
+learner = OASFClassifier(
+    schema=stream.get_schema(),
+    lambda_param=<span class="token-number">0.01</span>,
+    mu=<span class="token-number">1.0</span>,
+    L=<span class="token-number">100</span>
+)</code></pre>
+
+            <hr class="st-sep">
+
+            <div class="algo-header" id="rsol">
+                <h2>6. RSOL — Robust Sparse Online Learning</h2>
+                <span class="algo-badge badge-sparse">Sparse Opt + Optimized</span>
+            </div>
+
+            <p><strong>Background:</strong> RSOL improves upon OASF with two key optimizations: a ring buffer for the
+                sliding window (avoiding expensive array shifts) and auto-expanding weights for dynamic feature
+                dimensions. This makes it significantly faster on large datasets.</p>
+
+            <h4>Usage</h4>
+            <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> RSOLClassifier
+
+learner = RSOLClassifier(
+    schema=stream.get_schema(),
+    lambda_param=<span class="token-number">50.0</span>,
+    mu=<span class="token-number">1.0</span>,
+    L=<span class="token-number">1000</span>
+)</code></pre>
+
+            <div class="st-tip st-tip-info">
+                <strong>Optimization:</strong> The ring buffer replaces <code>np.roll()</code> with O(1) pointer
+                advancement.
+            </div>
+
+            <hr class="st-sep">
+
+            <div class="algo-header" id="fobos">
+                <h2>7. FOBOS — Forward-Backward Splitting</h2>
+                <span class="algo-badge badge-sparse">General Opt</span>
+            </div>
+
+            <p><strong>Background:</strong> FOBOS separates the gradient descent step (forward) from the regularization
+                step (backward proximal operator), enabling clean L1/L2/Group Lasso sparsity. Unlike FESL/OASF/RSOL,
+                FOBOS supports <strong>multi-class classification</strong>.</p>
+
+            <h4>How It Works</h4>
+            <ul class="logic-list">
+                <li><strong>Step 1 (Forward):</strong> Standard Gradient Descent (Logistic or Softmax).</li>
+                <li><strong>Step 2 (Backward):</strong> Proximal Operator. For L1, this is soft thresholding: $w
+                    \leftarrow \text{sign}(w) \cdot \max(0, |w| - \eta\lambda)$.</li>
+            </ul>
+
+            <h4>Usage</h4>
+            <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> FOBOSClassifier
+
+<span class="token-comment"># Supports "l1", "l2", "l1_l2" regularization</span>
+learner = FOBOSClassifier(
+    schema=stream.get_schema(),
+    alpha=<span class="token-number">1.0</span>,
+    lambda_=<span class="token-number">0.001</span>,
+    regularization=<span class="token-string">"l1"</span>,
+    step_schedule=<span class="token-string">"sqrt"</span>
+)</code></pre>
+
+            <hr class="st-sep">
+
+            <div class="algo-header" id="ftrl">
+                <h2>8. FTRL — Follow-The-Regularized-Leader</h2>
+                <span class="algo-badge badge-sparse">Industry Standard</span>
+            </div>
+
+            <p><strong>Background:</strong> FTRL-Proximal is a state-of-the-art algorithm used widely in industry (e.g.,
+                ad click prediction). It achieves superior sparsity compared to SGD by accumulating gradient information
+                and applying L1 thresholding in a principled manner.</p>
+
+            <h4>Parameters</h4>
+            <table class="concept-table param-table">
+                <tbody>
+                    <tr>
+                        <td>alpha</td>
+                        <td>float</td>
+                        <td>0.1</td>
+                        <td>Learning rate parameter</td>
+                    </tr>
+                    <tr>
+                        <td>beta</td>
+                        <td>float</td>
+                        <td>1.0</td>
+                        <td>Smoothing parameter</td>
+                    </tr>
+                    <tr>
+                        <td>l1</td>
+                        <td>float</td>
+                        <td>1.0</td>
+                        <td>L1 regularization (controls sparsity)</td>
+                    </tr>
+                    <tr>
+                        <td>l2</td>
+                        <td>float</td>
+                        <td>1.0</td>
+                        <td>L2 regularization (controls smoothness)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Usage</h4>
+            <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> FTRLClassifier
+
+learner = FTRLClassifier(
+    schema=stream.get_schema(),
+    alpha=<span class="token-number">0.1</span>,
+    beta=<span class="token-number">1.0</span>,
+    l1=<span class="token-number">1.0</span>,
+    l2=<span class="token-number">1.0</span>
+)
+<span class="token-function">print</span>(<span class="token-string">f"Sparsity: {learner.get_sparsity():.1%}"</span>)</code></pre>
+
+            <hr class="st-sep">
+
+            <div class="algo-header" id="old3s">
+                <h2>9. OLD3S — Online Learning from Data of Double Streams</h2>
+                <span class="algo-badge badge-deep">Deep Learning</span>
+            </div>
+
+            <p><strong>Background:</strong> OLD3S uses a Variational Autoencoder (VAE) to map each feature space into a
+                shared latent space, and a Hedge Backpropagation (HBP) MLP for classification. When the feature space
+                shifts, knowledge from the old model is distilled into the new one via latent-space alignment.</p>
+
+            <h4>Usage</h4>
+            <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> OLD3SClassifier
+
+learner = OLD3SClassifier(
+    schema=stream.get_schema(),
+    latent_dim=<span class="token-number">20</span>,
+    hidden_dim=<span class="token-number">128</span>,
+    num_hbp_layers=<span class="token-number">3</span>,
+    learning_rate=<span class="token-number">0.001</span>
+)</code></pre>
+
+            <div class="st-tip st-tip-warn">
+                <strong>Requirements:</strong> Requires <code>torch</code> installation. More computationally intensive
+                than linear methods.
+            </div>
+
+            <hr class="st-sep">
+
+            <div class="algo-header" id="orf3v">
+                <h2>10. ORF3V — Online Random Feature Forests</h2>
+                <span class="algo-badge badge-deep">Ensemble</span>
+            </div>
+
+            <p><strong>Background:</strong> ORF3V builds independent decision stump ensembles ("feature forests") for
+                each individual feature. This naturally handles varying feature spaces — when a feature is absent, its
+                forest is simply excluded from the vote. No imputation is required.</p>
+
+            <h4>Usage</h4>
+            <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> ORF3VClassifier
+
+learner = ORF3VClassifier(
+    schema=stream.get_schema(),
+    n_stumps=<span class="token-number">10</span>,
+    grace_period=<span class="token-number">100</span>,
+    replacement_interval=<span class="token-number">100</span>
+)</code></pre>
+
+            <hr class="st-sep">
+
+            <div class="algo-header" id="owss">
+                <h2>11. OWSS — Online World Soft Sensing</h2>
+                <span class="algo-badge badge-deep">GNN</span>
+            </div>
+
+            <p><strong>Background:</strong> OWSS uses a Graph Neural Network (GNN) approach with a bipartite graph
+                structure connecting instances to features. It learns universal feature embeddings that persist across
+                changing feature spaces.</p>
+
+            <h4>Usage</h4>
+            <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> OWSSClassifier
+
+learner = OWSSClassifier(
+    schema=stream.get_schema(),
+    hidden_dim=<span class="token-number">32</span>,
+    learning_rate=<span class="token-number">0.01</span>,
+    rec_weight=<span class="token-number">0.1</span>
+)</code></pre>
+
+            <hr class="st-sep">
+
+            <h2 id="comparison">12. Decision Guide</h2>
+
+            <h3>By Feature Evolution Pattern</h3>
+            <table class="concept-table">
+                <thead>
+                    <tr>
+                        <th>Pattern</th>
+                        <th>Best Algorithms</th>
+                        <th>Why</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>EDS</strong> (Overlap shifts)</td>
+                        <td>FESL, OLD3S</td>
+                        <td>Designed for explicit $S_{old} \to S_{new}$ transitions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TDS</strong> (Growth)</td>
+                        <td>OVFM, OASF, FOBOS, FTRL</td>
+                        <td>Handle monotonically growing feature space</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CDS</strong> (Random Missing)</td>
+                        <td>OVFM, OSLMF, ORF3V</td>
+                        <td>Imputation (OVFM) or independence (ORF3V)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>General / Large Scale</strong></td>
+                        <td>FOBOS, FTRL, RSOL</td>
+                        <td>Robust sparse methods that work everywhere</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Complete Benchmark Example</h3>
+            <div class="code-block">
+                <div class="code-block-header">
+                    <span class="code-block-dot red"></span>
+                    <span class="code-block-dot yellow"></span>
+                    <span class="code-block-dot green"></span>
+                    <span class="code-block-title">benchmark.py</span>
+                </div>
+                <pre><code><span class="token-keyword">from</span> <span class="token-module">openmoa.datasets</span> <span class="token-keyword">import</span> Electricity
+<span class="token-keyword">from</span> <span class="token-module">openmoa.stream</span> <span class="token-keyword">import</span> OpenFeatureStream
+<span class="token-keyword">from</span> <span class="token-module">openmoa.classifier</span> <span class="token-keyword">import</span> (
+    FESLClassifier, OASFClassifier, RSOLClassifier,
+    FOBOSClassifier, FTRLClassifier
+)
+<span class="token-keyword">from</span> <span class="token-module">openmoa.evaluation</span> <span class="token-keyword">import</span> ClassificationEvaluator
+
+base = Electricity()
+schema = base.get_schema()
+
+algorithms = {
+    <span class="token-string">"FESL"</span>: FESLClassifier(schema=schema, alpha=<span class="token-number">0.1</span>),
+    <span class="token-string">"OASF"</span>: OASFClassifier(schema=schema, lambda_param=<span class="token-number">0.01</span>),
+    <span class="token-string">"RSOL"</span>: RSOLClassifier(schema=schema, lambda_param=<span class="token-number">50.0</span>),
+    <span class="token-string">"FOBOS"</span>: FOBOSClassifier(schema=schema, alpha=<span class="token-number">1.0</span>, regularization=<span class="token-string">"l1"</span>),
+    <span class="token-string">"FTRL"</span>: FTRLClassifier(schema=schema, alpha=<span class="token-number">0.1</span>, l1=<span class="token-number">1.0</span>, l2=<span class="token-number">1.0</span>),
+}
+
+<span class="token-keyword">for</span> name, learner <span class="token-keyword">in</span> algorithms.items():
+    base.restart()
+    stream = OpenFeatureStream(
+        base_stream=base,
+        evolution_pattern=<span class="token-string">"pyramid"</span>,
+        d_min=<span class="token-number">2</span>,
+        total_instances=<span class="token-number">10000</span>
+    )
+    evaluator = ClassificationEvaluator(schema=schema)
+    
+    <span class="token-keyword">while</span> stream.has_more_instances():
+        instance = stream.next_instance()
+        prediction = learner.predict(instance)
+        learner.train(instance)
+        evaluator.update(instance.y_index, prediction)
+        
+    <span class="token-function">print</span>(<span class="token-string">f"{name:8s} → Accuracy: {evaluator.accuracy():.2f}%"</span>)</code></pre>
+            </div>
+
+            <div class="docs-nav">
+                <a href="streams.html" class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Previous: Streams
+                </a>
+                <a href="drift.html" class="btn btn-secondary">
+                    Next: Concept Drift
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <div class="footer-logo-icon">M</div>
+                <span class="footer-text">&copy; 2025 OpenMOA. Open source under MIT License.</span>
+            </div>
+            <div class="footer-links">
+                <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="footer-link">GitHub</a>
+                <a href="https://openmoa.net" class="footer-link">openmoa.net</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../../assets/script.js"></script>
+</body>
+
+</html>
