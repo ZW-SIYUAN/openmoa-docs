@@ -119,6 +119,44 @@
       font-size: 15px;
       font-weight: 500;
     }
+
+    .changelog-nav {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+
+    .changelog-nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .changelog-nav-item span {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .changelog-nav-item:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .changelog-nav-item:hover span {
+      color: var(--accent);
+    }
   </style>
 </head>
 <body>
@@ -161,6 +199,11 @@
 
       <h1 class="page-title">OpenMOA v0 Changelog</h1>
       <p class="page-subtitle">All updates and improvements across the v0 major version.</p>
+
+      <div class="changelog-nav">
+        <a href="#v0.2" class="changelog-nav-item">v0.2 <span>April 2026</span></a>
+        <a href="#v0.1" class="changelog-nav-item">v0.1 <span>January 2026</span></a>
+      </div>
 
       <!-- ================================================================
            v0.2
