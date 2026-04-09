@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenMOA v0 Changelog - Blog</title>
+  <meta name="description" content="All updates and improvements in the v0 major version of OpenMOA.">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .changelog-article {
+      margin-bottom: 48px;
+    }
+
+    .changelog-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .changelog-date {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .changelog-title {
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 24px;
+      margin-top: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      line-height: 1.3;
+    }
+
+    .changelog-divider {
+      border: none;
+      border-top: 2px solid var(--border);
+      margin: 56px 0;
+    }
+
+    .changelog-section h2 {
+      font-size: 1.4rem;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .changelog-section h3 {
+      font-size: 1.1rem;
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+
+    .changelog-section p {
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    .changelog-section ul {
+      padding-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .changelog-section li {
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      line-height: 1.6;
+    }
+
+    .changelog-section li strong {
+      color: var(--text);
+    }
+
+    .symptom-fix {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+    }
+
+    .symptom-fix .label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .label-symptom { color: #F59E0B; }
+    .label-cause   { color: #EF4444; }
+    .label-fix     { color: #10B981; }
+
+    .symptom-fix p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .links-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .links-row a {
+      color: var(--accent);
+      font-size: 15px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="../index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+
+    <div class="navbar-links">
+      <a href="../index.html" class="navbar-link">Home</a>
+      <a href="../docs/index.html" class="navbar-link">Documentation</a>
+      <a href="index.html" class="navbar-link active">Blog</a>
+      <a href="../contact.html" class="navbar-link">Contact</a>
+    </div>
+
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+  </nav>
+
+  <div class="page-wrapper">
+    <div class="container-narrow fade-in">
+
+      <h1 class="page-title">OpenMOA v0 Changelog</h1>
+      <p class="page-subtitle">All updates and improvements across the v0 major version.</p>
+
+      <!-- ================================================================
+           v0.2
+      ================================================================ -->
+      <article class="changelog-article" id="v0.2">
+        <div class="changelog-header">
+          <span class="tag tag-release">Release</span>
+          <span class="changelog-date">April 2026</span>
+        </div>
+        <h2 class="changelog-title">v0.2 — Code Quality, Bug Fixes, and Performance</h2>
+
+        <div class="changelog-section">
+          <p>
+            OpenMOA v0.2 is a quality-focused release. It does not change any algorithm's mathematical behaviour
+            or experimental results. Instead, it fixes correctness bugs that were silently producing wrong outputs,
+            eliminates code duplication, hardens reproducibility guarantees, and delivers measurable speed-ups on
+            the hot paths of several classifiers.
+          </p>
+          <p>Every change is covered by the <strong>61 new test cases</strong> added in this release.</p>
+
+          <h2>What Changed at a Glance</h2>
+          <table class="concept-table">
+            <thead>
+              <tr><th>Category</th><th>Count</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Refactoring</td><td>2</td></tr>
+              <tr><td>Algorithm bug fixes</td><td>7</td></tr>
+              <tr><td>Stream Wrapper bug fixes</td><td>5</td></tr>
+              <tr><td>Performance optimisations</td><td>8</td></tr>
+              <tr><td>New test cases</td><td>61 (3 files)</td></tr>
+              <tr><td>Files modified or created</td><td>15</td></tr>
+            </tbody>
+          </table>
+
+          <h2>Refactoring</h2>
+
+          <h3>Q1 — <code>SparseInputMixin</code>: Eliminating Copy-Pasted Logic</h3>
+          <p>
+            The <code>_get_sparse_x</code> helper — which converts an incoming instance into a
+            <code>(indices, values)</code> sparse pair — was duplicated almost verbatim across five classifier
+            files. Any future fix to the three-branch dispatch logic would have needed to be applied five times.
+          </p>
+          <p>A new <code>SparseInputMixin</code> class in <code>src/openmoa/base/_sparse_mixin.py</code> centralises the logic:</p>
+          <pre><code>class SparseInputMixin:
+    def _get_sparse_x(self, instance) -> tuple[np.ndarray, np.ndarray]:
+        if hasattr(instance, "feature_indices"):
+            return np.asarray(instance.feature_indices), np.asarray(instance.x, dtype=float)
+        if hasattr(instance, "x_index") and hasattr(instance, "x_value"):
+            return instance.x_index, instance.x_value
+        x = np.asarray(instance.x, dtype=float)
+        valid_mask = (x != 0) &amp; (~np.isnan(x))
+        return np.where(valid_mask)[0], x[valid_mask]</code></pre>
+          <p>
+            <strong>Affected files:</strong>
+            <code>_fesl_classifier.py</code>, <code>_oasf_classifier.py</code>,
+            <code>_fobos_classifier.py</code>, <code>_ftrl_classifier.py</code>,
+            <code>_rsol_classifier.py</code>
+          </p>
+
+          <h3>Q2 — Instance-Level RNG: Fixing Global Random State Pollution</h3>
+          <p>
+            Multiple classifiers and stream wrappers called <code>np.random.seed(random_seed)</code> to
+            initialise randomness. Setting a global seed has a well-known problem: any other code that touches
+            <code>np.random</code> in the same process will alter the drawn sequence, making results
+            non-reproducible between runs.
+          </p>
+          <p>All classifiers and wrappers now carry their own <code>np.random.RandomState</code> instance:</p>
+          <pre><code># Before — pollutes global state
+np.random.seed(random_seed)
+noise = np.random.randn(d)
+
+# After — isolated per object
+self._rng = np.random.RandomState(random_seed)
+noise = self._rng.randn(d)</code></pre>
+
+          <h2>Algorithm Bug Fixes</h2>
+
+          <h3>A1 — FOBOS / FTRL: <code>IndexError</code> on Growing Feature Streams</h3>
+          <div class="symptom-fix">
+            <div class="label label-symptom">Symptom</div>
+            <p>Running FOBOS or FTRL on an <code>OpenFeatureStream</code> in incremental mode crashes with <code>IndexError: index N is out of bounds for axis 0 with size M</code>.</p>
+          </div>
+          <div class="symptom-fix">
+            <div class="label label-cause">Cause</div>
+            <p>Both classifiers allocate their weight arrays at construction time using the initial feature count. As <code>OpenFeatureStream</code> introduces new features, their global IDs exceed the array dimensions.</p>
+          </div>
+          <div class="symptom-fix">
+            <div class="label label-fix">Fix</div>
+            <p>A <code>_ensure_dimension(target_dim)</code> method resizes the weight array on demand with a 1.5× growth factor. FTRL resizes three arrays (<code>z</code>, <code>n</code>, <code>w</code>) simultaneously.</p>
+          </div>
+          <pre><code>def _ensure_dimension(self, target_dim: int):
+    if target_dim &lt;= self.n_features:
+        return
+    new_dim = max(target_dim, int(self.n_features * 1.5))
+    new_W = np.zeros((new_dim, self.n_outputs))
+    new_W[:self.n_features] = self.W
+    self.W = new_W
+    self.n_features = new_dim</code></pre>
+
+          <h3>A2 — ORF3V: Wrong Feature IDs in Weight Dictionary</h3>
+          <div class="symptom-fix">
+            <div class="label label-symptom">Symptom</div>
+            <p>ORF3V's per-feature forests accumulate weights under incorrect keys, causing the model to learn associations between the wrong features and trees.</p>
+          </div>
+          <div class="symptom-fix">
+            <div class="label label-cause">Cause</div>
+            <p><code>_update_weights</code> used <code>range(len(x))</code> as feature IDs — local position indices within the current instance vector. With <code>OpenFeatureStream</code>, position 0 in <code>instance.x</code> may correspond to global feature ID 3, 7, or any other value.</p>
+          </div>
+          <div class="symptom-fix">
+            <div class="label label-fix">Fix</div>
+            <p>Use <code>getattr(instance, "feature_indices", range(len(x)))</code> to obtain the correct global IDs before iterating.</p>
+          </div>
+
+          <h3>A3 — OLD3S: Normalisation Statistics Never Updated</h3>
+          <div class="symptom-fix">
+            <div class="label label-symptom">Symptom</div>
+            <p>OLD3S's online Min-Max normalisation is effectively disabled from the first instance onward, meaning the VAE always receives unnormalised input.</p>
+          </div>
+          <div class="symptom-fix">
+            <div class="label label-cause">Cause</div>
+            <p>A one-character variable name error in the update condition made it always <code>False</code>.</p>
+          </div>
+          <pre><code># Before — always False → stats never update
+if len(x_raw) == len(stats['min']):
+    stats['min'] = np.minimum(stats['min'], x_sub)
+
+# After
+if len(x_sub) == len(stats['min']):
+    stats['min'] = np.minimum(stats['min'], x_sub)</code></pre>
+          <p>This bug affects every OLD3S experiment run with v0.1.</p>
+
+          <h3>A4 — OVFM: Ordinal Variable Initialisation Uses Global RNG</h3>
+          <div class="symptom-fix">
+            <div class="label label-cause">Cause</div>
+            <p><code>_init_z_ordinal</code> sampled from <code>np.random.uniform(...)</code> instead of <code>self._rng.uniform(...)</code>, breaking per-instance seed isolation introduced by Q2.</p>
+          </div>
+          <div class="symptom-fix">
+            <div class="label label-fix">Fix</div>
+            <p>Replace all global <code>np.random</code> calls in <code>_ovfm_classifier.py</code> with the instance-level RNG.</p>
+          </div>
+
+          <h3>A5 — OSLMF: DensityPeaks Called Once Per Instance Instead of Once Per Batch</h3>
+          <div class="symptom-fix">
+            <div class="label label-symptom">Symptom</div>
+            <p>OSLMF is dramatically slower than expected and its learning behaviour diverges from the published algorithm.</p>
+          </div>
+          <div class="symptom-fix">
+            <div class="label label-cause">Cause</div>
+            <p>The original paper (Wu et al., AAAI 2023) specifies that DensityPeaks label propagation runs once per <em>batch</em>. The implementation called it inside <code>train()</code>, triggering an O(buffer²) computation at every instance.</p>
+          </div>
+          <div class="symptom-fix">
+            <div class="label label-fix">Fix</div>
+            <p>Introduce a <code>batch_size</code> parameter (default 50). Instances accumulate in an internal buffer; DensityPeaks, EM covariance update, and SGD all run together when the buffer is full.</p>
+          </div>
+
+          <h3>A6 — ORF3V: Dead Code Removed</h3>
+          <p>
+            <code>_update_feature_stats</code> was defined in <code>_orf3v_classifier.py</code> but never called.
+            Its logic also overlapped with the <code>FeatureStatistics</code> class. The method has been deleted.
+          </p>
+
+          <h3>A7 — FESL: Inconsistent Indentation</h3>
+          <p>
+            Several method bodies in <code>_fesl_classifier.py</code> mixed 2-space and 4-space indentation.
+            All code is now uniformly 4-space indented.
+          </p>
+
+          <h2>Stream Wrapper Bug Fixes</h2>
+
+          <h3>W1 — <code>restart()</code> Did Not Reset the RNG</h3>
+          <div class="symptom-fix">
+            <div class="label label-symptom">Symptom</div>
+            <p>Restarting a stream and replaying it produces a different random sequence than the first pass, breaking reproducibility.</p>
+          </div>
+          <div class="symptom-fix">
+            <div class="label label-fix">Fix</div>
+            <p>All wrappers now reinitialise <code>self._rng</code> and regenerate derived schedules inside <code>restart()</code>.</p>
+          </div>
+
+          <h3>W2 — <code>ShuffledStream</code> Swallowed All Exceptions</h3>
+          <pre><code># Before — silently catches KeyboardInterrupt, MemoryError, everything
+try:
+    ...
+except Exception:
+    break
+
+# After — separates expected from unexpected
+try:
+    ...
+except StopIteration:
+    break
+except Exception as e:
+    warnings.warn(f"ShuffledStream: unexpected error: {e}", RuntimeWarning)
+    break</code></pre>
+
+          <h3>W3 — <code>OpenFeatureStream</code> Pre-allocated O(N) Index Cache</h3>
+          <div class="symptom-fix">
+            <div class="label label-symptom">Symptom</div>
+            <p>Constructing an <code>OpenFeatureStream</code> over a 100,000-instance dataset consumed significant memory before the first instance was read.</p>
+          </div>
+          <div class="symptom-fix">
+            <div class="label label-fix">Fix</div>
+            <p>Lazy evaluation — <code>_get_active_indices(t)</code> is called on demand in <code>next_instance()</code>. For random modes, determinism is preserved by deriving the RNG seed from <code>base_seed + t</code>.</p>
+          </div>
+
+          <h3>W4 — Magic Number in TDS</h3>
+          <p>
+            The constant <code>n_stages = 10</code> in <code>TrapezoidalStream</code> was undocumented.
+            A comment now explains its origin: the TDS paper (Gao et al.) defines 10 birth stages.
+          </p>
+
+          <h3>W5 — Duplicated EDS Boundary Formula</h3>
+          <p>
+            <code>OpenFeatureStream</code> (EDS mode) and <code>EvolvableStream</code> each had their own copy
+            of the same boundary computation. The formula is now in a single module-level function
+            <code>_calc_eds_boundaries()</code> shared by both classes.
+          </p>
+
+          <h2>Performance Optimisations</h2>
+
+          <h3>P1 — OASF: O(d × L) Roll → O(1) Ring Buffer</h3>
+          <p>
+            The sliding-window weight matrix was shifted every step with <code>np.roll(W, -1, axis=1)</code>,
+            which copies the entire matrix. A ring buffer with a write pointer performs the same logical
+            operation in O(1):
+          </p>
+          <pre><code># Before
+self.W = np.roll(self.W, -1, axis=1)
+self.W[:, -1] = w_new
+
+# After
+self.W[:, self._ptr] = w_new
+self._ptr = (self._ptr + 1) % self.L</code></pre>
+
+          <h3>P2 — OSLMF: <code>list.pop(0)</code> → <code>deque(maxlen=...)</code></h3>
+          <p>
+            The DensityPeaks buffer used a Python list with <code>pop(0)</code> to evict the oldest entry —
+            an O(n) operation on every step. Replaced with <code>collections.deque(maxlen=buffer_size)</code>,
+            which evicts automatically in O(1).
+          </p>
+
+          <h3>P3 — FESL: Vectorised Prediction via Mapping Matrix</h3>
+          <p>
+            The inner loop over old-space weights was replaced with a single NumPy dot product, eliminating
+            Python-level iteration over feature IDs.
+          </p>
+
+          <h3>P4 — ORF3V: Vectorised CDF Computation</h3>
+          <pre><code># Before
+return sum(1 for v in arr if v &lt; split_val) / len(arr)
+
+# After
+return float(np.sum(arr &lt; split_val)) / len(arr)</code></pre>
+
+          <h3>P5 — OSLMF: Vectorised DensityPeaks Delta Computation</h3>
+          <p>
+            The core O(n²) loop that finds each point's nearest higher-density neighbour was replaced with
+            a rank-mask matrix approach — no Python loops, two NumPy <code>min</code> calls.
+            Numerical equivalence verified by unit tests (error &lt; 1e-10).
+          </p>
+          <pre><code>rank_mask = rank[np.newaxis, :] &lt; rank[:, np.newaxis]   # (n, n) bool
+dist_masked = np.where(rank_mask, dist_matrix, np.inf)
+delta = dist_masked.min(axis=1)
+nearest_higher = np.argmin(dist_masked, axis=1)</code></pre>
+          <table class="concept-table">
+            <thead>
+              <tr><th>Buffer size</th><th>Before</th><th>After</th><th>Speedup</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>n = 50</td><td>0.151 ms</td><td>0.047 ms</td><td><strong>3.2×</strong></td></tr>
+              <tr><td>n = 100</td><td>0.430 ms</td><td>0.253 ms</td><td><strong>1.7×</strong></td></tr>
+              <tr><td>n = 200 (default)</td><td>1.492 ms</td><td>1.109 ms</td><td><strong>1.3×</strong></td></tr>
+            </tbody>
+          </table>
+
+          <h3>P6 — OSLMF / OVFM: <code>statsmodels.ECDF</code> → <code>np.searchsorted</code></h3>
+          <p>
+            The Gaussian Copula transform constructed a <code>statsmodels.ECDF</code> object per feature per
+            batch. The operation reduces to a sorted search with the standard Hájek smoothing factor.
+            <code>statsmodels</code> is no longer imported in either file, removing a heavy optional dependency.
+          </p>
+          <pre><code># Before
+ecdf = ECDF(window_clean)
+u = (len(window_clean) / (len(window_clean) + 1)) * ecdf(x_obs)
+
+# After — numerically identical
+sorted_w = np.sort(window_clean)
+u = np.searchsorted(sorted_w, x_obs, side='right') / (len(sorted_w) + 1)</code></pre>
+          <table class="concept-table">
+            <thead>
+              <tr><th>Observations</th><th>Before</th><th>After</th><th>Speedup</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>10</td><td>0.0146 ms</td><td>0.0042 ms</td><td><strong>3.5×</strong></td></tr>
+              <tr><td>100</td><td>0.0154 ms</td><td>0.0038 ms</td><td><strong>4.0×</strong></td></tr>
+            </tbody>
+          </table>
+
+          <h3>P7 — <code>np.array</code> → <code>np.asarray</code> (14 call sites)</h3>
+          <p>
+            <code>np.array(x)</code> always allocates and copies. <code>np.asarray(x)</code> returns the
+            original array unchanged when dtype already matches. This affects <code>train()</code> and
+            <code>predict()</code> — called on every instance — so the gain accumulates over long streams.
+          </p>
+          <table class="concept-table">
+            <thead>
+              <tr><th>Case</th><th><code>np.array</code></th><th><code>np.asarray</code></th><th>Speedup</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>float64, no conversion needed</td><td>0.30 µs</td><td>0.07 µs</td><td><strong>4.2×</strong></td></tr>
+              <tr><td>dtype mismatch (must copy)</td><td colspan="2" style="text-align:center">same</td><td>—</td></tr>
+            </tbody>
+          </table>
+
+          <h3>P8 — OLD3S: Vectorised HBP Weight Update</h3>
+          <pre><code># Before — Python loop, one temporary tensor per layer
+for i, l in enumerate(losses):
+    bundle['hbp_weights'][i] *= torch.pow(decay, l)
+bundle['hbp_weights'] /= bundle['hbp_weights'].sum()
+
+# After — single in-place operation, no loop, no temporaries
+losses_t = torch.stack([l.detach() for l in losses])
+bundle['hbp_weights'].mul_(decay.pow(losses_t))
+bundle['hbp_weights'].div_(bundle['hbp_weights'].sum())</code></pre>
+          <p>Measured speedup: <strong>1.4×</strong> for 3-layer MLP; gains scale with depth.</p>
+
+          <h2>End-to-End Benchmark</h2>
+          <p>Environment: Windows 11, Intel CPU, Python 3.13, NumPy 2.x. 400 <code>train</code> calls, d = 8.</p>
+          <table class="concept-table">
+            <thead>
+              <tr><th>Classifier</th><th>Total time</th><th>Per instance</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>OSLMF (batch = 50)</td><td>51.0 ms</td><td>0.128 ms</td></tr>
+              <tr><td>OVFM</td><td>31.8 ms</td><td>0.080 ms</td></tr>
+            </tbody>
+          </table>
+
+          <h2>Test Coverage</h2>
+          <p>Three new test files, 61 test cases, all passing.</p>
+
+          <h3><code>tests/test_stream_wrappers.py</code> — 23 cases</h3>
+          <p>
+            Covers correct <code>feature_indices</code> attachment, monotone dimension trends, EDS ID ranges,
+            <code>restart()</code> reproducibility for all wrappers, <code>missing_ratio=0</code> produces no NaN,
+            invalid arguments raise exceptions, <code>ShuffledStream</code> yields every instance exactly once.
+          </p>
+
+          <h3><code>tests/test_uol_classifiers.py</code> — 27 cases</h3>
+          <p>
+            Covers smoke tests (train + predict does not crash) for all 10 classifiers,
+            <code>predict_proba</code> shape/range/sum-to-one, FOBOS/FTRL dynamic dimension expansion without
+            <code>IndexError</code>, ORF3V weight keys are valid global feature IDs, OSLMF correct batch gating,
+            schema mismatch raises <code>ValueError</code>.
+          </p>
+
+          <h3><code>tests/test_optimizations.py</code> — 11 cases</h3>
+          <p>
+            Verifies numerical equivalence: <code>searchsorted</code> vs ECDF error &lt; 1e-12; vectorised
+            DensityPeaks vs loop-based, element-wise error &lt; 1e-10 across four matrix sizes; OVFM, OSLMF,
+            and ORF3V with the same seed produce bit-identical prediction sequences across two runs.
+          </p>
+
+          <h2>Compatibility</h2>
+          <p>
+            v0.2 is fully backwards compatible with v0.1. The public API (<code>train</code>,
+            <code>predict</code>, <code>predict_proba</code>, all stream wrapper constructors) is unchanged.
+            The only user-visible behavioural difference is that OLD3S normalisation now works correctly —
+            experiments that relied on the buggy (unnormalised) behaviour may see different accuracy numbers.
+          </p>
+        </div>
+      </article>
+
+      <hr class="changelog-divider">
+
+      <!-- ================================================================
+           v0.1
+      ================================================================ -->
+      <article class="changelog-article" id="v0.1">
+        <div class="changelog-header">
+          <span class="tag tag-release">Release</span>
+          <span class="changelog-date">January 2026</span>
+        </div>
+        <h2 class="changelog-title">v0.1 — Introducing Utilitarian Online Learning for Dynamic Feature Spaces</h2>
+
+        <div class="changelog-section">
+          <p>
+            OpenMOA is a Python library for <strong>Utilitarian Online Learning (UOL)</strong> — a paradigm
+            designed for real-world streaming environments where the feature space itself evolves over time.
+            Built on top of <a href="https://capymoa.org" target="_blank">CapyMOA</a>, OpenMOA provides a
+            clean, unified API that integrates MOA online learners, CapyMOA's stream learning backend, and
+            PyTorch deep models.
+          </p>
+
+          <h2>Why OpenMOA?</h2>
+          <p>
+            Most online learning libraries assume a <strong>fixed feature space</strong>: every instance arrives
+            with the same set of features, in the same order, with the same semantics. Real-world data streams
+            routinely violate this assumption.
+          </p>
+          <p>
+            Sensors go offline. New signals are added mid-deployment. Features phase in or out according to
+            external schedules. In these settings, standard online learners silently produce wrong predictions —
+            or crash outright.
+          </p>
+          <p>OpenMOA addresses this gap with two purpose-built layers:</p>
+          <ul>
+            <li><strong>Stream Wrappers</strong> that simulate diverse feature-space dynamics on top of any static dataset</li>
+            <li><strong>UOL Classifiers</strong> that are designed from the ground up to handle evolving feature spaces</li>
+          </ul>
+
+          <h2>Installation</h2>
+          <p>OpenMOA requires Java (for MOA) and PyTorch.</p>
+          <pre><code># Check Java
+java -version
+
+# Install PyTorch (CPU)
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+# Install OpenMOA
+pip install openmoa
+
+# Verify
+python -c "import openmoa; print(openmoa.__version__)"</code></pre>
+          <p>For GPU support or troubleshooting, see the <a href="https://openmoa.net/docs/getting-started/">installation guide</a>.</p>
+
+          <h2>Core Components</h2>
+
+          <h3>Stream Wrappers</h3>
+          <p>
+            OpenMOA wraps any static dataset and transforms it into a dynamic stream that simulates
+            feature-space evolution. Five wrapper types cover the major paradigms studied in the literature.
+          </p>
+
+          <h3><code>OpenFeatureStream</code> — Variable-Length Output with Global Index Mapping</h3>
+          <p>
+            The flagship wrapper. At each time step, it exposes only the currently <em>active</em> features
+            and attaches a <code>feature_indices</code> attribute to every instance — a list of global feature
+            IDs corresponding to the values in <code>instance.x</code>. Downstream learners use this to
+            maintain consistent weight indexing across changing feature sets.
+          </p>
+          <p>Supports six evolution modes: EDS (Evolvable), TDS (Trapezoidal), CDS (Capricious), random, cyclic, and custom schedules.</p>
+          <pre><code>from openmoa.stream import OpenFeatureStream
+from capymoa.datasets import Electricity
+
+stream = OpenFeatureStream(
+    base_stream=Electricity(),
+    mode="EDS",
+    n_segments=5,
+    overlap_ratio=0.5,
+)
+
+instance = stream.next_instance()
+print(instance.feature_indices)  # e.g. [0, 2, 5] — active global feature IDs
+print(instance.x)                # values for those three features only</code></pre>
+
+          <h3><code>TrapezoidalStream</code> — Features Phase In Gradually (TDS)</h3>
+          <p>
+            Implements the Trapezoidal Data Stream paradigm (Gao et al.). Features enter the stream in stages:
+            each feature has a birth stage and a retirement stage, creating a trapezoidal activation window.
+            Inactive features are represented as <code>NaN</code> in a fixed-width vector.
+          </p>
+
+          <h3><code>CapriciousStream</code> — Random Missing Features (CDS)</h3>
+          <p>
+            At each time step, features are independently masked with a configurable <code>missing_ratio</code>.
+            Missing values appear as <code>NaN</code>. Models must tolerate sparse, unpredictably incomplete input.
+          </p>
+          <pre><code>from openmoa.stream import CapriciousStream
+
+stream = CapriciousStream(base_stream=..., missing_ratio=0.3)
+# ~30% of feature values will be NaN at each step</code></pre>
+
+          <h3><code>EvolvableStream</code> — Segmented Feature Rotation (EDS)</h3>
+          <p>
+            Divides the stream into alternating <em>stable</em> and <em>transition</em> segments. During stable
+            segments, a fixed feature subset is active. During transitions, old features fade out while new ones
+            phase in. Output is fixed-width with <code>NaN</code> fill.
+          </p>
+
+          <h3><code>ShuffledStream</code> — Eliminates Label-Sorting Bias</h3>
+          <p>
+            Many benchmark datasets are sorted by class label, which artificially inflates the performance of
+            any learner with a memory component. <code>ShuffledStream</code> buffers the entire dataset in memory
+            and shuffles instances before replay, ensuring evaluation reflects truly random arrival order.
+          </p>
+
+          <h2>UOL Classifiers</h2>
+          <p>
+            Ten algorithms, all implementing a common interface (<code>train(instance)</code> /
+            <code>predict(instance)</code> / <code>predict_proba(instance)</code>), all compatible with
+            <code>OpenFeatureStream</code>'s variable-length input.
+          </p>
+          <table class="concept-table">
+            <thead>
+              <tr><th>Algorithm</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>FESL</strong></td>
+                <td>Feature-Evolving Sparse Learning. The core UOL algorithm: maintains a sparse weight vector in a global feature ID space and handles feature-space transitions via explicit mapping matrices.</td>
+              </tr>
+              <tr>
+                <td><strong>OASF</strong></td>
+                <td>Online Adaptive Sparse Filtering. Sliding-window weight matrix; adapts to changing feature relevance over time.</td>
+              </tr>
+              <tr>
+                <td><strong>RSOL</strong></td>
+                <td>Randomly Sparse Online Learning. Random projection-based sparse updates with provable regret bounds.</td>
+              </tr>
+              <tr>
+                <td><strong>FOBOS</strong></td>
+                <td>Forward-Backward Splitting. Proximal gradient descent with L1 regularization for online sparse learning.</td>
+              </tr>
+              <tr>
+                <td><strong>FTRL</strong></td>
+                <td>Follow The Regularized Leader. Per-coordinate adaptive learning rates with L1+L2 regularization.</td>
+              </tr>
+              <tr>
+                <td><strong>ORF3V</strong></td>
+                <td>Online Random Forest for Variable-length feature Vectors. Extends random forests to streams with dynamic feature spaces by maintaining per-feature-ID tree structures.</td>
+              </tr>
+              <tr>
+                <td><strong>OVFM</strong></td>
+                <td>Online Variational Factorization Machine. Models feature interactions via a Gaussian Copula; designed for mixed continuous/ordinal feature types.</td>
+              </tr>
+              <tr>
+                <td><strong>OSLMF</strong></td>
+                <td>Online Semi-supervised Local Matrix Factorization. Combines DensityPeaks clustering with a Copula-based latent representation for label-efficient learning.</td>
+              </tr>
+              <tr>
+                <td><strong>OLD3S</strong></td>
+                <td>Online Deep Dynamic Semi-Supervised Streams. VAE-based deep model with hierarchical Bayesian pruning (HBP); supports unlabeled instances.</td>
+              </tr>
+              <tr>
+                <td><strong>OWSS</strong></td>
+                <td>Online Weighted Sparse Streams. Importance-weighted sparse updates for non-stationary distributions.</td>
+              </tr>
+            </tbody>
+          </table>
+          <pre><code>from openmoa.stream import OpenFeatureStream
+from openmoa.classifier import FESLClassifier
+from capymoa.datasets import Electricity
+from capymoa.evaluation import prequential_evaluation
+
+stream = OpenFeatureStream(Electricity(), mode="EDS", n_segments=5)
+learner = FESLClassifier(schema=stream.get_schema())
+
+results = prequential_evaluation(stream, learner, window_size=500)
+print(results.accuracy())</code></pre>
+
+          <h2>Datasets</h2>
+          <p>
+            OpenMOA v0.1 ships with benchmark support for <strong>17 datasets</strong> — 11 binary
+            classification and 6 multi-class — drawn from UCI, MOA's built-in repository, and domain-specific
+            streaming benchmarks. All 17 datasets are evaluated under all three feature-space paradigms
+            (TDS, CDS, EDS), yielding a comprehensive 10-algorithm × 17-dataset × 3-paradigm benchmark grid.
+          </p>
+
+          <h2>Evaluation Protocol</h2>
+          <p>
+            All experiments follow the <strong>prequential (test-then-train)</strong> protocol: each instance
+            is first used for evaluation, then for training. This produces unbiased estimates of online accuracy
+            without a held-out test set. Prequential evaluation is the standard protocol in stream learning
+            research and is natively supported by CapyMOA's evaluation utilities.
+          </p>
+
+          <h2>Cite</h2>
+          <pre><code>@misc{ZhiliWang2025OpenMOA,
+    title={{OpenMOA}: A Python Library for Utilitarian Online Learning},
+    author={Zhili Wang, Heitor M. Gomes and Yi He},
+    year={2025},
+    archivePrefix={arXiv},
+    url={https://arxiv.org/abs/},
+}</code></pre>
+
+          <h2>Links</h2>
+          <div class="links-row">
+            <a href="https://openmoa.net/docs/">Documentation</a>
+            <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank">GitHub</a>
+            <a href="https://pypi.org/project/openmoa/" target="_blank">PyPI</a>
+            <a href="https://discord.gg/spd2gQJGAb" target="_blank">Discord</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="footer-logo-icon">M</div>
+        <span class="footer-text">© 2025 OpenMOA. Open source under MIT License.</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="footer-link">GitHub</a>
+        <a href="https://openmoa.net" class="footer-link">openmoa.net</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/script.js"></script>
+</body>
+</html>
