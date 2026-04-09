@@ -29,8 +29,8 @@
     }
     
     .team-avatar {
-      width: 80px;
-      height: 80px;
+      width: 88px;
+      height: 88px;
       border-radius: 50%;
       background: var(--gradient);
       display: flex;
@@ -41,6 +41,16 @@
       font-weight: 600;
       font-family: 'Space Grotesk', sans-serif;
       flex-shrink: 0;
+      overflow: hidden;
+      border: 2px solid var(--border);
+    }
+
+    .team-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
     }
     
     .team-info {
@@ -90,6 +100,33 @@
       padding: 12px;
       background: var(--bg-tertiary);
       border-radius: 8px;
+    }
+
+    .team-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .team-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .team-link:hover {
+      border-color: var(--accent);
+      color: var(--accent);
     }
     
     .contact-box {
@@ -153,40 +190,63 @@
       <!-- Team Members -->
       <div class="team-card">
         <div class="team-card-inner">
-          <div class="team-avatar">ZW</div>
+          <div class="team-avatar">
+            <img src="assets/figure/zhili.png" alt="Zhili Wang">
+          </div>
           <div class="team-info">
             <h2 class="team-name">Zhili Wang</h2>
             <p class="team-role">PhD Student</p>
-            <p class="team-affiliation">Department of Data Science, School of Computing, Data Sciences & Physics (CDSP), William & Mary</p>
+            <p class="team-affiliation">Department of Data Science, School of Computing, Data Sciences &amp; Physics (CDSP), William &amp; Mary</p>
             <p class="team-bio">Lead developer of OpenMOA.</p>
+            <div class="team-links">
+              <a href="mailto:zwang68@wm.edu" class="team-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                zwang68@wm.edu
+              </a>
+            </div>
           </div>
         </div>
       </div>
-      
+
       <div class="team-card">
         <div class="team-card-inner">
-          <div class="team-avatar">HG</div>
+          <div class="team-avatar">
+            <img src="assets/figure/heitor.jpg" alt="Heitor Murilo Gomes">
+          </div>
           <div class="team-info">
             <h2 class="team-name">Heitor Murilo Gomes</h2>
             <p class="team-role">Senior Lecturer (Assistant Professor)</p>
             <p class="team-affiliation">Victoria University of Wellington, New Zealand</p>
             <p class="team-bio">Machine Learning Researcher and Data Scientist. Previously Senior Researcher and Co-Director of the AI Institute at the University of Waikato. Research focuses on Adaptive Machine Learning, with emphasis on data stream learning and online continual learning.</p>
-            <p class="team-note">For collaboration opportunities or PhD inquiries, please contact via institutional email.</p>
+            <div class="team-links">
+              <a href="https://heitorgomes.com/" target="_blank" class="team-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                Homepage
+              </a>
+            </div>
           </div>
         </div>
       </div>
-      
+
       <div class="team-card">
         <div class="team-card-inner">
-          <div class="team-avatar">YH</div>
+          <div class="team-avatar">
+            <img src="assets/figure/yihe.png" alt="Yi He">
+          </div>
           <div class="team-info">
             <h2 class="team-name">Yi He</h2>
             <p class="team-role">Assistant Professor (PI)</p>
-            <p class="team-affiliation">School of Computing, Data Sciences, and Physics, William & Mary</p>
+            <p class="team-affiliation">School of Computing, Data Sciences, and Physics, William &amp; Mary</p>
             <p class="team-bio">Previously at Old Dominion University (2021). PhD from University of Louisiana at Lafayette (2020) under Dr. Xindong Wu. B.E. from Harbin Institute of Technology (2013). Research interests: data mining, streaming algorithms, graph learning, and AI for conservation.</p>
             <div class="team-awards">
               <span class="tag tag-release">IEEE TCII Volunteer Award (2022)</span>
               <span class="tag tag-tutorial">NSF CRII Award (2023)</span>
+            </div>
+            <div class="team-links" style="margin-top: 12px;">
+              <a href="https://yhe15.people.wm.edu/" target="_blank" class="team-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                Homepage
+              </a>
             </div>
           </div>
         </div>
