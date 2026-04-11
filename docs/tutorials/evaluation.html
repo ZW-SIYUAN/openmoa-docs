@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaluation Methods - OpenMOA Documentation</title>
+  <meta name="description" content="A comprehensive guide to OpenMOA's evaluation framework for stream learning — prequential evaluation, metrics, evaluator classes, and performance optimization.">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/style.css">
+
+  <style>
+    /* ================================================================
+       Evaluation Tutorial Page — Scoped Styles
+       ================================================================ */
+
+    /* --- Table of Contents --- */
+    .st-toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+      margin: 24px 0 32px;
+    }
+    .st-toc a {
+      display: block;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .st-toc a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .st-toc a span {
+      color: var(--accent);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    /* --- Tip / Info / Warning boxes --- */
+    .st-tip {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .st-tip-info {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      color: var(--text-secondary);
+    }
+    .st-tip-warn {
+      background: #FEF3C7;
+      border-left: 4px solid #F59E0B;
+      color: #92400E;
+    }
+    [data-theme="dark"] .st-tip-warn {
+      background: #78350F33;
+      border-left-color: #FBBF24;
+      color: #FDE68A;
+    }
+    .st-tip strong { color: var(--text); }
+    [data-theme="dark"] .st-tip-warn strong { color: #FBBF24; }
+
+    /* --- Separator --- */
+    .st-sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 36px 0;
+    }
+
+    /* --- Anchor scroll offset --- */
+    .docs-content h2[id] {
+      scroll-margin-top: 80px;
+    }
+
+    /* --- Param table: monospace first column --- */
+    .param-table td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .param-table td:nth-child(2) {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* --- Metrics table: monospace method column --- */
+    .metrics-table td:nth-child(2) {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+    }
+
+    /* --- Function header block --- */
+    .fn-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-top: 40px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .fn-header h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+    .fn-badge {
+      font-size: 12px;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      background: #DBEAFE;
+      color: #1E40AF;
+    }
+    [data-theme="dark"] .fn-badge {
+      background: #1E3A5F;
+      color: #60A5FA;
+    }
+    .fn-badge-ssl {
+      background: #F3E8FF;
+      color: #7C3AED;
+    }
+    [data-theme="dark"] .fn-badge-ssl {
+      background: #4C1D95;
+      color: #A78BFA;
+    }
+    .fn-badge-anomaly {
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+    [data-theme="dark"] .fn-badge-anomaly {
+      background: #7F1D1D;
+      color: #F87171;
+    }
+    .fn-badge-multi {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+    [data-theme="dark"] .fn-badge-multi {
+      background: #064E3B;
+      color: #34D399;
+    }
+
+    /* --- Code block headers --- */
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .code-block-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    .red    { background: #FF5F56; }
+    .yellow { background: #FFBD2E; }
+    .green  { background: #27C93F; }
+    .code-block-title {
+      margin-left: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #94A3B8;
+    }
+    .code-block pre {
+      border-radius: 0 0 12px 12px;
+      margin: 0;
+    }
+
+    /* --- Metrics section cards --- */
+    .metrics-section-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .metrics-section-card {
+      padding: 18px 20px;
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    .metrics-section-card h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: var(--text);
+    }
+    .metrics-section-card p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* --- Flow diagram --- */
+    .flow-diagram {
+      background: var(--code-bg);
+      border-radius: 16px;
+      padding: 32px 24px;
+      margin: 24px 0;
+      overflow-x: auto;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: nowrap;
+      margin-bottom: 16px;
+    }
+    .flow-box {
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(14, 165, 233, 0.4);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #E2E8F0;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .flow-arrow {
+      font-size: 18px;
+      color: #38BDF8;
+      padding: 0 8px;
+      flex-shrink: 0;
+    }
+    .flow-down {
+      display: flex;
+      justify-content: center;
+      color: #38BDF8;
+      font-size: 18px;
+      margin: 0 0 16px;
+    }
+    .flow-split {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .flow-box-result {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #E2E8F0;
+      text-align: center;
+    }
+    .flow-box-final {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #E2E8F0;
+      text-align: center;
+      margin: 0 auto;
+    }
+    .flow-methods {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .flow-method-tag {
+      background: rgba(255,255,255,0.07);
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #94A3B8;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="../../index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+
+    <div class="navbar-links">
+      <a href="../../index.html" class="navbar-link">Home</a>
+      <a href="../index.html" class="navbar-link active">Documentation</a>
+      <a href="../../blog/index.html" class="navbar-link">Blog</a>
+      <a href="../../contact.html" class="navbar-link">Contact</a>
+    </div>
+
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+  </nav>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Getting Started</div>
+        <a href="../quickstart.html" class="docs-sidebar-link">Quick Start Guide</a>
+        <a href="../installation.html" class="docs-sidebar-link">Installation</a>
+        <a href="../concepts.html" class="docs-sidebar-link">Core Concepts</a>
+      </div>
+
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Tutorials</div>
+        <a href="streams.html" class="docs-sidebar-link">Working with Data Streams</a>
+        <a href="classifiers.html" class="docs-sidebar-link">Classification Algorithms</a>
+        <a href="drift.html" class="docs-sidebar-link">Concept Drift Detection</a>
+        <a href="evaluation.html" class="docs-sidebar-link active">Evaluation Methods</a>
+        <a href="advanced.html" class="docs-sidebar-link">Advanced Topics</a>
+      </div>
+
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">API Reference</div>
+        <a href="../../api/streams.html" class="docs-sidebar-link">openmoa.streams</a>
+        <a href="../../api/classifiers.html" class="docs-sidebar-link">openmoa.classifiers</a>
+        <a href="../../api/regressors.html" class="docs-sidebar-link">openmoa.regressors</a>
+        <a href="../../api/drift.html" class="docs-sidebar-link">openmoa.drift_detection</a>
+        <a href="../../api/evaluation.html" class="docs-sidebar-link">openmoa.evaluation</a>
+        <a href="../../api/utils.html" class="docs-sidebar-link">openmoa.utils</a>
+      </div>
+
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Source Deep Dive</div>
+        <a href="../source-files/stream_wrapper.html" class="docs-sidebar-link">stream_wrapper.py</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content fade-in">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+        <span class="tag tag-tutorial">Tutorial</span>
+        <span class="tag tag-guide">~20 min read</span>
+      </div>
+
+      <h1>Evaluation Methods</h1>
+      <p>OpenMOA provides a comprehensive evaluation framework for online / stream learning. It supports multiple
+        evaluation paradigms, task types, and metric sets — all built on MOA's high-performance Java backend
+        with a clean Python API.</p>
+
+      <!-- Table of Contents -->
+      <div class="st-toc">
+        <a href="#overview"><span>1.</span> Overview</a>
+        <a href="#prequential"><span>2.</span> prequential_evaluation</a>
+        <a href="#multiple"><span>3.</span> Multiple Learners</a>
+        <a href="#ssl"><span>4.</span> Semi-Supervised</a>
+        <a href="#anomaly"><span>5.</span> Anomaly Detection</a>
+        <a href="#results"><span>6.</span> PrequentialResults</a>
+        <a href="#metrics"><span>7.</span> Metrics by Task</a>
+        <a href="#evaluators"><span>8.</span> Evaluator Classes</a>
+        <a href="#specialized"><span>9.</span> Specialized Evaluations</a>
+        <a href="#fast-mode"><span>10.</span> Fast Evaluation Mode</a>
+        <a href="#diagram"><span>11.</span> How It Works</a>
+      </div>
+
+      <!-- ============================================================
+           Section 1: Overview
+      ============================================================ -->
+      <h2 id="overview">1. Evaluation in OpenMOA</h2>
+
+      <p>
+        OpenMOA's evaluation framework follows the <strong>prequential (test-then-train)</strong> paradigm,
+        which is the standard approach for evaluating learning algorithms on data streams. In this paradigm,
+        each instance is first used for prediction (testing), then used to update the model (training) —
+        ensuring every instance contributes to both evaluation and learning.
+      </p>
+
+      <p>Evaluations produce two complementary views:</p>
+
+      <div class="metrics-section-grid">
+        <div class="metrics-section-card">
+          <h4>Cumulative Metrics</h4>
+          <p>Aggregate performance over all instances seen so far. Returns a single scalar value — the overall
+            performance across the full stream.</p>
+        </div>
+        <div class="metrics-section-card">
+          <h4>Windowed Metrics</h4>
+          <p>Performance within the most recent fixed-size window (default: 1000 instances). Returns a list of
+            values — one per completed window — capturing how performance evolves over time.</p>
+        </div>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 2: prequential_evaluation
+      ============================================================ -->
+      <div class="fn-header" id="prequential">
+        <h2>2. <code>prequential_evaluation</code></h2>
+        <span class="fn-badge">supervised</span>
+      </div>
+
+      <p>Standard evaluation for a single supervised learner (classification or regression).</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">Signature</span>
+        </div>
+        <pre><code>from openmoa.evaluation import prequential_evaluation
+
+results = prequential_evaluation(
+    stream,
+    learner,
+    max_instances=None,        # None = full stream
+    window_size=1000,
+    store_predictions=False,
+    store_y=False,
+    optimise=True,             # Uses fast MOA evaluation loop when compatible
+    restart_stream=True,
+    progress_bar=False,
+    batch_size=1,
+)</code></pre>
+      </div>
+
+      <h3>Key Parameters</h3>
+      <table class="concept-table param-table">
+        <thead>
+          <tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>stream</td><td>Stream</td><td>required</td><td>Data stream to evaluate on</td></tr>
+          <tr><td>learner</td><td>Classifier / Regressor</td><td>required</td><td>The learner to evaluate</td></tr>
+          <tr><td>max_instances</td><td>int or None</td><td>None</td><td>Max instances to process; <code>None</code> = full stream</td></tr>
+          <tr><td>window_size</td><td>int</td><td>1000</td><td>Size of evaluation windows</td></tr>
+          <tr><td>store_predictions</td><td>bool</td><td>False</td><td>Whether to store all predictions</td></tr>
+          <tr><td>store_y</td><td>bool</td><td>False</td><td>Whether to store all ground truth labels</td></tr>
+          <tr><td>optimise</td><td>bool</td><td>True</td><td>Use fast MOA native loop when possible</td></tr>
+          <tr><td>restart_stream</td><td>bool</td><td>True</td><td>Reset stream to beginning before evaluation</td></tr>
+          <tr><td>batch_size</td><td>int</td><td>1</td><td>Number of instances per training batch</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>Returns:</strong> <code>PrequentialResults</code> object</p>
+
+      <h3>Example</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">prequential_evaluation — basic usage</span>
+        </div>
+        <pre><code>from openmoa.classifier import NaiveBayes
+from openmoa.datasets import Electricity
+from openmoa.evaluation import prequential_evaluation
+
+stream = Electricity()
+learner = NaiveBayes(schema=stream.get_schema())
+
+results = prequential_evaluation(stream=stream, learner=learner, max_instances=10000)
+
+print(results.cumulative.accuracy())   # e.g., 76.34
+print(results.windowed.accuracy())     # list of values per window</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 3: Multiple Learners
+      ============================================================ -->
+      <div class="fn-header" id="multiple">
+        <h2>3. <code>prequential_evaluation_multiple_learners</code></h2>
+        <span class="fn-badge fn-badge-multi">multi-learner</span>
+      </div>
+
+      <p>
+        Evaluates multiple learners on the same stream simultaneously, iterating the stream only
+        <strong>once</strong> for efficiency.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">Signature</span>
+        </div>
+        <pre><code>from openmoa.evaluation import prequential_evaluation_multiple_learners
+
+results_dict = prequential_evaluation_multiple_learners(
+    stream,
+    learners,           # Dict[str, Learner]
+    max_instances=None,
+    window_size=1000,
+    store_predictions=False,
+    store_y=False,
+    progress_bar=False,
+)</code></pre>
+      </div>
+
+      <h3>Key Parameters</h3>
+      <table class="concept-table param-table">
+        <thead>
+          <tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>learners</td><td>Dict[str, Learner]</td><td>required</td><td>Dictionary mapping learner names to learner objects</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>Returns:</strong> <code>Dict[str, PrequentialResults]</code> — one result per learner name</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">Example — comparing two classifiers</span>
+        </div>
+        <pre><code>from openmoa.classifier import NaiveBayes, HoeffdingTree
+from openmoa.evaluation import prequential_evaluation_multiple_learners
+
+learners = {
+    "NaiveBayes":    NaiveBayes(schema=stream.get_schema()),
+    "HoeffdingTree": HoeffdingTree(schema=stream.get_schema()),
+}
+
+results = prequential_evaluation_multiple_learners(stream, learners)
+
+for name, res in results.items():
+    print(f"{name}: {res.cumulative.accuracy():.2f}%")</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 4: SSL
+      ============================================================ -->
+      <div class="fn-header" id="ssl">
+        <h2>4. <code>prequential_ssl_evaluation</code></h2>
+        <span class="fn-badge fn-badge-ssl">semi-supervised</span>
+      </div>
+
+      <p>
+        Evaluation for semi-supervised learning, where only a fraction of instances are labeled.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">Signature</span>
+        </div>
+        <pre><code>from openmoa.evaluation import prequential_ssl_evaluation
+
+results = prequential_ssl_evaluation(
+    stream,
+    learner,
+    max_instances=None,
+    window_size=1000,
+    initial_window_size=0,
+    delay_length=0,
+    label_probability=0.01,    # 1% of instances are labeled
+    random_seed=1,
+    store_predictions=False,
+    store_y=False,
+    optimise=True,
+    restart_stream=True,
+    progress_bar=False,
+    batch_size=1,
+)</code></pre>
+      </div>
+
+      <h3>Key Parameters</h3>
+      <table class="concept-table param-table">
+        <thead>
+          <tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>label_probability</td><td>float</td><td>0.01</td><td>Fraction of instances that provide a label (0.0 – 1.0)</td></tr>
+          <tr><td>initial_window_size</td><td>int</td><td>0</td><td>Number of fully labeled instances at the start</td></tr>
+          <tr><td>delay_length</td><td>int</td><td>0</td><td>Delay (in instances) before a label becomes available</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>Returns:</strong> <code>PrequentialResults</code> object</p>
+
+      <div class="st-tip st-tip-info">
+        <strong>Note:</strong> <code>label_probability=0.01</code> means roughly 1 in 100 instances will carry
+        a label during evaluation. Use <code>initial_window_size</code> to warm-start the model with a small
+        fully-labeled window before entering the semi-supervised regime.
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 5: Anomaly
+      ============================================================ -->
+      <div class="fn-header" id="anomaly">
+        <h2>5. <code>prequential_evaluation_anomaly</code></h2>
+        <span class="fn-badge fn-badge-anomaly">anomaly detection</span>
+      </div>
+
+      <p>Evaluation for anomaly detection tasks, using AUC-based metrics.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">Signature</span>
+        </div>
+        <pre><code>from openmoa.evaluation import prequential_evaluation_anomaly
+
+results = prequential_evaluation_anomaly(
+    stream,
+    learner,
+    max_instances=None,
+    window_size=1000,
+    optimise=True,
+    store_predictions=False,
+    store_y=False,
+    progress_bar=False,
+)</code></pre>
+      </div>
+
+      <p><strong>Returns:</strong> <code>PrequentialResults</code> object with anomaly detection metrics (AUC, sAUC)</p>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 6: PrequentialResults
+      ============================================================ -->
+      <h2 id="results">6. Reading Evaluation Results</h2>
+
+      <p>
+        All evaluation functions return a <code>PrequentialResults</code> object. The two primary views are
+        <code>.cumulative</code> (scalar metrics over all instances) and <code>.windowed</code> (list of metrics,
+        one per window).
+      </p>
+
+      <h3>Attributes &amp; Methods</h3>
+      <table class="concept-table metrics-table">
+        <thead>
+          <tr><th>Attribute / Method</th><th>Returns</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>.cumulative</td><td>Evaluator</td><td>Cumulative evaluator — metrics as scalars over all instances</td></tr>
+          <tr><td>.windowed</td><td>Evaluator</td><td>Windowed evaluator — metrics as lists, one value per window</td></tr>
+          <tr><td>.wallclock()</td><td>float</td><td>Total wall clock time in seconds</td></tr>
+          <tr><td>.cpu_time()</td><td>float</td><td>Total CPU time in seconds</td></tr>
+          <tr><td>.max_instances()</td><td>int</td><td>Total number of instances evaluated</td></tr>
+          <tr><td>.predictions()</td><td>list</td><td>All stored predictions (requires <code>store_predictions=True</code>)</td></tr>
+          <tr><td>.ground_truth_y()</td><td>list</td><td>All stored ground truth labels (requires <code>store_y=True</code>)</td></tr>
+          <tr><td>.metrics_per_window()</td><td>DataFrame</td><td>Pandas DataFrame of all windowed metrics</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Export Results</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">Write results to CSV</span>
+        </div>
+        <pre><code>results.write_to_file(path="./output", directory_name="my_experiment")
+# Writes cumulative and windowed metrics to CSV files</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 7: Metrics
+      ============================================================ -->
+      <h2 id="metrics">7. Metrics by Task Type</h2>
+
+      <h3>Classification Metrics</h3>
+      <p>Available on <code>ClassificationEvaluator</code> and <code>ClassificationWindowedEvaluator</code>:</p>
+      <table class="concept-table metrics-table">
+        <thead>
+          <tr><th>Metric</th><th>Method</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Accuracy</td><td>.accuracy()</td><td>Percentage of correct predictions</td></tr>
+          <tr><td>Kappa Statistic</td><td>.kappa()</td><td>Cohen's Kappa (chance-corrected accuracy)</td></tr>
+          <tr><td>Kappa T</td><td>.kappa_t()</td><td>Temporal Kappa (compared to no-change predictor)</td></tr>
+          <tr><td>Kappa M</td><td>.kappa_m()</td><td>Marginal Kappa</td></tr>
+          <tr><td>F1 Score</td><td>.f1_score()</td><td>Harmonic mean of precision and recall</td></tr>
+          <tr><td>Precision</td><td>.precision()</td><td>Positive predictive value</td></tr>
+          <tr><td>Recall</td><td>.recall()</td><td>True positive rate</td></tr>
+          <tr><td>Per-class F1</td><td>.f1_score_N()</td><td>F1 score for class N</td></tr>
+          <tr><td>Per-class Precision</td><td>.precision_N()</td><td>Precision for class N</td></tr>
+          <tr><td>Per-class Recall</td><td>.recall_N()</td><td>Recall for class N</td></tr>
+          <tr><td>Instances</td><td>.instances()</td><td>Total number of instances processed</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Regression Metrics</h3>
+      <p>Available on <code>RegressionEvaluator</code> and <code>RegressionWindowedEvaluator</code>:</p>
+      <table class="concept-table metrics-table">
+        <thead>
+          <tr><th>Metric</th><th>Method</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>MAE</td><td>.mae()</td><td>Mean Absolute Error</td></tr>
+          <tr><td>RMSE</td><td>.rmse()</td><td>Root Mean Squared Error</td></tr>
+          <tr><td>RMAE</td><td>.rmae()</td><td>Relative Mean Absolute Error</td></tr>
+          <tr><td>RRMSE</td><td>.rrmse()</td><td>Relative Root Mean Squared Error</td></tr>
+          <tr><td>R²</td><td>.r2()</td><td>Coefficient of Determination</td></tr>
+          <tr><td>Adjusted R²</td><td>.adjusted_r2()</td><td>R² adjusted for number of features</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Prediction Interval Metrics</h3>
+      <p>Available on <code>PredictionIntervalEvaluator</code>:</p>
+      <table class="concept-table metrics-table">
+        <thead>
+          <tr><th>Metric</th><th>Method</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Coverage</td><td>.coverage()</td><td>% of true values falling within predicted intervals</td></tr>
+          <tr><td>Average Length</td><td>.average_length()</td><td>Mean width of prediction intervals</td></tr>
+          <tr><td>NMPIW</td><td>.nmpiw()</td><td>Normalized Mean Prediction Interval Width</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Anomaly Detection Metrics</h3>
+      <p>Available on <code>AnomalyDetectionEvaluator</code>:</p>
+      <table class="concept-table metrics-table">
+        <thead>
+          <tr><th>Metric</th><th>Method</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>AUC</td><td>.auc()</td><td>Area Under the ROC Curve</td></tr>
+          <tr><td>sAUC</td><td>.s_auc()</td><td>Sensitivity-adjusted AUC</td></tr>
+        </tbody>
+      </table>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 8: Evaluator Classes
+      ============================================================ -->
+      <h2 id="evaluators">8. Evaluator Classes</h2>
+
+      <p>
+        For advanced use cases, evaluator classes can be instantiated and updated manually — giving you full
+        control over the evaluation loop.
+      </p>
+
+      <h3>Classification Evaluator</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">ClassificationEvaluator</span>
+        </div>
+        <pre><code>from openmoa.evaluation import ClassificationEvaluator
+
+evaluator = ClassificationEvaluator(schema=stream.get_schema(), window_size=1000)
+
+for x, y in stream:
+    y_pred = learner.predict(x)
+    evaluator.update(y_target_index=y, y_pred_index=y_pred)
+    learner.train(x, y)
+
+print(evaluator.accuracy())         # Cumulative accuracy
+print(evaluator.metrics_dict())     # All metrics as dict</code></pre>
+      </div>
+
+      <h3>Regression Evaluator</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">RegressionEvaluator</span>
+        </div>
+        <pre><code>from openmoa.evaluation import RegressionEvaluator
+
+evaluator = RegressionEvaluator(schema=stream.get_schema(), window_size=1000)
+evaluator.update(y=actual_value, y_pred=predicted_value)
+print(evaluator.mae(), evaluator.rmse())</code></pre>
+      </div>
+
+      <h3>Prediction Interval Evaluator</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">PredictionIntervalEvaluator</span>
+        </div>
+        <pre><code>from openmoa.evaluation import PredictionIntervalEvaluator
+
+evaluator = PredictionIntervalEvaluator(schema=stream.get_schema())
+# y_pred must be a 3-tuple: [lower_bound, prediction, upper_bound]
+evaluator.update(y=actual, y_pred=[lower, pred, upper])
+print(evaluator.coverage(), evaluator.nmpiw())</code></pre>
+      </div>
+
+      <h3>Clustering Evaluator</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">ClusteringEvaluator</span>
+        </div>
+        <pre><code>from openmoa.evaluation import ClusteringEvaluator
+
+evaluator = ClusteringEvaluator(schema=stream.get_schema())
+evaluator.update(clusterer=my_clusterer)
+macro, micro = evaluator.get_measurements()</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 9: Specialized Evaluations
+      ============================================================ -->
+      <h2 id="specialized">9. Specialized Evaluations</h2>
+
+      <h3>Online Continual Learning (OCL) Metrics</h3>
+      <p>
+        Located in <code>openmoa.ocl.evaluation</code>, the <code>OCLMetrics</code> dataclass provides
+        evaluation for multi-task continual learning streams:
+      </p>
+      <ul style="margin: 12px 0 16px; padding-left: 1.5rem;">
+        <li style="color: var(--text-secondary); margin-bottom: 6px; line-height: 1.6;">
+          <strong style="color: var(--text);">Anytime Accuracy</strong> — measured during training within each task
+        </li>
+        <li style="color: var(--text-secondary); margin-bottom: 6px; line-height: 1.6;">
+          <strong style="color: var(--text);">Forward Transfer</strong> — how learning a task improves future tasks
+        </li>
+        <li style="color: var(--text-secondary); margin-bottom: 6px; line-height: 1.6;">
+          <strong style="color: var(--text);">Backward Transfer</strong> — how learning new tasks affects performance on past tasks
+        </li>
+        <li style="color: var(--text-secondary); margin-bottom: 6px; line-height: 1.6;">
+          Per-task and aggregate accuracy matrices
+        </li>
+      </ul>
+
+      <h3>Drift Detection Evaluation</h3>
+      <p>
+        Located in <code>openmoa.drift.eval_detector</code>, the <code>EvaluateDetector</code> class evaluates
+        drift detector performance against known ground-truth drift points:
+      </p>
+      <table class="concept-table metrics-table">
+        <thead>
+          <tr><th>Metric</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Mean Time to Detect</td><td>Average delay between true drift and detection</td></tr>
+          <tr><td>Missed Detection Ratio</td><td>Fraction of true drifts that were missed</td></tr>
+          <tr><td>Mean Time Between False Alarms</td><td>Average gap between false positive detections</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">EvaluateDetector</span>
+        </div>
+        <pre><code>from openmoa.drift.eval_detector import EvaluateDetector
+
+evaluator = EvaluateDetector(max_delay=200)
+results = evaluator.calc_performance(
+    preds=detected_positions,
+    trues=true_drift_positions
+)</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 10: Fast Mode
+      ============================================================ -->
+      <h2 id="fast-mode">10. Fast Evaluation Mode</h2>
+
+      <p>
+        When <code>optimise=True</code> (default), OpenMOA automatically detects whether a stream–learner pair
+        is compatible with MOA's native <code>EfficientEvaluationLoops</code>. When compatible, this
+        significantly speeds up evaluation by running the full evaluation loop in Java rather than Python.
+      </p>
+
+      <div class="st-tip st-tip-warn">
+        <strong>Fast mode is automatically disabled when:</strong>
+        <ul style="margin: 8px 0 0; padding-left: 1.4rem;">
+          <li>A progress bar is requested (<code>progress_bar=True</code>)</li>
+          <li>A custom MOA evaluator is provided</li>
+          <li>The stream or learner is Python-native (not a MOA wrapper)</li>
+        </ul>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 11: Diagram
+      ============================================================ -->
+      <h2 id="diagram">11. How Prequential Evaluation Works</h2>
+
+      <p>Every instance passes through the same three-step cycle before the next instance arrives:</p>
+
+      <div class="flow-diagram">
+        <div class="flow-row">
+          <div class="flow-box">Stream Instance</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">Predict</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">Evaluate<br><small style="opacity:0.7">update metrics</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">Train<br><small style="opacity:0.7">update model</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">next instance</div>
+        </div>
+
+        <div class="flow-down">↓</div>
+
+        <div class="flow-split">
+          <div class="flow-box-result">Cumulative Metrics<br><small style="opacity:0.7">scalar — all instances</small></div>
+          <div class="flow-box-result">Windowed Metrics<br><small style="opacity:0.7">list — per window</small></div>
+        </div>
+
+        <div class="flow-down">↓</div>
+
+        <div class="flow-box-final">PrequentialResults</div>
+        <div class="flow-methods">
+          <span class="flow-method-tag">.cumulative</span>
+          <span class="flow-method-tag">.windowed</span>
+          <span class="flow-method-tag">.wallclock()</span>
+          <span class="flow-method-tag">.cpu_time()</span>
+          <span class="flow-method-tag">.predictions()</span>
+          <span class="flow-method-tag">.ground_truth_y()</span>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="footer-logo-icon">M</div>
+        <span class="footer-text">© 2025 OpenMOA. Open source under MIT License.</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="footer-link">GitHub</a>
+        <a href="https://openmoa.net" class="footer-link">openmoa.net</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/script.js"></script>
+</body>
+</html>
