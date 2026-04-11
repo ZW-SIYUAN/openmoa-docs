@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Concept Drift Detection - OpenMOA Documentation</title>
+  <meta name="description" content="A complete guide to OpenMOA's drift detection framework — 12 detectors, drift stream construction, synthetic generators, and detector evaluation tools.">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/style.css">
+
+  <style>
+    /* ================================================================
+       Drift Tutorial Page — Scoped Styles
+       ================================================================ */
+
+    .st-toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px;
+      margin: 24px 0 32px;
+    }
+    .st-toc a {
+      display: block;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .st-toc a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .st-toc a span {
+      color: var(--accent);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .st-tip {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .st-tip-info {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      color: var(--text-secondary);
+    }
+    .st-tip strong { color: var(--text); }
+
+    .st-sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 36px 0;
+    }
+
+    .docs-content h2[id],
+    .docs-content h3[id] {
+      scroll-margin-top: 80px;
+    }
+
+    .param-table td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .param-table td:nth-child(2) {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .detector-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-top: 40px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+    .detector-header h3 { margin: 0; font-size: 20px; color: var(--text); }
+    .detector-import {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+      background: var(--bg-tertiary);
+      padding: 3px 10px;
+      border-radius: 5px;
+    }
+    .detector-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin: 8px 0 14px;
+      line-height: 1.6;
+    }
+
+    .detector-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .d-badge {
+      font-size: 12px;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .d-badge-warn   { background: #D1FAE5; color: #065F46; }
+    .d-badge-nowarn { background: #FEE2E2; color: #991B1B; }
+    .d-badge-free   { background: #DBEAFE; color: #1E40AF; }
+    .d-badge-param  { background: #F3E8FF; color: #7C3AED; }
+    .d-badge-fast   { background: #FEF3C7; color: #92400E; }
+    .d-badge-slow   { background: #FEE2E2; color: #991B1B; }
+    [data-theme="dark"] .d-badge-warn   { background: #064E3B; color: #34D399; }
+    [data-theme="dark"] .d-badge-nowarn { background: #7F1D1D; color: #F87171; }
+    [data-theme="dark"] .d-badge-free   { background: #1E3A5F; color: #60A5FA; }
+    [data-theme="dark"] .d-badge-param  { background: #4C1D95; color: #A78BFA; }
+    [data-theme="dark"] .d-badge-fast   { background: #78350F; color: #FBBF24; }
+    [data-theme="dark"] .d-badge-slow   { background: #7F1D1D; color: #F87171; }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .code-block-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+    .red    { background: #FF5F56; }
+    .yellow { background: #FFBD2E; }
+    .green  { background: #27C93F; }
+    .code-block-title {
+      margin-left: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #94A3B8;
+    }
+    .code-block pre { border-radius: 0 0 12px 12px; margin: 0; }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+      margin: 20px 0;
+    }
+    .overview-card {
+      padding: 18px 20px;
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    .overview-card h4 { margin: 0 0 6px; font-size: 15px; color: var(--text); }
+    .overview-card p  { margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+    .yes-badge {
+      display: inline-block; padding: 1px 8px; border-radius: 4px;
+      font-size: 12px; font-weight: 600;
+      background: #D1FAE5; color: #065F46;
+    }
+    .no-badge {
+      display: inline-block; padding: 1px 8px; border-radius: 4px;
+      font-size: 12px; font-weight: 600;
+      background: #FEE2E2; color: #991B1B;
+    }
+    [data-theme="dark"] .yes-badge { background: #064E3B; color: #34D399; }
+    [data-theme="dark"] .no-badge  { background: #7F1D1D; color: #F87171; }
+
+    .viz-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 16px 0;
+    }
+    @media (max-width: 600px) { .viz-row { grid-template-columns: 1fr; } }
+    .viz-box {
+      padding: 16px 18px;
+      border-radius: 10px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    .viz-box h4 { margin: 0 0 6px; font-size: 14px; }
+    .viz-box p  { margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="../../index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+    <div class="navbar-links">
+      <a href="../../index.html" class="navbar-link">Home</a>
+      <a href="../index.html" class="navbar-link active">Documentation</a>
+      <a href="../../blog/index.html" class="navbar-link">Blog</a>
+      <a href="../../contact.html" class="navbar-link">Contact</a>
+    </div>
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+  </nav>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar">
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Getting Started</div>
+        <a href="../quickstart.html" class="docs-sidebar-link">Quick Start Guide</a>
+        <a href="../installation.html" class="docs-sidebar-link">Installation</a>
+        <a href="../concepts.html" class="docs-sidebar-link">Core Concepts</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Tutorials</div>
+        <a href="streams.html" class="docs-sidebar-link">Working with Data Streams</a>
+        <a href="classifiers.html" class="docs-sidebar-link">Classification Algorithms</a>
+        <a href="drift.html" class="docs-sidebar-link active">Concept Drift Detection</a>
+        <a href="evaluation.html" class="docs-sidebar-link">Evaluation Methods</a>
+        <a href="advanced.html" class="docs-sidebar-link">Advanced Topics</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">API Reference</div>
+        <a href="../../api/streams.html" class="docs-sidebar-link">openmoa.streams</a>
+        <a href="../../api/classifiers.html" class="docs-sidebar-link">openmoa.classifiers</a>
+        <a href="../../api/regressors.html" class="docs-sidebar-link">openmoa.regressors</a>
+        <a href="../../api/drift.html" class="docs-sidebar-link">openmoa.drift_detection</a>
+        <a href="../../api/evaluation.html" class="docs-sidebar-link">openmoa.evaluation</a>
+        <a href="../../api/utils.html" class="docs-sidebar-link">openmoa.utils</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Source Deep Dive</div>
+        <a href="../source-files/stream_wrapper.html" class="docs-sidebar-link">stream_wrapper.py</a>
+      </div>
+    </aside>
+
+    <main class="docs-content fade-in">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+        <span class="tag tag-tutorial">Tutorial</span>
+        <span class="tag tag-guide">~30 min read</span>
+      </div>
+
+      <h1>Concept Drift Detection</h1>
+      <p>OpenMOA provides a complete concept drift detection framework covering 12 detectors, drift stream
+        construction, drift-aware data generators, and evaluation tools for detector performance — all
+        integrated with the broader stream learning pipeline.</p>
+
+      <div class="st-toc">
+        <a href="#overview"><span>1.</span> What is Concept Drift?</a>
+        <a href="#api"><span>2.</span> Detector API</a>
+        <a href="#detectors"><span>3.</span> Detector Catalogue</a>
+        <a href="#comparison"><span>4.</span> Choosing a Detector</a>
+        <a href="#evaluate"><span>5.</span> EvaluateDetector</a>
+        <a href="#driftstream"><span>6.</span> DriftStream</a>
+        <a href="#generators"><span>7.</span> Drifting Generators</a>
+        <a href="#datasets"><span>8.</span> Drift Datasets</a>
+        <a href="#visualization"><span>9.</span> Visualization</a>
+      </div>
+
+      <!-- 1 -->
+      <h2 id="overview">1. What is Concept Drift?</h2>
+      <p>In data streams, the underlying data distribution can change over time — a phenomenon known as
+        <strong>concept drift</strong>. When drift occurs, a learner's previously acquired knowledge may
+        become outdated, leading to degraded prediction performance.</p>
+      <p>OpenMOA addresses this through a dedicated drift detection module (<code>openmoa.drift</code>) that provides:</p>
+      <div class="overview-grid">
+        <div class="overview-card">
+          <h4>12 Drift Detectors</h4>
+          <p>From classic statistical tests (ADWIN, DDM, CUSUM) to deep learning-based multivariate methods (ABCD).</p>
+        </div>
+        <div class="overview-card">
+          <h4>Drift Stream Builders</h4>
+          <p>Compose any sequence of sub-streams connected by abrupt or gradual drift transitions.</p>
+        </div>
+        <div class="overview-card">
+          <h4>Drift-Aware Generators</h4>
+          <p>Synthetic streams with built-in drift — RBF centroids that drift, LED and waveform attributes that change.</p>
+        </div>
+        <div class="overview-card">
+          <h4>Detector Evaluation</h4>
+          <p>Measure detection delay, missed detections, and false alarm rate against known ground truth.</p>
+        </div>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- 2 -->
+      <h2 id="api">2. Common Detector Interface</h2>
+      <p>All detectors share the same base interface defined in <code>BaseDriftDetector</code>. You call
+        <code>add_element()</code> on each new data point, then query detection state.</p>
+
+      <h3>Base Class Attributes</h3>
+      <table class="concept-table param-table">
+        <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>in_concept_change</td><td>bool</td><td>Whether drift is currently detected</td></tr>
+          <tr><td>in_warning_zone</td><td>bool</td><td>Whether the detector is in warning state</td></tr>
+          <tr><td>detection_index</td><td>list[int]</td><td>History of all instance indices where drift was signaled</td></tr>
+          <tr><td>warning_index</td><td>list[int]</td><td>History of all instance indices where warning was signaled</td></tr>
+          <tr><td>idx</td><td>int</td><td>Total number of instances processed</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Base Class Methods</h3>
+      <table class="concept-table param-table">
+        <thead><tr><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>add_element(element: float)</td><td>Update detector with new input value (typically prediction error: 0 or 1)</td></tr>
+          <tr><td>detected_change() → bool</td><td>Returns <code>True</code> if drift is currently detected</td></tr>
+          <tr><td>detected_warning() → bool</td><td>Returns <code>True</code> if warning zone is currently active</td></tr>
+          <tr><td>reset(clean_history=False)</td><td>Reset detector state; optionally clear detection history</td></tr>
+          <tr><td>get_params() → dict</td><td>Return the detector's hyperparameter configuration</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Basic Usage Pattern</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div><div class="code-block-dot yellow"></div><div class="code-block-dot green"></div>
+          <span class="code-block-title">Basic detector usage</span>
+        </div>
+        <pre><code>from openmoa.drift.detectors import ADWIN
+
+detector = ADWIN(delta=0.001)
+
+for i, (x, y) in enumerate(stream):
+    y_pred = learner.predict(x)
+
+    error = int(y_pred != y)
+    detector.add_element(error)
+
+    if detector.detected_change():
+        print(f"Drift detected at instance {i}")
+        learner.reset()
+    elif detector.detected_warning():
+        print(f"Warning at instance {i}")
+
+    learner.train(x, y)
+
+print(detector.detection_index)   # [1011, 3025, ...]
+print(detector.warning_index)     # [985, 2990, ...]</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- 3 -->
+      <h2 id="detectors">3. Drift Detector Catalogue</h2>
+
+      <!-- ADWIN -->
+      <div class="detector-header" id="adwin">
+        <h3>3.1 ADWIN — Adaptive Windowing</h3>
+        <span class="detector-import">from openmoa.drift.detectors import ADWIN</span>
+      </div>
+      <p class="detector-desc">Maintains an adaptive window that automatically shrinks when it detects that two sub-windows have statistically different means. Non-parametric and parameter-light.</p>
+      <div class="detector-badges">
+        <span class="d-badge d-badge-warn">Warning zone</span>
+        <span class="d-badge d-badge-free">Distribution-free</span>
+        <span class="d-badge d-badge-fast">Fast</span>
+      </div>
+      <pre><code>ADWIN(delta=0.002)</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>delta</td><td>float</td><td>0.002</td><td>Confidence bound. Smaller = more sensitive</td></tr>
+        </tbody>
+      </table>
+
+      <!-- DDM -->
+      <div class="detector-header" id="ddm">
+        <h3>3.2 DDM — Drift Detection Method</h3>
+        <span class="detector-import">from openmoa.drift.detectors import DDM</span>
+      </div>
+      <p class="detector-desc">Monitors the error rate of a classifier. Drift is detected when the error rate increases significantly beyond the minimum observed error rate, using statistical control limits.</p>
+      <div class="detector-badges">
+        <span class="d-badge d-badge-warn">Warning zone</span>
+        <span class="d-badge d-badge-param">Parametric</span>
+        <span class="d-badge d-badge-fast">Fast</span>
+      </div>
+      <pre><code>DDM(min_n_instances=30, warning_level=2.0, out_control_level=3.0)</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>min_n_instances</td><td>int</td><td>30</td><td>Minimum instances before monitoring begins</td></tr>
+          <tr><td>warning_level</td><td>float</td><td>2.0</td><td>Standard deviations above minimum for warning</td></tr>
+          <tr><td>out_control_level</td><td>float</td><td>3.0</td><td>Standard deviations above minimum for drift</td></tr>
+        </tbody>
+      </table>
+
+      <!-- CUSUM -->
+      <div class="detector-header" id="cusum">
+        <h3>3.3 CUSUM — Cumulative Sum Test</h3>
+        <span class="detector-import">from openmoa.drift.detectors import CUSUM</span>
+      </div>
+      <p class="detector-desc">Accumulates deviations from a target mean. When the cumulative sum exceeds threshold <code>lambda_</code>, drift is flagged and the counter resets.</p>
+      <div class="detector-badges">
+        <span class="d-badge d-badge-nowarn">No warning zone</span>
+        <span class="d-badge d-badge-fast">Fast</span>
+      </div>
+      <pre><code>CUSUM(min_n_instances=30, delta=0.005, lambda_=50)</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>min_n_instances</td><td>int</td><td>30</td><td>Minimum instances before monitoring</td></tr>
+          <tr><td>delta</td><td>float</td><td>0.005</td><td>Allowance parameter (sensitivity)</td></tr>
+          <tr><td>lambda_</td><td>float</td><td>50</td><td>Detection threshold</td></tr>
+        </tbody>
+      </table>
+
+      <!-- EWMA -->
+      <div class="detector-header" id="ewma">
+        <h3>3.4 EWMA Chart — Exponentially Weighted Moving Average</h3>
+        <span class="detector-import">from openmoa.drift.detectors import EWMAChart</span>
+      </div>
+      <p class="detector-desc">Applies exponential smoothing to the error stream. Drift is detected when the smoothed value exceeds a control limit.</p>
+      <div class="detector-badges">
+        <span class="d-badge d-badge-nowarn">No warning zone</span>
+        <span class="d-badge d-badge-fast">Fast</span>
+      </div>
+      <pre><code>EWMAChart(min_n_instances=30, lambda_=0.2)</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>min_n_instances</td><td>int</td><td>30</td><td>Minimum instances before monitoring</td></tr>
+          <tr><td>lambda_</td><td>float</td><td>0.2</td><td>Smoothing factor (0 &lt; λ ≤ 1)</td></tr>
+        </tbody>
+      </table>
+
+      <!-- GMA -->
+      <div class="detector-header" id="gma">
+        <h3>3.5 GeometricMovingAverage</h3>
+        <span class="detector-import">from openmoa.drift.detectors import GeometricMovingAverage</span>
+      </div>
+      <p class="detector-desc">Uses a geometric moving average with a forgetting factor to track the error rate. Drift is flagged when the average exceeds a threshold.</p>
+      <div class="detector-badges">
+        <span class="d-badge d-badge-nowarn">No warning zone</span>
+        <span class="d-badge d-badge-fast">Fast</span>
+      </div>
+      <pre><code>GeometricMovingAverage(min_n_instances=30, lambda_=1.0, alpha=0.99)</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>min_n_instances</td><td>int</td><td>30</td><td>Minimum instances before monitoring</td></tr>
+          <tr><td>lambda_</td><td>float</td><td>1.0</td><td>Detection threshold</td></tr>
+          <tr><td>alpha</td><td>float</td><td>0.99</td><td>Decay factor (forgetting rate)</td></tr>
+        </tbody>
+      </table>
+
+      <!-- HDDM_A -->
+      <div class="detector-header" id="hddm-a">
+        <h3>3.6 HDDM_A — Hoeffding's Bound DDM (Average)</h3>
+        <span class="detector-import">from openmoa.drift.detectors import HDDM_A</span>
+      </div>
+      <p class="detector-desc">Applies Hoeffding's inequality to bound the probability that the error rate has increased significantly from its historical minimum, using cumulative average statistics.</p>
+      <div class="detector-badges">
+        <span class="d-badge d-badge-warn">Warning zone</span>
+        <span class="d-badge d-badge-free">Distribution-free</span>
+      </div>
+      <pre><code>HDDM_A(drift_confidence=0.001, warning_confidence=0.005, test_type="Two-sided")</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>drift_confidence</td><td>float</td><td>0.001</td><td>Significance level for drift detection</td></tr>
+          <tr><td>warning_confidence</td><td>float</td><td>0.005</td><td>Significance level for warning</td></tr>
+          <tr><td>test_type</td><td>str</td><td>"Two-sided"</td><td>"Two-sided" or "One-sided"</td></tr>
+        </tbody>
+      </table>
+
+      <!-- HDDM_W -->
+      <div class="detector-header" id="hddm-w">
+        <h3>3.7 HDDM_W — Hoeffding's Bound DDM (Weighted)</h3>
+        <span class="detector-import">from openmoa.drift.detectors import HDDM_W</span>
+      </div>
+      <p class="detector-desc">Weighted variant of HDDM_A. More recent observations receive higher weight via an exponential decay factor <code>lambda_</code>.</p>
+      <div class="detector-badges">
+        <span class="d-badge d-badge-warn">Warning zone</span>
+        <span class="d-badge d-badge-free">Distribution-free</span>
+      </div>
+      <pre><code>HDDM_W(drift_confidence=0.001, warning_confidence=0.005, lambda_=0.05, test_type="Two-sided")</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>drift_confidence</td><td>float</td><td>0.001</td><td>Significance level for drift</td></tr>
+          <tr><td>warning_confidence</td><td>float</td><td>0.005</td><td>Significance level for warning</td></tr>
+          <tr><td>lambda_</td><td>float</td><td>0.05</td><td>Decay factor weighting recent instances higher</td></tr>
+          <tr><td>test_type</td><td>str</td><td>"Two-sided"</td><td>"Two-sided" or "One-sided"</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:14px; color:var(--text-secondary);">
+        <strong style="color:var(--text);">Extra attributes:</strong>
+        <code>.estimation</code> (current mean estimate), <code>.delay</code> (detection delay)
+      </p>
+
+      <!-- Page-Hinkley -->
+      <div class="detector-header" id="ph">
+        <h3>3.8 Page-Hinkley Test</h3>
+        <span class="detector-import">from openmoa.drift.detectors import PageHinkley</span>
+      </div>
+      <p class="detector-desc">Sequential change-point detection using cumulative sums with both upper and lower bounds. Drift is flagged when the difference between the maximum cumulative sum and the current value exceeds the threshold.</p>
+      <div class="detector-badges">
+        <span class="d-badge d-badge-nowarn">No warning zone</span>
+        <span class="d-badge d-badge-fast">Fast</span>
+      </div>
+      <pre><code>PageHinkley(min_n_instances=30, delta=0.005, lambda_=50.0, alpha=0.9999)</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>min_n_instances</td><td>int</td><td>30</td><td>Minimum instances before monitoring</td></tr>
+          <tr><td>delta</td><td>float</td><td>0.005</td><td>Allowance parameter</td></tr>
+          <tr><td>lambda_</td><td>float</td><td>50.0</td><td>Detection threshold</td></tr>
+          <tr><td>alpha</td><td>float</td><td>0.9999</td><td>Forgetting factor (decay)</td></tr>
+        </tbody>
+      </table>
+
+      <!-- RDDM -->
+      <div class="detector-header" id="rddm">
+        <h3>3.9 RDDM — Reactive Drift Detection Method</h3>
+        <span class="detector-import">from openmoa.drift.detectors import RDDM</span>
+      </div>
+      <p class="detector-desc">An extension of DDM that resets when a long sequence of instances passes without drift detection, preventing false adaptation to temporary fluctuations.</p>
+      <div class="detector-badges">
+        <span class="d-badge d-badge-warn">Warning zone</span>
+        <span class="d-badge d-badge-param">Parametric</span>
+      </div>
+      <pre><code>RDDM(
+    min_n_instances=129,
+    warning_level=1.773,
+    drift_level=2.258,
+    max_size_concept=40000,
+    min_size_concept=7000,
+    warning_limit=1400
+)</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>min_n_instances</td><td>int</td><td>129</td><td>Minimum instances before monitoring</td></tr>
+          <tr><td>warning_level</td><td>float</td><td>1.773</td><td>Standard deviations for warning</td></tr>
+          <tr><td>drift_level</td><td>float</td><td>2.258</td><td>Standard deviations for drift</td></tr>
+          <tr><td>max_size_concept</td><td>int</td><td>40000</td><td>Max concept length before reset</td></tr>
+          <tr><td>min_size_concept</td><td>int</td><td>7000</td><td>Min concept length to retain</td></tr>
+          <tr><td>warning_limit</td><td>int</td><td>1400</td><td>Max consecutive warnings before reset</td></tr>
+        </tbody>
+      </table>
+
+      <!-- SEED -->
+      <div class="detector-header" id="seed">
+        <h3>3.10 SEED — Statistical Entropy-based Detector</h3>
+        <span class="detector-import">from openmoa.drift.detectors import SEED</span>
+      </div>
+      <p class="detector-desc">Detects drift by monitoring volatility shifts in the error stream using block-level entropy. Suited for detecting changes in error variability rather than just mean shift.</p>
+      <div class="detector-badges">
+        <span class="d-badge d-badge-warn">Warning zone</span>
+        <span class="d-badge d-badge-free">Distribution-free</span>
+      </div>
+      <pre><code>SEED(delta=0.05, block_size=32, epsilon_prime=0.01, alpha=0.8, compress_term=75)</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>delta</td><td>float</td><td>0.05</td><td>Confidence threshold</td></tr>
+          <tr><td>block_size</td><td>int</td><td>32</td><td>Size of blocks for entropy computation</td></tr>
+          <tr><td>epsilon_prime</td><td>float</td><td>0.01</td><td>Error tolerance</td></tr>
+          <tr><td>alpha</td><td>float</td><td>0.8</td><td>Decay factor</td></tr>
+          <tr><td>compress_term</td><td>int</td><td>75</td><td>Compression frequency</td></tr>
+        </tbody>
+      </table>
+
+      <!-- STEPD -->
+      <div class="detector-header" id="stepd">
+        <h3>3.11 STEPD — Statistical Test of Equal Proportions Drift</h3>
+        <span class="detector-import">from openmoa.drift.detectors import STEPD</span>
+      </div>
+      <p class="detector-desc">Uses a statistical test comparing the proportion of correct predictions in a recent window versus the overall accuracy to date.</p>
+      <div class="detector-badges">
+        <span class="d-badge d-badge-warn">Warning zone</span>
+        <span class="d-badge d-badge-fast">Fast</span>
+      </div>
+      <pre><code>STEPD(window_size=30, alpha_drift=0.003, alpha_warning=0.05)</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>window_size</td><td>int</td><td>30</td><td>Size of the recent comparison window</td></tr>
+          <tr><td>alpha_drift</td><td>float</td><td>0.003</td><td>Significance level for drift detection</td></tr>
+          <tr><td>alpha_warning</td><td>float</td><td>0.05</td><td>Significance level for warning</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ABCD -->
+      <div class="detector-header" id="abcd">
+        <h3>3.12 ABCD — Anomaly-Based Concept Drift (Multivariate)</h3>
+        <span class="detector-import">from openmoa.drift.detectors import ABCD</span>
+      </div>
+      <p class="detector-desc">Unique among OpenMOA detectors — ABCD operates on <strong>raw feature vectors</strong> (not prediction errors). It trains a dimensionality reduction model (AutoEncoder, PCA, or Kernel PCA) and monitors reconstruction loss over time using the Bernstein statistical test. It can also identify which features are drifting.</p>
+      <div class="detector-badges">
+        <span class="d-badge d-badge-warn">Warning zone</span>
+        <span class="d-badge d-badge-free">Distribution-free</span>
+        <span class="d-badge d-badge-slow">Slower</span>
+      </div>
+      <pre><code>ABCD(
+    delta_drift=0.002,
+    delta_warn=0.01,
+    model_id="ae",              # "ae", "pca", or "kpca"
+    split_type="ed",
+    encoding_factor=0.5,
+    update_epochs=50,
+    num_splits=20,
+    max_size=np.inf,
+    subspace_threshold=2.5,
+    n_min=100,
+    maximum_absolute_value=1.0,
+    bonferroni=False
+)</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>delta_drift</td><td>float</td><td>0.002</td><td>Confidence level for drift detection</td></tr>
+          <tr><td>delta_warn</td><td>float</td><td>0.01</td><td>Confidence level for warning</td></tr>
+          <tr><td>model_id</td><td>str</td><td>"ae"</td><td>Feature extraction model: "ae" (AutoEncoder), "pca", "kpca"</td></tr>
+          <tr><td>encoding_factor</td><td>float</td><td>0.5</td><td>Bottleneck size as fraction of input size</td></tr>
+          <tr><td>update_epochs</td><td>int</td><td>50</td><td>Training epochs after confirmed drift</td></tr>
+          <tr><td>num_splits</td><td>int</td><td>20</td><td>Number of time split points to evaluate</td></tr>
+          <tr><td>n_min</td><td>int</td><td>100</td><td>Minimum instances before pre-training</td></tr>
+          <tr><td>bonferroni</td><td>bool</td><td>False</td><td>Apply Bonferroni correction for multiple testing</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Additional Methods (ABCD only)</h3>
+      <table class="concept-table param-table">
+        <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>get_drift_dims()</td><td>np.ndarray</td><td>Feature indices where drift was detected</td></tr>
+          <tr><td>get_dims_p_values()</td><td>np.ndarray</td><td>Per-feature p-values</td></tr>
+          <tr><td>get_severity()</td><td>float</td><td>Magnitude of drift as a z-score</td></tr>
+          <tr><td>loss()</td><td>float</td><td>Current reconstruction loss</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div><div class="code-block-dot yellow"></div><div class="code-block-dot green"></div>
+          <span class="code-block-title">ABCD — multivariate drift detection</span>
+        </div>
+        <pre><code>from openmoa.drift.detectors import ABCD
+import numpy as np
+
+detector = ABCD(model_id="ae", delta_drift=0.002)
+
+for instance in stream:
+    detector.add_element(instance.x)   # full feature vector, not error
+
+    if detector.detected_change():
+        print(f"Drift at feature dims: {detector.get_drift_dims()}")
+        print(f"Severity: {detector.get_severity():.3f}")</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- 4 -->
+      <h2 id="comparison">4. Choosing a Detector</h2>
+      <table class="concept-table">
+        <thead>
+          <tr><th>Detector</th><th>Input</th><th>Warning Zone</th><th>Distribution-free</th><th>Speed</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>ADWIN</strong></td><td>Error (0/1)</td><td><span class="yes-badge">Yes</span></td><td><span class="yes-badge">Yes</span></td><td>Fast</td><td>General purpose</td></tr>
+          <tr><td><strong>DDM</strong></td><td>Error (0/1)</td><td><span class="yes-badge">Yes</span></td><td><span class="no-badge">No</span></td><td>Fast</td><td>Binary classification</td></tr>
+          <tr><td><strong>CUSUM</strong></td><td>Continuous</td><td><span class="no-badge">No</span></td><td><span class="no-badge">No</span></td><td>Fast</td><td>Process monitoring</td></tr>
+          <tr><td><strong>EWMA Chart</strong></td><td>Error (0/1)</td><td><span class="no-badge">No</span></td><td><span class="no-badge">No</span></td><td>Fast</td><td>Smoothed error tracking</td></tr>
+          <tr><td><strong>Geometric MA</strong></td><td>Error (0/1)</td><td><span class="no-badge">No</span></td><td><span class="no-badge">No</span></td><td>Fast</td><td>Adaptive smoothing</td></tr>
+          <tr><td><strong>HDDM_A</strong></td><td>Error (0/1)</td><td><span class="yes-badge">Yes</span></td><td><span class="yes-badge">Yes</span></td><td>Medium</td><td>Error rate bounds</td></tr>
+          <tr><td><strong>HDDM_W</strong></td><td>Error (0/1)</td><td><span class="yes-badge">Yes</span></td><td><span class="yes-badge">Yes</span></td><td>Medium</td><td>Recency-weighted</td></tr>
+          <tr><td><strong>Page-Hinkley</strong></td><td>Continuous</td><td><span class="no-badge">No</span></td><td><span class="no-badge">No</span></td><td>Fast</td><td>Mean shift detection</td></tr>
+          <tr><td><strong>RDDM</strong></td><td>Error (0/1)</td><td><span class="yes-badge">Yes</span></td><td><span class="no-badge">No</span></td><td>Medium</td><td>Avoids false resets</td></tr>
+          <tr><td><strong>SEED</strong></td><td>Error (0/1)</td><td><span class="yes-badge">Yes</span></td><td><span class="yes-badge">Yes</span></td><td>Medium</td><td>Volatility shifts</td></tr>
+          <tr><td><strong>STEPD</strong></td><td>Error (0/1)</td><td><span class="yes-badge">Yes</span></td><td><span class="no-badge">No</span></td><td>Fast</td><td>Proportion comparison</td></tr>
+          <tr><td><strong>ABCD</strong></td><td>Feature vector</td><td><span class="yes-badge">Yes</span></td><td><span class="yes-badge">Yes</span></td><td>Slower</td><td>Multivariate / raw features</td></tr>
+        </tbody>
+      </table>
+
+      <hr class="st-sep">
+
+      <!-- 5 -->
+      <h2 id="evaluate">5. Evaluating Drift Detectors</h2>
+      <p>When the true drift positions are known, OpenMOA provides <code>EvaluateDetector</code> to measure the quality of a detector's output.</p>
+      <p><strong>Import:</strong> <code>from openmoa.drift.eval_detector import EvaluateDetector</code></p>
+      <pre><code>EvaluateDetector(max_delay: int)</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>max_delay</td><td>Maximum instances to wait after a drift before it is counted as "missed"</td></tr>
+        </tbody>
+      </table>
+      <pre><code>results = evaluator.calc_performance(preds, trues)</code></pre>
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>preds</td><td>array-like</td><td>Instance indices where the detector signaled drift (from <code>detector.detection_index</code>)</td></tr>
+          <tr><td>trues</td><td>array-like</td><td>Ground-truth drift positions</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Returned Metrics (<code>pd.Series</code>)</h3>
+      <table class="concept-table">
+        <thead><tr><th>Metric</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>mean_time_to_detect</code></td><td>Average instances between true drift and first detection (NaN if missed)</td></tr>
+          <tr><td><code>missed_detection_ratio</code></td><td>Fraction of true drifts not detected within <code>max_delay</code> (0.0 = perfect)</td></tr>
+          <tr><td><code>mean_time_btw_false_alarms</code></td><td>Average gap between consecutive false alarms (NaN if none)</td></tr>
+          <tr><td><code>no_alarms_per_episode</code></td><td>Average number of false alarms per drift episode</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div><div class="code-block-dot yellow"></div><div class="code-block-dot green"></div>
+          <span class="code-block-title">Full evaluation example</span>
+        </div>
+        <pre><code>import numpy as np
+from openmoa.drift.detectors import ADWIN
+from openmoa.drift.eval_detector import EvaluateDetector
+
+data = np.concatenate([
+    np.random.randint(0, 2, 1000),    # Before drift: low error
+    np.random.randint(3, 8, 1000),    # After drift: high error
+])
+
+detector = ADWIN(delta=0.001)
+for val in data:
+    detector.add_element(float(val))
+
+evaluator = EvaluateDetector(max_delay=200)
+results = evaluator.calc_performance(
+    preds=detector.detection_index,
+    trues=np.array([1000])
+)
+print(results)
+# mean_time_to_detect          11.0
+# missed_detection_ratio        0.0
+# mean_time_btw_false_alarms    NaN
+# no_alarms_per_episode         0.0</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- 6 -->
+      <h2 id="driftstream">6. DriftStream — Composing Streams with Drift</h2>
+      <p><strong>Import:</strong> <code>from openmoa.stream.drift import DriftStream, AbruptDrift, GradualDrift</code></p>
+
+      <h3>AbruptDrift</h3>
+      <pre><code>AbruptDrift(position: int, random_seed: int = 1)</code></pre>
+      <p style="font-size:14px; color:var(--text-secondary); margin-top:4px;">Instantaneous switch at a given instance index.</p>
+
+      <h3>GradualDrift</h3>
+      <pre><code># Specify by center position + width
+GradualDrift(position=10000, width=2000, random_seed=1)
+
+# Or specify by start + end
+GradualDrift(start=9000, end=11000, random_seed=1)</code></pre>
+      <p style="font-size:14px; color:var(--text-secondary); margin-top:4px;">Instances are probabilistically drawn from either concept over the drift window.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div><div class="code-block-dot yellow"></div><div class="code-block-dot green"></div>
+          <span class="code-block-title">Composing a drift stream</span>
+        </div>
+        <pre><code>from openmoa.stream.drift import DriftStream, AbruptDrift, GradualDrift
+from openmoa.stream.generator import SEA
+
+stream = DriftStream(stream=[
+    SEA(function=1),                           # Concept 1
+    AbruptDrift(position=5000),                # Sudden switch at instance 5000
+    SEA(function=2),                           # Concept 2
+    GradualDrift(position=10000, width=2000),  # Gradual drift from 9000–11000
+    SEA(function=3),                           # Concept 3
+])
+
+print(stream.get_num_drifts())   # 2
+print(stream.get_drifts())       # List of Drift objects</code></pre>
+      </div>
+
+      <h3>RecurrentConceptDriftStream</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div><div class="code-block-dot yellow"></div><div class="code-block-dot green"></div>
+          <span class="code-block-title">Recurrent concepts</span>
+        </div>
+        <pre><code>from openmoa.stream.drift import RecurrentConceptDriftStream
+
+stream = RecurrentConceptDriftStream(
+    concept_list=[concept1, concept2, concept3],
+    max_recurrences_per_concept=2,
+    transition_type_template=AbruptDrift(position=2000),
+)</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- 7 -->
+      <h2 id="generators">7. Built-in Drifting Generators</h2>
+      <table class="concept-table">
+        <thead><tr><th>Generator</th><th>Key Parameters</th><th>Drift Mechanism</th></tr></thead>
+        <tbody>
+          <tr><td><code>RandomRBFGeneratorDrift</code></td><td><code>number_of_drifting_centroids=2</code>, <code>magnitude_of_change=0.0</code></td><td>RBF centroids slowly move over time</td></tr>
+          <tr><td><code>LEDGeneratorDrift</code></td><td><code>number_of_attributes_with_drift=7</code></td><td>LED display attributes drift</td></tr>
+          <tr><td><code>WaveformGeneratorDrift</code></td><td><code>number_of_attributes_with_drift=10</code></td><td>Waveform attributes drift</td></tr>
+        </tbody>
+      </table>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div><div class="code-block-dot yellow"></div><div class="code-block-dot green"></div>
+          <span class="code-block-title">RandomRBFGeneratorDrift</span>
+        </div>
+        <pre><code>from openmoa.stream.generator import RandomRBFGeneratorDrift
+
+stream = RandomRBFGeneratorDrift(
+    model_random_seed=1,
+    number_of_classes=2,
+    number_of_centroids=50,
+    number_of_drifting_centroids=5,
+    magnitude_of_change=0.5,
+)</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- 8 -->
+      <h2 id="datasets">8. Drift Benchmark Datasets</h2>
+      <table class="concept-table">
+        <thead><tr><th>Dataset</th><th>Instances</th><th>Features</th><th>Drift Events</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>CovtFD</code></td><td>581,011</td><td>104</td><td>2 (at 193,669 &amp; 387,338)</td>
+            <td>Covertype with synthetic feature drift: dummy features swap with real features</td>
+          </tr>
+          <tr>
+            <td><code>RTG_2abrupt</code></td><td>100,000</td><td>30</td><td>2 abrupt</td>
+            <td>Random Tree Generator with 2 injected abrupt concept drifts, 5 classes</td>
+          </tr>
+        </tbody>
+      </table>
+      <pre><code>from openmoa.datasets import CovtFD, RTG_2abrupt
+
+stream = CovtFD()
+stream = RTG_2abrupt()</code></pre>
+
+      <hr class="st-sep">
+
+      <!-- 9 -->
+      <h2 id="visualization">9. Visualizing Drift in Evaluation Results</h2>
+      <p>When a <code>DriftStream</code> is passed to <code>prequential_evaluation</code>, the resulting plot automatically marks drift locations.</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div><div class="code-block-dot yellow"></div><div class="code-block-dot green"></div>
+          <span class="code-block-title">Drift visualization</span>
+        </div>
+        <pre><code>from openmoa.evaluation import prequential_evaluation
+from openmoa.evaluation.visualization import plot_windowed_results
+from openmoa.classifier import HoeffdingTree
+
+stream = DriftStream(stream=[
+    SEA(function=1),
+    AbruptDrift(position=5000),
+    SEA(function=2),
+    GradualDrift(position=10000, width=2000),
+    SEA(function=3),
+])
+
+learner = HoeffdingTree(schema=stream.get_schema())
+results = prequential_evaluation(stream=stream, learner=learner, window_size=500)
+
+plot_windowed_results(results, metric="accuracy")</code></pre>
+      </div>
+      <div class="viz-row">
+        <div class="viz-box">
+          <h4>Abrupt Drifts</h4>
+          <p>Rendered as vertical dashed lines at the exact drift position.</p>
+        </div>
+        <div class="viz-box">
+          <h4>Gradual Drifts</h4>
+          <p>Rendered as shaded bands (70% transparency) showing the full transition window.</p>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="docs-nav">
+        <a href="classifiers.html" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Previous: Classification Algorithms
+        </a>
+        <a href="evaluation.html" class="btn btn-secondary">
+          Next: Evaluation Methods
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="footer-logo-icon">M</div>
+        <span class="footer-text">© 2025 OpenMOA. Open source under MIT License.</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="footer-link">GitHub</a>
+        <a href="https://openmoa.net" class="footer-link">openmoa.net</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/script.js"></script>
+</body>
+</html>
