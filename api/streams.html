@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>openmoa.streams — API Reference</title>
+  <meta name="description" content="Complete API reference for all stream classes, instance types, schema, and stream wrappers in OpenMOA.">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/style.css">
+
+  <style>
+    /* ================================================================
+       API Reference — Shared Theme
+       Accent: Emerald #10B981 (distinct from tutorials blue #0EA5E9)
+       ================================================================ */
+
+    /* ── CSS overrides for emerald accent ── */
+    .docs-content code { color: #059669; }
+    [data-theme="dark"] .docs-content code { color: #34D399; }
+
+    /* ── Page-level scrolling offset ── */
+    .docs-content h2[id], .docs-content h3[id] { scroll-margin-top: 80px; }
+
+    /* ── Compact two-column TOC ── */
+    .api-toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 6px 12px;
+      margin: 20px 0 32px;
+      padding: 20px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      border-left: 4px solid #10B981;
+    }
+    .api-toc-group { grid-column: 1 / -1; margin-top: 10px; }
+    .api-toc-group:first-child { margin-top: 0; }
+    .api-toc-group-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .api-toc-link {
+      display: block;
+      padding: 4px 8px;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .api-toc-link:hover { background: var(--bg-tertiary); color: #10B981; }
+
+    /* ── Section divider ── */
+    .api-sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 40px 0;
+    }
+
+    /* ── Section header ── */
+    .api-section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+      margin-top: 40px;
+    }
+    .api-section-title:first-of-type { margin-top: 0; }
+
+    /* ── Class / function header block ── */
+    .api-entity {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 28px 0 0;
+    }
+    .api-entity-header {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 20px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border);
+    }
+    .api-entity-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .api-entity-body { padding: 20px; }
+
+    /* ── Type badges ── */
+    .api-badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+    }
+    .api-badge-class    { background: #D1FAE5; color: #065F46; }
+    .api-badge-func     { background: #DBEAFE; color: #1E40AF; }
+    .api-badge-alias    { background: #FEF3C7; color: #92400E; }
+    .api-badge-abstract { background: #F3E8FF; color: #6B21A8; }
+    .api-badge-prop     { background: #FEE2E2; color: #991B1B; }
+    [data-theme="dark"] .api-badge-class    { background: #064E3B; color: #6EE7B7; }
+    [data-theme="dark"] .api-badge-func     { background: #1E3A5F; color: #93C5FD; }
+    [data-theme="dark"] .api-badge-alias    { background: #78350F; color: #FDE68A; }
+    [data-theme="dark"] .api-badge-abstract { background: #3B0764; color: #D8B4FE; }
+    [data-theme="dark"] .api-badge-prop     { background: #7F1D1D; color: #FCA5A5; }
+
+    /* ── Inheritance / file meta ── */
+    .api-meta {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .api-meta-sep { margin: 0 6px; opacity: 0.4; }
+
+    /* ── Function signature block ── */
+    .api-sig {
+      background: var(--code-bg);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 0 0 16px;
+      overflow-x: auto;
+    }
+    .api-sig pre {
+      margin: 0;
+      background: none;
+      padding: 0;
+      border-radius: 0;
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--code-text);
+    }
+    .api-sig-label {
+      font-size: 11px;
+      color: #475569;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 6px;
+    }
+
+    /* ── Description paragraph ── */
+    .api-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    /* ── Parameter table ── */
+    .api-param-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 13px;
+    }
+    .api-param-table th {
+      background: var(--bg-tertiary);
+      font-weight: 600;
+      color: var(--text);
+      padding: 9px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .api-param-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      vertical-align: top;
+    }
+    .api-param-table td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: #059669;
+      white-space: nowrap;
+    }
+    [data-theme="dark"] .api-param-table td:first-child { color: #34D399; }
+    .api-param-table td:nth-child(2) {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* ── Method rows (compact) ── */
+    .api-method-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 13px;
+    }
+    .api-method-table th {
+      background: var(--bg-tertiary);
+      font-weight: 600;
+      color: var(--text);
+      padding: 9px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .api-method-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      vertical-align: top;
+    }
+    .api-method-table td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: #059669;
+    }
+    [data-theme="dark"] .api-method-table td:first-child { color: #34D399; }
+    .api-method-table td:nth-child(2) {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* ── Sub-section heading ── */
+    .api-sub-heading {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 18px 0 6px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* ── Note box ── */
+    .api-note {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 12px 0;
+    }
+    .api-note-info {
+      background: #D1FAE5;
+      border-left: 3px solid #10B981;
+      color: #065F46;
+    }
+    .api-note-warn {
+      background: #FEF3C7;
+      border-left: 3px solid #F59E0B;
+      color: #92400E;
+    }
+    [data-theme="dark"] .api-note-info { background: #064E3B33; border-left-color: #34D399; color: #6EE7B7; }
+    [data-theme="dark"] .api-note-warn { background: #78350F33; border-left-color: #FBBF24; color: #FDE68A; }
+    .api-note strong { color: inherit; font-weight: 700; }
+
+    /* ── Module import block ── */
+    .api-import-block {
+      background: var(--code-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 16px 0 24px;
+    }
+    .api-import-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(16,185,129,0.1);
+      border-bottom: 1px solid rgba(16,185,129,0.2);
+    }
+    .api-import-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .d1 { background: #FF5F56; }
+    .d2 { background: #FFBD2E; }
+    .d3 { background: #27CA40; }
+    .api-import-label {
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #34D399;
+      margin-left: 6px;
+    }
+    .api-import-block pre {
+      margin: 0;
+      background: none;
+      padding: 16px 20px;
+      border-radius: 0;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    /* ── Dataset table ── */
+    .api-dataset-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 13px;
+    }
+    .api-dataset-table th {
+      background: var(--bg-tertiary);
+      font-weight: 600;
+      color: var(--text);
+      padding: 9px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .api-dataset-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .api-dataset-table td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: #059669;
+      white-space: nowrap;
+    }
+    [data-theme="dark"] .api-dataset-table td:first-child { color: #34D399; }
+    .api-dataset-table td:nth-child(2),
+    .api-dataset-table td:nth-child(3),
+    .api-dataset-table td:nth-child(4) {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="../index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+    <div class="navbar-links">
+      <a href="../index.html" class="navbar-link">Home</a>
+      <a href="../docs/index.html" class="navbar-link active">Documentation</a>
+      <a href="../blog/index.html" class="navbar-link">Blog</a>
+      <a href="../contact.html" class="navbar-link">Contact</a>
+    </div>
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+  </nav>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Getting Started</div>
+        <a href="../docs/quickstart.html" class="docs-sidebar-link">Quick Start Guide</a>
+        <a href="../docs/installation.html" class="docs-sidebar-link">Installation</a>
+        <a href="../docs/concepts.html" class="docs-sidebar-link">Core Concepts</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Tutorials</div>
+        <a href="../docs/tutorials/streams.html" class="docs-sidebar-link">Working with Data Streams</a>
+        <a href="../docs/tutorials/classifiers.html" class="docs-sidebar-link">Classification Algorithms</a>
+        <a href="../docs/tutorials/drift.html" class="docs-sidebar-link">Concept Drift Detection</a>
+        <a href="../docs/tutorials/evaluation.html" class="docs-sidebar-link">Evaluation Methods</a>
+        <a href="../docs/tutorials/advanced.html" class="docs-sidebar-link">Advanced Topics</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">API Reference</div>
+        <a href="streams.html" class="docs-sidebar-link active">openmoa.streams</a>
+        <a href="classifiers.html" class="docs-sidebar-link">openmoa.classifiers</a>
+        <a href="regressors.html" class="docs-sidebar-link">openmoa.regressors</a>
+        <a href="drift.html" class="docs-sidebar-link">openmoa.drift_detection</a>
+        <a href="evaluation.html" class="docs-sidebar-link">openmoa.evaluation</a>
+        <a href="utils.html" class="docs-sidebar-link">openmoa.utils</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Source Deep Dive</div>
+        <a href="../docs/source-files/stream_wrapper.html" class="docs-sidebar-link">stream_wrapper.py</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content fade-in">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
+        <span class="tag" style="background:#D1FAE5;color:#065F46;">API Reference</span>
+        <span class="tag tag-guide">Complete Reference</span>
+      </div>
+
+      <h1 style="font-family:'JetBrains Mono',monospace; font-size:1.9rem;">openmoa.streams</h1>
+      <p>Complete API reference for all stream classes, instance types, schema, and stream wrappers in OpenMOA.
+        Covers every public class, method, parameter, and attribute.</p>
+
+      <!-- ── TOC ── -->
+      <div class="api-toc">
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">§0 · Module Exports</div>
+          <a href="#exports" class="api-toc-link">import overview</a>
+        </div>
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">§1 · Core Data Structures</div>
+          <a href="#schema" class="api-toc-link">Schema</a>
+          <a href="#instance" class="api-toc-link">Instance</a>
+          <a href="#labeled-instance" class="api-toc-link">LabeledInstance</a>
+          <a href="#regression-instance" class="api-toc-link">RegressionInstance</a>
+          <a href="#type-aliases" class="api-toc-link">Type Aliases</a>
+        </div>
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">§2 · Stream Base Classes</div>
+          <a href="#stream-abc" class="api-toc-link">Stream (Abstract)</a>
+          <a href="#moastream" class="api-toc-link">MOAStream</a>
+        </div>
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">§3 · File-Based Streams</div>
+          <a href="#arffstream" class="api-toc-link">ARFFStream</a>
+          <a href="#numpystream" class="api-toc-link">NumpyStream</a>
+          <a href="#csvstream" class="api-toc-link">CSVStream</a>
+          <a href="#libsvmstream" class="api-toc-link">LibsvmStream</a>
+          <a href="#bagofwords" class="api-toc-link">BagOfWordsStream</a>
+          <a href="#concatstream" class="api-toc-link">ConcatStream</a>
+          <a href="#stream-from-file" class="api-toc-link">stream_from_file</a>
+        </div>
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">§4 · Feature Evolution Wrappers</div>
+          <a href="#openfeaturestream" class="api-toc-link">OpenFeatureStream</a>
+          <a href="#trapezoidalstream" class="api-toc-link">TrapezoidalStream</a>
+          <a href="#capriciousstream" class="api-toc-link">CapriciousStream</a>
+          <a href="#evolvablestream" class="api-toc-link">EvolvableStream</a>
+          <a href="#shuffledstream" class="api-toc-link">ShuffledStream</a>
+        </div>
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">§5 · Synthetic Generators</div>
+          <a href="#sea" class="api-toc-link">SEA</a>
+          <a href="#randomtree" class="api-toc-link">RandomTreeGenerator</a>
+          <a href="#randomrbf" class="api-toc-link">RandomRBFGenerator</a>
+          <a href="#randomrbfdrift" class="api-toc-link">RandomRBFGeneratorDrift</a>
+          <a href="#led" class="api-toc-link">LEDGenerator</a>
+          <a href="#leddrift" class="api-toc-link">LEDGeneratorDrift</a>
+          <a href="#waveform" class="api-toc-link">WaveformGenerator</a>
+          <a href="#waveformdrift" class="api-toc-link">WaveformGeneratorDrift</a>
+          <a href="#agrawal" class="api-toc-link">AgrawalGenerator</a>
+          <a href="#hyperplane" class="api-toc-link">HyperplaneGenerator</a>
+          <a href="#stagger" class="api-toc-link">STAGGERGenerator</a>
+          <a href="#mixed" class="api-toc-link">MixedGenerator</a>
+        </div>
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">§6 · Drift Streams</div>
+          <a href="#drift" class="api-toc-link">Drift</a>
+          <a href="#abruptdrift" class="api-toc-link">AbruptDrift</a>
+          <a href="#gradualdrift" class="api-toc-link">GradualDrift</a>
+          <a href="#driftstream" class="api-toc-link">DriftStream</a>
+          <a href="#recurrent" class="api-toc-link">RecurrentConceptDriftStream</a>
+        </div>
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">§7 · Built-in Datasets</div>
+          <a href="#datasets" class="api-toc-link">classification datasets</a>
+          <a href="#datasets-regression" class="api-toc-link">regression datasets</a>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §0  Module Exports
+      ══════════════════════════════════════════ -->
+      <h2 id="exports" class="api-section-title">§0 &nbsp; Module Exports</h2>
+
+      <div class="api-import-block">
+        <div class="api-import-header">
+          <div class="api-import-dot d1"></div>
+          <div class="api-import-dot d2"></div>
+          <div class="api-import-dot d3"></div>
+          <span class="api-import-label">openmoa/stream/__init__.py</span>
+        </div>
+        <pre><code>from openmoa.stream import (
+    Stream, MOAStream,
+    ARFFStream, NumpyStream, CSVStream, ConcatStream,
+    LibsvmStream, BagOfWordsStream,
+    OpenFeatureStream, EvolvingFeatureStream,   # EvolvingFeatureStream is an alias
+    TrapezoidalStream, CapriciousStream, EvolvableStream,
+    ShuffledStream,
+    stream_from_file,
+)</code></pre>
+      </div>
+
+      <div class="api-import-block">
+        <div class="api-import-header">
+          <div class="api-import-dot d1"></div>
+          <div class="api-import-dot d2"></div>
+          <div class="api-import-dot d3"></div>
+          <span class="api-import-label">openmoa/stream/drift/__init__.py</span>
+        </div>
+        <pre><code>from openmoa.stream.drift import (
+    DriftStream, Drift, AbruptDrift, GradualDrift,
+    RecurrentConceptDriftStream,
+)</code></pre>
+      </div>
+
+      <div class="api-import-block">
+        <div class="api-import-header">
+          <div class="api-import-dot d1"></div>
+          <div class="api-import-dot d2"></div>
+          <div class="api-import-dot d3"></div>
+          <span class="api-import-label">openmoa/stream/generator/__init__.py</span>
+        </div>
+        <pre><code>from openmoa.stream.generator import (
+    SEA, RandomTreeGenerator,
+    RandomRBFGenerator, RandomRBFGeneratorDrift,
+    LEDGenerator, LEDGeneratorDrift,
+    WaveformGenerator, WaveformGeneratorDrift,
+    AgrawalGenerator, HyperplaneGenerator,
+    STAGGERGenerator, MixedGenerator,
+)</code></pre>
+      </div>
+
+      <div class="api-import-block">
+        <div class="api-import-header">
+          <div class="api-import-dot d1"></div>
+          <div class="api-import-dot d2"></div>
+          <div class="api-import-dot d3"></div>
+          <span class="api-import-label">openmoa/datasets/__init__.py  (selection)</span>
+        </div>
+        <pre><code>from openmoa.datasets import (
+    Electricity, ElectricityTiny,
+    Covtype, CovtypeNorm, CovtypeTiny, CovtFD,
+    RBFm_100k, RTG_2abrupt, Hyper100k, Sensor,
+    Fried, FriedTiny, Bike,
+    # ... full list in §7
+)</code></pre>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §1  Core Data Structures
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="core" class="api-section-title">§1 &nbsp; Core Data Structures</h2>
+
+      <!-- Schema -->
+      <div class="api-entity" id="schema">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">Schema</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/stream/_stream.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Describes the structure of a stream: attribute names, data types, number of classes, and label values. Required by all learners and evaluators.</p>
+
+          <div class="api-sub-heading">Schema(moa_header)</div>
+          <div class="api-sig">
+            <div class="api-sig-label">signature</div>
+            <pre>Schema(moa_header: InstancesHeader) -> None</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>moa_header</td><td>InstancesHeader</td><td>Java MOA header object. Typically not called directly — use <code>Schema.from_custom()</code> or <code>stream.get_schema()</code>.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Schema.from_custom (class method)</div>
+          <div class="api-sig">
+            <div class="api-sig-label">signature</div>
+            <pre>Schema.from_custom(
+    feature_names: Sequence[str],
+    values_for_nominal_features: Dict[str, Sequence[str]] = {},
+    values_for_class_label: Sequence[str] = None,
+    dataset_name: str = "No_Name",
+    target_attribute_name: Optional[str] = None,
+    target_type: Optional[str] = None,
+) -> Schema</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>feature_names</td><td>Sequence[str]</td><td>required</td><td>List of feature attribute names</td></tr>
+              <tr><td>values_for_nominal_features</td><td>Dict[str, Sequence[str]]</td><td>{}</td><td>Maps feature name → list of possible values for nominal features</td></tr>
+              <tr><td>values_for_class_label</td><td>Sequence[str]</td><td>None</td><td>Possible class label strings; if <code>None</code> → regression schema</td></tr>
+              <tr><td>dataset_name</td><td>str</td><td>"No_Name"</td><td>Name of the dataset</td></tr>
+              <tr><td>target_attribute_name</td><td>Optional[str]</td><td>None</td><td>Name of the target/class attribute</td></tr>
+              <tr><td>target_type</td><td>Optional[str]</td><td>None</td><td><code>'categorical'</code>, <code>'numeric'</code>, or <code>None</code> (auto-detect)</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Task type methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>is_classification()</td><td>bool</td><td>True if classification task</td></tr>
+              <tr><td>is_regression()</td><td>bool</td><td>True if regression task</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attribute info methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>get_num_attributes()</td><td>int</td><td>Number of input features (excluding target)</td></tr>
+              <tr><td>get_num_numeric_attributes()</td><td>int</td><td>Count of numeric attributes</td></tr>
+              <tr><td>get_num_nominal_attributes()</td><td>int</td><td>Count of nominal (categorical) attributes</td></tr>
+              <tr><td>get_numeric_attributes()</td><td>list | None</td><td>List of numeric attribute names</td></tr>
+              <tr><td>get_nominal_attributes()</td><td>dict | None</td><td>Dict of <code>{name: [values]}</code> for nominal attributes</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Class / label info methods (classification only)</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>get_num_classes()</td><td>int</td><td>Number of possible classes (1 for regression)</td></tr>
+              <tr><td>get_label_values()</td><td>Sequence[str]</td><td>List of possible class label strings</td></tr>
+              <tr><td>get_label_indexes()</td><td>Sequence[int]</td><td>List of class indices [0, 1, ..., n-1]</td></tr>
+              <tr><td>get_value_for_index(y_index)</td><td>Optional[str]</td><td>Class label string for index; None if y_index is None</td></tr>
+              <tr><td>get_index_for_label(y)</td><td>int</td><td>Class index for label string; raises KeyError if not found</td></tr>
+              <tr><td>is_y_index_in_range(y_index)</td><td>bool</td><td>Whether y_index is valid for this schema</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">MOA access &amp; special methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method / Property</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>get_moa_header()</td><td>InstancesHeader</td><td>Underlying Java MOA header (advanced use)</td></tr>
+              <tr><td>dataset_name</td><td>str</td><td>Property — name of the dataset</td></tr>
+              <tr><td>__str__() / __repr__()</td><td>str</td><td>Returns ARFF header representation</td></tr>
+              <tr><td>__eq__(other)</td><td>bool</td><td>Compares number of attributes and classes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Instance -->
+      <div class="api-entity" id="instance">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">Instance</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/instance.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Base class representing a single data point with a feature vector and schema reference.</p>
+          <div class="api-sig">
+            <div class="api-sig-label">signature</div>
+            <pre>Instance(schema: Schema, instance: Union[InstanceExample, FeatureVector]) -> None</pre>
+          </div>
+          <div class="api-sub-heading">Instance.from_array (class method)</div>
+          <div class="api-sig"><pre>Instance.from_array(schema: Schema, instance: FeatureVector) -> Instance</pre></div>
+          <p class="api-desc" style="margin:8px 0 12px;">Creates an Instance from a NumPy feature array (no label).</p>
+          <div class="api-sub-heading">Properties</div>
+          <table class="api-method-table">
+            <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>x</td><td>NDArray[float64]</td><td>Feature vector as 1D NumPy array</td></tr>
+              <tr><td>schema</td><td>Schema</td><td>The stream schema</td></tr>
+              <tr><td>java_instance</td><td>InstanceExample</td><td>Java representation</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- LabeledInstance -->
+      <div class="api-entity" id="labeled-instance">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">LabeledInstance</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Instance &nbsp;·&nbsp; Classification tasks</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Instance with a class label for classification tasks.</p>
+          <div class="api-sub-heading">LabeledInstance.from_array (class method)</div>
+          <div class="api-sig">
+            <pre>LabeledInstance.from_array(schema: Schema, x: FeatureVector, y_index: int) -> LabeledInstance</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>Classification schema</td></tr>
+              <tr><td>x</td><td>NDArray[float64]</td><td>Feature vector</td></tr>
+              <tr><td>y_index</td><td>int</td><td>Class index (0-based)</td></tr>
+            </tbody>
+          </table>
+          <div class="api-sub-heading">Properties</div>
+          <table class="api-method-table">
+            <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>x</td><td>NDArray[float64]</td><td>Feature vector</td></tr>
+              <tr><td>y_index</td><td>int</td><td>Class index (0-based integer)</td></tr>
+              <tr><td>y_label</td><td>str</td><td>Class label string (via <code>schema.get_value_for_index</code>)</td></tr>
+              <tr><td>schema</td><td>Schema</td><td>Stream schema</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RegressionInstance -->
+      <div class="api-entity" id="regression-instance">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">RegressionInstance</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Instance &nbsp;·&nbsp; Regression tasks</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Instance with a continuous target value for regression tasks.</p>
+          <div class="api-sub-heading">RegressionInstance.from_array (class method)</div>
+          <div class="api-sig">
+            <pre>RegressionInstance.from_array(schema: Schema, x: FeatureVector, y_value: float) -> RegressionInstance</pre>
+          </div>
+          <div class="api-sub-heading">Properties</div>
+          <table class="api-method-table">
+            <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>x</td><td>NDArray[float64]</td><td>Feature vector</td></tr>
+              <tr><td>y_value</td><td>float</td><td>Continuous target value</td></tr>
+              <tr><td>schema</td><td>Schema</td><td>Stream schema</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Type Aliases -->
+      <div class="api-entity" id="type-aliases">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-alias">aliases</span>
+          <span class="api-entity-name">Type Aliases</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/type_alias.py</span>
+        </div>
+        <div class="api-entity-body">
+          <table class="api-method-table">
+            <thead><tr><th>Alias</th><th>Underlying Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>FeatureVector</td><td>NDArray[float64]</td><td>1D NumPy float64 array of feature values</td></tr>
+              <tr><td>LabelIndex</td><td>int</td><td>Non-negative class index integer</td></tr>
+              <tr><td>Label</td><td>str</td><td>Class label string</td></tr>
+              <tr><td>LabelProbabilities</td><td>NDArray[float64]</td><td>1D array of prediction probabilities</td></tr>
+              <tr><td>TargetValue</td><td>float</td><td>Continuous target value for regression</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §2  Stream Base Classes
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="stream-abc" class="api-section-title">§2 &nbsp; Stream Base Classes</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-abstract">abstract</span>
+          <span class="api-entity-name">Stream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> ABC, Generic[_AnyInstance], Iterator[_AnyInstance] &nbsp;·&nbsp; src/openmoa/stream/_stream.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Abstract base class for all streams. Implements the Python iterator protocol. All subclasses must implement the four abstract methods below.</p>
+
+          <div class="api-sub-heading">Abstract methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>has_more_instances()</td><td>() → bool</td><td>True if stream has more instances</td></tr>
+              <tr><td>next_instance()</td><td>() → _AnyInstance</td><td>Returns the next instance</td></tr>
+              <tr><td>get_schema()</td><td>() → Schema</td><td>Returns the stream schema</td></tr>
+              <tr><td>restart()</td><td>() → None</td><td>Resets the stream to the beginning</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Concrete methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>__iter__()</td><td>Iterator</td><td>Returns self; does NOT restart the stream</td></tr>
+              <tr><td>__next__()</td><td>_AnyInstance</td><td>Returns next instance; raises StopIteration if exhausted</td></tr>
+              <tr><td>get_moa_stream()</td><td>Optional[InstanceStream]</td><td>Returns underlying Java MOA stream, or None</td></tr>
+              <tr><td>CLI_help()</td><td>str</td><td>Returns MOA option documentation (if MOA stream available)</td></tr>
+              <tr><td>__str__()</td><td>str</td><td>Returns dataset name</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="api-entity" id="moastream">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">MOAStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Stream[_AnyInstance]</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Wraps any MOA Java stream. Used internally by all built-in generators and dataset streams.</p>
+          <div class="api-sig">
+            <div class="api-sig-label">signature</div>
+            <pre>MOAStream(
+    moa_stream: Optional[InstanceStream] = None,
+    schema: Optional[Schema] = None,
+    CLI: Optional[str] = None,
+) -> None</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>moa_stream</td><td>Optional[InstanceStream]</td><td>None</td><td>MOA stream Java object</td></tr>
+              <tr><td>schema</td><td>Optional[Schema]</td><td>None</td><td>Schema; inferred from moa_stream if None</td></tr>
+              <tr><td>CLI</td><td>Optional[str]</td><td>None</td><td>Additional MOA CLI arguments</td></tr>
+            </tbody>
+          </table>
+          <div class="api-note api-note-warn"><strong>Raises:</strong> ValueError if no schema and no moa_stream; ValueError if CLI provided without moa_stream.</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §3  File-Based Streams
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="file-streams" class="api-section-title">§3 &nbsp; File-Based Streams</h2>
+
+      <!-- ARFFStream -->
+      <div class="api-entity" id="arffstream">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">ARFFStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: MOAStream[_AnyInstance]</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Reads a stream from an ARFF file (Attribute-Relation File Format).</p>
+          <div class="api-sig">
+            <pre>ARFFStream(
+    path: Union[str, Path],
+    CLI: Optional[str] = None,
+    class_index: int = -1,
+) -> None</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>path</td><td>str | Path</td><td>required</td><td>Path to .arff file</td></tr>
+              <tr><td>CLI</td><td>Optional[str]</td><td>None</td><td>Additional MOA CLI arguments</td></tr>
+              <tr><td>class_index</td><td>int</td><td>-1</td><td>Index of class column (-1 = last column)</td></tr>
+            </tbody>
+          </table>
+          <div class="api-import-block" style="margin-top:12px;">
+            <div class="api-import-header"><div class="api-import-dot d1"></div><div class="api-import-dot d2"></div><div class="api-import-dot d3"></div><span class="api-import-label">example</span></div>
+            <pre><code>from openmoa.stream import ARFFStream
+
+stream = ARFFStream("data/covtype.arff")
+instance = stream.next_instance()
+print(instance.x)        # feature vector
+print(instance.y_index)  # class index</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- NumpyStream -->
+      <div class="api-entity" id="numpystream">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">NumpyStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Stream[_AnyInstance]</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Creates a stream directly from NumPy arrays. Useful for integrating existing datasets.</p>
+          <div class="api-sig">
+            <pre>NumpyStream(
+    X: np.ndarray,
+    y: np.ndarray,
+    dataset_name: str = "No_Name",
+    feature_names: Optional[Sequence[str]] = None,
+    target_name: Optional[str] = None,
+    target_type: Optional[str] = None,
+) -> None</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>X</td><td>np.ndarray</td><td>required</td><td>Feature matrix, shape (n_samples, n_features)</td></tr>
+              <tr><td>y</td><td>np.ndarray</td><td>required</td><td>Target vector, shape (n_samples,)</td></tr>
+              <tr><td>dataset_name</td><td>str</td><td>"No_Name"</td><td>Name of the dataset</td></tr>
+              <tr><td>feature_names</td><td>Optional[Sequence[str]]</td><td>None</td><td>Feature names; auto-generated as <code>attrib_0, attrib_1, …</code> if None</td></tr>
+              <tr><td>target_name</td><td>Optional[str]</td><td>None</td><td>Name of the target attribute</td></tr>
+              <tr><td>target_type</td><td>Optional[str]</td><td>None</td><td><code>'categorical'</code>, <code>'numeric'</code>, or None (auto-detect)</td></tr>
+            </tbody>
+          </table>
+          <div class="api-sub-heading">Attributes &amp; Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Name</th><th>Type / Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>current_instance_index</td><td>int</td><td>Current position in the array</td></tr>
+              <tr><td>has_more_instances()</td><td>bool</td><td>True if current_instance_index &lt; len(X)</td></tr>
+              <tr><td>next_instance()</td><td>LabeledInstance | RegressionInstance</td><td>Next instance from arrays</td></tr>
+              <tr><td>restart()</td><td>None</td><td>Resets current_instance_index to 0</td></tr>
+              <tr><td>__len__()</td><td>int</td><td>Total number of instances</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CSVStream -->
+      <div class="api-entity" id="csvstream">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">CSVStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Stream[_AnyInstance]</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Reads a stream from a CSV file line by line.</p>
+          <div class="api-sig">
+            <pre>CSVStream(
+    csv_file_path: str,
+    dtypes: Optional[list] = None,
+    values_for_nominal_features: Dict = {},
+    class_index: int = -1,
+    values_for_class_label: Optional[list] = None,
+    target_attribute_name: Optional[str] = None,
+    target_type: Optional[str] = None,
+    skip_header: bool = False,
+    delimiter: str = ",",
+    dataset_name: Optional[str] = None,
+) -> None</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>csv_file_path</td><td>str</td><td>required</td><td>Path to CSV file</td></tr>
+              <tr><td>dtypes</td><td>Optional[list]</td><td>None</td><td>List of (column_name, dtype) tuples; auto-inferred if None</td></tr>
+              <tr><td>values_for_nominal_features</td><td>Dict</td><td>{}</td><td>Maps column index → list of possible nominal values</td></tr>
+              <tr><td>class_index</td><td>int</td><td>-1</td><td>Index of class/target column (-1 = last)</td></tr>
+              <tr><td>values_for_class_label</td><td>Optional[list]</td><td>None</td><td>Possible class values; auto-detected if None</td></tr>
+              <tr><td>target_attribute_name</td><td>Optional[str]</td><td>None</td><td>Name of target attribute</td></tr>
+              <tr><td>target_type</td><td>Optional[str]</td><td>None</td><td><code>'categorical'</code>, <code>'numeric'</code>, or None</td></tr>
+              <tr><td>skip_header</td><td>bool</td><td>False</td><td>Skip the first line</td></tr>
+              <tr><td>delimiter</td><td>str</td><td>","</td><td>Field delimiter character</td></tr>
+              <tr><td>dataset_name</td><td>Optional[str]</td><td>None</td><td>Defaults to "CSVStream({path})"</td></tr>
+            </tbody>
+          </table>
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>csv_file_path</td><td>str</td><td>Path to file</td></tr>
+              <tr><td>total_number_of_lines</td><td>int</td><td>Total lines in file (set at init)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- LibsvmStream -->
+      <div class="api-entity" id="libsvmstream">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">LibsvmStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Stream</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Reads sparse data in LIBSVM format (<code>label feat_id:value feat_id:value …</code>).</p>
+          <div class="api-sig">
+            <pre>LibsvmStream(
+    path: Union[str, Path],
+    dataset_name: str = "LibsvmDataset",
+    target_type: str = "categorical",
+) -> None</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>path</td><td>str | Path</td><td>required</td><td>Path to LIBSVM file</td></tr>
+              <tr><td>dataset_name</td><td>str</td><td>"LibsvmDataset"</td><td>Dataset name</td></tr>
+              <tr><td>target_type</td><td>str</td><td>"categorical"</td><td><code>'categorical'</code> or <code>'numeric'</code></td></tr>
+            </tbody>
+          </table>
+          <div class="api-note api-note-info"><strong>Note:</strong> Instances have a <code>_sparse_x</code> attribute (dict <code>{feature_id: value}</code>) alongside the standard <code>x</code> array. Raises <code>FileNotFoundError</code> if file does not exist.</div>
+          <table class="api-method-table" style="margin-top:12px;">
+            <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>has_more_instances()</td><td>bool</td><td>True if more lines available</td></tr>
+              <tr><td>next_instance()</td><td>LabeledInstance | RegressionInstance</td><td>Next sparse instance</td></tr>
+              <tr><td>restart()</td><td>None</td><td>Resets position and clears cache</td></tr>
+              <tr><td>__len__()</td><td>int</td><td>Total number of instances</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BagOfWordsStream -->
+      <div class="api-entity" id="bagofwords">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">BagOfWordsStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Stream</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Reads text data from bag-of-words <code>.review</code> files for binary classification (positive vs. negative).</p>
+          <div class="api-sig">
+            <pre>BagOfWordsStream(
+    positive_file: Path,
+    negative_file: Path,
+    dataset_name: str = "BagOfWords",
+    normalize: bool = True,
+    shuffle_seed: Optional[int] = None,
+) -> None</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>positive_file</td><td>Path</td><td>required</td><td>File containing positive examples</td></tr>
+              <tr><td>negative_file</td><td>Path</td><td>required</td><td>File containing negative examples</td></tr>
+              <tr><td>dataset_name</td><td>str</td><td>"BagOfWords"</td><td>Dataset name</td></tr>
+              <tr><td>normalize</td><td>bool</td><td>True</td><td>Normalize feature vectors to unit length</td></tr>
+              <tr><td>shuffle_seed</td><td>Optional[int]</td><td>None</td><td>Shuffle seed; None = no shuffle</td></tr>
+            </tbody>
+          </table>
+          <div class="api-note api-note-info"><strong>Note:</strong> Instances have a <code>_sparse_x</code> attribute (dict <code>{word: count}</code>). Class 0 = negative, class 1 = positive.</div>
+        </div>
+      </div>
+
+      <!-- ConcatStream -->
+      <div class="api-entity" id="concatstream">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">ConcatStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Stream[_AnyInstance]</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Concatenates multiple streams into one, switching to the next stream when the current one is exhausted.</p>
+          <div class="api-sig"><pre>ConcatStream(streams: Sequence[Stream]) -> None</pre></div>
+          <div class="api-note api-note-warn"><strong>Raises:</strong> ValueError if schemas are not equal across streams.</div>
+          <table class="api-method-table" style="margin-top:12px;">
+            <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>has_more_instances()</td><td>bool</td><td>True if any remaining stream has instances</td></tr>
+              <tr><td>next_instance()</td><td>_AnyInstance</td><td>Next instance; advances to next sub-stream when exhausted</td></tr>
+              <tr><td>get_schema()</td><td>Schema</td><td>Schema of the current stream</td></tr>
+              <tr><td>restart()</td><td>None</td><td>Restarts all sub-streams and resets index</td></tr>
+              <tr><td>__len__()</td><td>int</td><td>Total length (only if all sub-streams support len())</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- stream_from_file -->
+      <div class="api-entity" id="stream-from-file">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-func">function</span>
+          <span class="api-entity-name">stream_from_file</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Auto-detects file type and returns the appropriate stream object (ARFFStream for .arff, CSVStream for .csv).</p>
+          <div class="api-sig">
+            <pre>stream_from_file(
+    path_to_csv_or_arff: Union[str, Path],
+    dataset_name: str = "NoName",
+    class_index: int = -1,
+    target_type: Optional[str] = None,
+) -> Stream</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>path_to_csv_or_arff</td><td>str | Path</td><td>required</td><td>Path to .arff or .csv file</td></tr>
+              <tr><td>dataset_name</td><td>str</td><td>"NoName"</td><td>Dataset name</td></tr>
+              <tr><td>class_index</td><td>int</td><td>-1</td><td>Class column index</td></tr>
+              <tr><td>target_type</td><td>Optional[str]</td><td>None</td><td><code>'categorical'</code>, <code>'numeric'</code>, or None (CSV only)</td></tr>
+            </tbody>
+          </table>
+          <div class="api-note api-note-warn"><strong>Raises:</strong> FileNotFoundError · IsADirectoryError · ValueError (unsupported extension).</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §4  Feature Evolution Wrappers
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="feature-wrappers" class="api-section-title">§4 &nbsp; Feature Evolution Wrappers</h2>
+      <p style="font-size:14px; color:var(--text-secondary); margin-bottom:0;">These wrappers simulate dynamic feature spaces where the set of active features changes over time.</p>
+
+      <!-- OpenFeatureStream -->
+      <div class="api-entity" id="openfeaturestream">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">OpenFeatureStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> alias: EvolvingFeatureStream &nbsp;·&nbsp; Inheritance: Stream</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Wraps a stream to shrink/grow the active feature set over time. Each returned instance carries a <code>feature_indices</code> NumPy attribute indicating which original features are active.</p>
+          <div class="api-sig">
+            <pre>OpenFeatureStream(
+    base_stream: Stream,
+    d_min: int = 2,
+    d_max: Optional[int] = None,
+    evolution_pattern: Literal["pyramid","incremental","decremental","tds","cds","eds"] = "pyramid",
+    total_instances: int = 10000,
+    feature_selection: Literal["prefix","suffix","random"] = "prefix",
+    missing_ratio: float = 0.0,
+    random_seed: int = 42,
+    tds_mode: Literal["random","ordered"] = "random",
+    n_segments: int = 2,
+    overlap_ratio: float = 1.0,
+) -> None</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>base_stream</td><td>Stream</td><td>required</td><td>Stream to wrap</td></tr>
+              <tr><td>d_min</td><td>int</td><td>2</td><td>Minimum number of active features</td></tr>
+              <tr><td>d_max</td><td>Optional[int]</td><td>None</td><td>Maximum features; defaults to original feature count</td></tr>
+              <tr><td>evolution_pattern</td><td>str</td><td>"pyramid"</td><td>Pattern of feature evolution (see table below)</td></tr>
+              <tr><td>total_instances</td><td>int</td><td>10000</td><td>Total stream length</td></tr>
+              <tr><td>feature_selection</td><td>str</td><td>"prefix"</td><td>Which features to keep when dimension is reduced</td></tr>
+              <tr><td>missing_ratio</td><td>float</td><td>0.0</td><td>Per-feature absence probability (only used by "cds" pattern)</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>42</td><td>RNG seed for reproducibility</td></tr>
+              <tr><td>tds_mode</td><td>str</td><td>"random"</td><td>"random" or "ordered" birth assignment (only used by "tds")</td></tr>
+              <tr><td>n_segments</td><td>int</td><td>2</td><td>Number of sequential partitions (only used by "eds")</td></tr>
+              <tr><td>overlap_ratio</td><td>float</td><td>1.0</td><td>Overlap length relative to stable period (only used by "eds")</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Evolution patterns</div>
+          <table class="api-method-table">
+            <thead><tr><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>"pyramid"</td><td>Feature count grows linearly from d_min to d_max, then shrinks back to d_min</td></tr>
+              <tr><td>"incremental"</td><td>Monotonic growth from d_min to d_max</td></tr>
+              <tr><td>"decremental"</td><td>Monotonic shrinkage from d_max to d_min</td></tr>
+              <tr><td>"tds"</td><td>Trapezoidal: each feature has an independent birth time assigned across 10 stages</td></tr>
+              <tr><td>"cds"</td><td>Capricious: each feature is independently present at each step with probability 1 − missing_ratio</td></tr>
+              <tr><td>"eds"</td><td>Evolvable: n_segments sequential partitions with configurable overlap windows</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Feature selection modes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Value</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>"prefix"</td><td>Keep the first d features from the active set</td></tr>
+              <tr><td>"suffix"</td><td>Keep the last d features</td></tr>
+              <tr><td>"random"</td><td>Randomly select d features (reproducible per time step via seed)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TrapezoidalStream -->
+      <div class="api-entity" id="trapezoidalstream">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">TrapezoidalStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Stream</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Similar to OpenFeatureStream but keeps the vector fixed-size: inactive features are filled with <code>np.nan</code> rather than omitted.</p>
+          <div class="api-sig">
+            <pre>TrapezoidalStream(
+    base_stream: Stream,
+    d_min: int = 2,
+    d_max: Optional[int] = None,
+    evolution_mode: Literal["random","ordered","pyramid"] = "random",
+    total_instances: int = 10000,
+    random_seed: int = 42,
+) -> None</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>base_stream</td><td>Stream</td><td>required</td><td>Stream to wrap</td></tr>
+              <tr><td>d_min</td><td>int</td><td>2</td><td>Minimum active features</td></tr>
+              <tr><td>d_max</td><td>Optional[int]</td><td>None</td><td>Maximum features (defaults to original count)</td></tr>
+              <tr><td>evolution_mode</td><td>str</td><td>"random"</td><td>"random": random order; "ordered": index order; "pyramid": grow then shrink</td></tr>
+              <tr><td>total_instances</td><td>int</td><td>10000</td><td>Stream length</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>42</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CapriciousStream -->
+      <div class="api-entity" id="capriciousstream">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">CapriciousStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Stream</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Each feature is independently and randomly absent at each time step with probability <code>missing_ratio</code>. Inactive features are filled with <code>np.nan</code>.</p>
+          <div class="api-sig">
+            <pre>CapriciousStream(
+    base_stream: Stream,
+    d_max: Optional[int] = None,
+    missing_ratio: float = 0.5,
+    total_instances: int = 10000,
+    min_features: int = 1,
+    random_seed: int = 42,
+) -> None</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>base_stream</td><td>Stream</td><td>required</td><td>Stream to wrap</td></tr>
+              <tr><td>d_max</td><td>Optional[int]</td><td>None</td><td>Feature dimension (defaults to original)</td></tr>
+              <tr><td>missing_ratio</td><td>float</td><td>0.5</td><td>Probability that each feature is missing per time step</td></tr>
+              <tr><td>total_instances</td><td>int</td><td>10000</td><td>Stream length</td></tr>
+              <tr><td>min_features</td><td>int</td><td>1</td><td>Guaranteed minimum features per instance</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>42</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- EvolvableStream -->
+      <div class="api-entity" id="evolvablestream">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">EvolvableStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Stream</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Divides features into <code>n_segments</code> sequential partitions. Features transition from one segment to the next with configurable overlap windows. Inactive features are filled with <code>np.nan</code>.</p>
+          <div class="api-sig">
+            <pre>EvolvableStream(
+    base_stream: Stream,
+    d_max: Optional[int] = None,
+    n_segments: int = 2,
+    overlap_ratio: float = 1.0,
+    total_instances: int = 10000,
+    random_seed: int = 42,
+) -> None</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>base_stream</td><td>Stream</td><td>required</td><td>Stream to wrap</td></tr>
+              <tr><td>d_max</td><td>Optional[int]</td><td>None</td><td>Feature dimension</td></tr>
+              <tr><td>n_segments</td><td>int</td><td>2</td><td>Number of sequential feature partitions (≥ 2)</td></tr>
+              <tr><td>overlap_ratio</td><td>float</td><td>1.0</td><td>Overlap window length relative to stable period</td></tr>
+              <tr><td>total_instances</td><td>int</td><td>10000</td><td>Stream length</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>42</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ShuffledStream -->
+      <div class="api-entity" id="shuffledstream">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">ShuffledStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Stream</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Buffers the entire base stream into memory and serves instances in a randomly shuffled order.</p>
+          <div class="api-note api-note-warn"><strong>Warning:</strong> Loads the full dataset into memory. Suitable for MB-scale datasets; use caution with GB-scale data.</div>
+          <div class="api-sig" style="margin-top:12px;">
+            <pre>ShuffledStream(base_stream: Stream, random_seed: int = 42) -> None</pre>
+          </div>
+          <table class="api-method-table" style="margin-top:10px;">
+            <thead><tr><th>Method / Attribute</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>n_instances</td><td>int</td><td>Total buffered instances</td></tr>
+              <tr><td>get_num_instances()</td><td>int</td><td>Total buffered instances</td></tr>
+              <tr><td>has_more_instances()</td><td>bool</td><td>True if pointer not exhausted</td></tr>
+              <tr><td>next_instance()</td><td>_AnyInstance</td><td>Next shuffled instance</td></tr>
+              <tr><td>restart()</td><td>None</td><td>Re-shuffles and resets pointer</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §5  Synthetic Stream Generators
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="generators" class="api-section-title">§5 &nbsp; Synthetic Stream Generators</h2>
+      <p style="font-size:14px; color:var(--text-secondary); margin-bottom:0;">Module: <code>openmoa.stream.generator</code>. All generators inherit from <code>MOAStream</code>.</p>
+
+      <!-- SEA -->
+      <div class="api-entity" id="sea">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">SEA</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Binary classification · 3 numeric features</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Classic SEA (Stream Ensemble Algorithm) binary classification with three numeric features.</p>
+          <div class="api-sig">
+            <pre>SEA(function: int = 1, instance_random_seed: int = 1, noise_percentage: int = 10)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>function</td><td>int</td><td>1</td><td>Concept function (1, 2, 3, or 4)</td></tr>
+              <tr><td>instance_random_seed</td><td>int</td><td>1</td><td>RNG seed for instance generation</td></tr>
+              <tr><td>noise_percentage</td><td>int</td><td>10</td><td>Percentage of noisy labels</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RandomTreeGenerator -->
+      <div class="api-entity" id="randomtree">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">RandomTreeGenerator</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Generates instances from a random decision tree concept.</p>
+          <div class="api-sig">
+            <pre>RandomTreeGenerator(
+    instance_random_seed: int = 1, tree_random_seed: int = 1,
+    num_classes: int = 2, num_nominals: int = 5, num_numerics: int = 5,
+    num_vals_per_nominal: int = 5, max_tree_depth: int = 5,
+    first_leaf_level: int = 3, leaf_fraction: float = 0.15,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>instance_random_seed</td><td>1</td><td>RNG seed for instances</td></tr>
+              <tr><td>tree_random_seed</td><td>1</td><td>RNG seed for tree structure</td></tr>
+              <tr><td>num_classes</td><td>2</td><td>Number of classes</td></tr>
+              <tr><td>num_nominals</td><td>5</td><td>Number of nominal attributes</td></tr>
+              <tr><td>num_numerics</td><td>5</td><td>Number of numeric attributes</td></tr>
+              <tr><td>num_vals_per_nominal</td><td>5</td><td>Possible values per nominal attribute</td></tr>
+              <tr><td>max_tree_depth</td><td>5</td><td>Maximum tree depth</td></tr>
+              <tr><td>first_leaf_level</td><td>3</td><td>Level at which leaves start appearing</td></tr>
+              <tr><td>leaf_fraction</td><td>0.15</td><td>Fraction of internal nodes converted to leaves</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RandomRBFGenerator -->
+      <div class="api-entity" id="randomrbf">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">RandomRBFGenerator</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Generates instances from randomly placed RBF (Radial Basis Function) centroids.</p>
+          <div class="api-sig">
+            <pre>RandomRBFGenerator(
+    model_random_seed: int = 1, instance_random_seed: int = 1,
+    number_of_classes: int = 2, number_of_attributes: int = 10,
+    number_of_centroids: int = 50,
+)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- RandomRBFGeneratorDrift -->
+      <div class="api-entity" id="randomrbfdrift">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">RandomRBFGeneratorDrift</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Extends RandomRBFGenerator with drifting centroids</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">RBF generator where centroids drift over time — simulates continuous concept drift.</p>
+          <div class="api-sig">
+            <pre>RandomRBFGeneratorDrift(
+    model_random_seed: int = 1, instance_random_seed: int = 1,
+    number_of_classes: int = 2, number_of_attributes: int = 10,
+    number_of_centroids: int = 50,
+    number_of_drifting_centroids: int = 2,
+    magnitude_of_change: float = 0.0,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>number_of_drifting_centroids</td><td>2</td><td>Number of centroids that drift</td></tr>
+              <tr><td>magnitude_of_change</td><td>0.0</td><td>Speed of centroid movement</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- LEDGenerator -->
+      <div class="api-entity" id="led">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">LEDGenerator</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> 7-segment display digit recognition</span>
+        </div>
+        <div class="api-entity-body">
+          <div class="api-sig">
+            <pre>LEDGenerator(instance_random_seed: int = 1, noise_percentage: int = 10, reduce_data: bool = False)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEDGeneratorDrift -->
+      <div class="api-entity" id="leddrift">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">LEDGeneratorDrift</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">LED generator with a configurable number of drifting attributes.</p>
+          <div class="api-sig">
+            <pre>LEDGeneratorDrift(
+    instance_random_seed: int = 1, noise_percentage: int = 10,
+    reduce_data: bool = False, number_of_attributes_with_drift: int = 7,
+)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- WaveformGenerator -->
+      <div class="api-entity" id="waveform">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">WaveformGenerator</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> 3-class · 21 attributes</span>
+        </div>
+        <div class="api-entity-body">
+          <div class="api-sig">
+            <pre>WaveformGenerator(instance_random_seed: int = 1, noise: bool = False)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- WaveformGeneratorDrift -->
+      <div class="api-entity" id="waveformdrift">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">WaveformGeneratorDrift</span>
+        </div>
+        <div class="api-entity-body">
+          <div class="api-sig">
+            <pre>WaveformGeneratorDrift(
+    instance_random_seed: int = 1, noise: bool = False,
+    number_of_attributes_with_drift: int = 10,
+)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- AgrawalGenerator -->
+      <div class="api-entity" id="agrawal">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">AgrawalGenerator</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Loan classification</span>
+        </div>
+        <div class="api-entity-body">
+          <div class="api-sig">
+            <pre>AgrawalGenerator(
+    instance_random_seed: int = 1, function: int = 1,
+    balance_classes: bool = False, peturbation: float = 0.05,
+)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- HyperplaneGenerator -->
+      <div class="api-entity" id="hyperplane">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">HyperplaneGenerator</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Rotating hyperplane · continuous gradual drift</span>
+        </div>
+        <div class="api-entity-body">
+          <div class="api-sig">
+            <pre>HyperplaneGenerator(
+    instance_random_seed: int = 1,
+    number_of_attributes: int = 10,
+    number_of_drifting_attributes: int = 2,
+    magnitude_of_change: float = 0.0,
+    noise_percentage: int = 5,
+    sigma_percentage: int = 10,
+)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAGGERGenerator -->
+      <div class="api-entity" id="stagger">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">STAGGERGenerator</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Binary classification</span>
+        </div>
+        <div class="api-entity-body">
+          <div class="api-sig">
+            <pre>STAGGERGenerator(instance_random_seed: int = 1, function: int = 1, balance_classes: bool = False)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- MixedGenerator -->
+      <div class="api-entity" id="mixed">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">MixedGenerator</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Numeric + nominal features</span>
+        </div>
+        <div class="api-entity-body">
+          <div class="api-sig">
+            <pre>MixedGenerator(instance_random_seed: int = 1, function: int = 1, balance_classes: bool = False)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §6  Drift Streams
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="drift-streams" class="api-section-title">§6 &nbsp; Drift Streams</h2>
+      <p style="font-size:14px; color:var(--text-secondary); margin-bottom:0;">Module: <code>openmoa.stream.drift</code></p>
+
+      <!-- Drift -->
+      <div class="api-entity" id="drift">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">Drift</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Base class for drift transitions</span>
+        </div>
+        <div class="api-entity-body">
+          <div class="api-sig">
+            <pre>Drift(position: int, width: int = 0, alpha: float = 0.0, random_seed: int = 1)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>position</td><td>int</td><td>required</td><td>Instance index at which drift occurs</td></tr>
+              <tr><td>width</td><td>int</td><td>0</td><td>Transition window size (0 or 1 = abrupt)</td></tr>
+              <tr><td>alpha</td><td>float</td><td>0.0</td><td>Grade of change</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed for the transition</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- AbruptDrift -->
+      <div class="api-entity" id="abruptdrift">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">AbruptDrift</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Drift</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Instantaneous concept switch at a specific instance.</p>
+          <div class="api-sig">
+            <pre>AbruptDrift(position: int, random_seed: int = 1)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- GradualDrift -->
+      <div class="api-entity" id="gradualdrift">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">GradualDrift</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: Drift</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Gradual transition where instances are probabilistically drawn from either the old or new concept.</p>
+          <div class="api-sig">
+            <pre># Specify by center + width
+GradualDrift(position=10000, width=2000, random_seed=1)
+
+# Or specify by start + end
+GradualDrift(start=9000, end=11000, random_seed=1)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>position</td><td>Optional[int]</td><td>None</td><td>Center of the drift window</td></tr>
+              <tr><td>width</td><td>Optional[int]</td><td>None</td><td>Length of transition window</td></tr>
+              <tr><td>start</td><td>Optional[int]</td><td>None</td><td>Start of transition window</td></tr>
+              <tr><td>end</td><td>Optional[int]</td><td>None</td><td>End of transition window</td></tr>
+              <tr><td>alpha</td><td>float</td><td>0.0</td><td>Grade of change</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+          <div class="api-note api-note-info"><strong>Note:</strong> Either (position + width) or (start + end) must be provided. Internally: width = end − start, position = (start + end) / 2.</div>
+        </div>
+      </div>
+
+      <!-- DriftStream -->
+      <div class="api-entity" id="driftstream">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">DriftStream</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> Inheritance: MOAStream</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Composes a list of sub-streams connected by <code>Drift</code> objects into a single stream with concept drift.</p>
+          <div class="api-sig">
+            <pre>DriftStream(
+    schema: Optional[Schema] = None,
+    CLI: Optional[str] = None,
+    moa_stream: Optional[InstanceStream] = None,
+    stream: Optional[list] = None,
+)</pre>
+          </div>
+          <p class="api-desc" style="margin:8px 0 12px;">The <code>stream</code> parameter takes an alternating list: <code>[Stream, Drift, Stream, Drift, Stream, …]</code></p>
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>get_num_drifts()</td><td>int</td><td>Number of drift transitions</td></tr>
+              <tr><td>get_drifts()</td><td>list[Drift]</td><td>List of Drift objects with their positions and widths</td></tr>
+            </tbody>
+          </table>
+          <div class="api-import-block" style="margin-top:12px;">
+            <div class="api-import-header"><div class="api-import-dot d1"></div><div class="api-import-dot d2"></div><div class="api-import-dot d3"></div><span class="api-import-label">example</span></div>
+            <pre><code>from openmoa.stream.drift import DriftStream, AbruptDrift, GradualDrift
+from openmoa.stream.generator import SEA
+
+stream = DriftStream(stream=[
+    SEA(function=1),
+    AbruptDrift(position=5000),
+    SEA(function=2),
+    GradualDrift(position=10000, width=2000),
+    SEA(function=3),
+])
+print(stream.get_num_drifts())   # 2</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- RecurrentConceptDriftStream -->
+      <div class="api-entity" id="recurrent">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">RecurrentConceptDriftStream</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc">Generates recurrent / periodic concepts from a list of concepts that cycle through multiple times.</p>
+          <div class="api-sig">
+            <pre>RecurrentConceptDriftStream(
+    concept_list: Sequence[Stream],
+    max_recurrences_per_concept: int = 2,
+    transition_type_template: Drift = AbruptDrift(position=2000),
+    concept_name_list: Optional[Sequence[str]] = None,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>concept_list</td><td>Sequence[Stream]</td><td>required</td><td>List of concepts to cycle through</td></tr>
+              <tr><td>max_recurrences_per_concept</td><td>int</td><td>2</td><td>How many times each concept reappears</td></tr>
+              <tr><td>transition_type_template</td><td>Drift</td><td>AbruptDrift(2000)</td><td>Template for transitions between concepts</td></tr>
+              <tr><td>concept_name_list</td><td>Optional[Sequence[str]]</td><td>None</td><td>Names for each concept</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §7  Built-in Datasets
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="datasets" class="api-section-title">§7 &nbsp; Built-in Datasets</h2>
+      <p style="font-size:14px; color:var(--text-secondary);">Module: <code>openmoa.datasets</code>. All datasets auto-download on first use and are stored locally. All inherit from <code>DownloadARFFGzip</code> and expose the standard <code>Stream</code> interface.</p>
+
+      <div class="api-sub-heading" style="margin-top:20px;">Classification Datasets</div>
+      <table class="api-dataset-table">
+        <thead><tr><th>Class</th><th>Instances</th><th>Attributes</th><th>Classes</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>Electricity</td><td>45,312</td><td>8</td><td>2</td><td>Electricity demand (UP/DOWN)</td></tr>
+          <tr><td>ElectricityTiny</td><td>2,000</td><td>8</td><td>2</td><td>Tiny version for testing</td></tr>
+          <tr><td>Covtype</td><td>581,012</td><td>54</td><td>7</td><td>Forest cover type</td></tr>
+          <tr><td>CovtypeNorm</td><td>581,012</td><td>54</td><td>7</td><td>Covtype with normalized features</td></tr>
+          <tr><td>CovtypeTiny</td><td>1,001</td><td>54</td><td>7</td><td>Tiny version for testing</td></tr>
+          <tr><td>CovtFD</td><td>581,011</td><td>104</td><td>7</td><td>Covtype with 2 synthetic feature drifts at instances 193,669 and 387,338</td></tr>
+          <tr><td>RBFm_100k</td><td>100,000</td><td>10</td><td>5</td><td>Synthetic RBF</td></tr>
+          <tr><td>RTG_2abrupt</td><td>100,000</td><td>30</td><td>5</td><td>Random Tree with 2 abrupt drifts</td></tr>
+          <tr><td>Hyper100k</td><td>100,000</td><td>10</td><td>2</td><td>Hyperplane</td></tr>
+          <tr><td>Sensor</td><td>2,219,803</td><td>5</td><td>54</td><td>Indoor sensor readings</td></tr>
+          <tr><td>RCV1</td><td>20,242</td><td>~47,236 (sparse)</td><td>2</td><td>Text classification</td></tr>
+          <tr><td>W8a</td><td>49,749</td><td>300</td><td>2</td><td>Web page classification</td></tr>
+          <tr><td>Adult</td><td>32,561</td><td>123</td><td>2</td><td>Census income</td></tr>
+          <tr><td>Magic04</td><td>19,020</td><td>10</td><td>2</td><td>MAGIC gamma telescope</td></tr>
+          <tr><td>Spambase</td><td>4,601</td><td>57</td><td>2</td><td>Email spam</td></tr>
+          <tr><td>Musk</td><td>6,598</td><td>166</td><td>2</td><td>Musk molecules</td></tr>
+          <tr><td>SVMGuide3</td><td>1,243</td><td>21</td><td>2</td><td>SVM benchmark</td></tr>
+          <tr><td>German</td><td>1,000</td><td>24</td><td>2</td><td>Credit risk</td></tr>
+          <tr><td>Australian</td><td>690</td><td>14</td><td>2</td><td>Credit approval</td></tr>
+          <tr><td>Ionosphere</td><td>351</td><td>34</td><td>2</td><td>Radar returns</td></tr>
+          <tr><td>InternetAds</td><td>2,359</td><td>1,558</td><td>2</td><td>Internet advertisements</td></tr>
+          <tr><td>DryBean</td><td>13,611</td><td>16</td><td>7</td><td>Dry bean classification</td></tr>
+          <tr><td>Optdigits</td><td>5,620</td><td>64</td><td>10</td><td>Optical digit recognition</td></tr>
+          <tr><td>Frogs</td><td>7,195</td><td>22</td><td>4</td><td>Frog species</td></tr>
+          <tr><td>Wine</td><td>178</td><td>13</td><td>3</td><td>Wine cultivars</td></tr>
+          <tr><td>Splice</td><td>3,190</td><td>60</td><td>3</td><td>DNA splice junctions</td></tr>
+          <tr><td>SeagateBinary</td><td>49,999</td><td>94</td><td>2</td><td>Seagate binary</td></tr>
+          <tr><td>SeagateMulti</td><td>11,800</td><td>94</td><td>11</td><td>Seagate multi-class</td></tr>
+        </tbody>
+      </table>
+
+      <div class="api-sub-heading" id="datasets-regression">Regression Datasets</div>
+      <table class="api-dataset-table">
+        <thead><tr><th>Class</th><th>Instances</th><th>Attributes</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>Fried</td><td>40,768</td><td>10</td><td>Friedman regression</td></tr>
+          <tr><td>FriedTiny</td><td>1,000</td><td>10</td><td>Tiny version for testing</td></tr>
+          <tr><td>Bike</td><td>17,379</td><td>12</td><td>Bike sharing demand</td></tr>
+        </tbody>
+      </table>
+
+      <div class="api-import-block">
+        <div class="api-import-header"><div class="api-import-dot d1"></div><div class="api-import-dot d2"></div><div class="api-import-dot d3"></div><span class="api-import-label">usage example</span></div>
+        <pre><code>from openmoa.datasets import Electricity, Fried
+
+stream = Electricity()
+print(stream.get_schema().get_num_classes())     # 2
+print(stream.get_schema().get_num_attributes())  # 8
+
+reg_stream = Fried()
+print(reg_stream.get_schema().is_regression())   # True</code></pre>
+      </div>
+
+      <!-- Navigation -->
+      <div class="docs-nav" style="margin-top:48px;">
+        <div></div>
+        <a href="classifiers.html" class="btn btn-secondary">
+          Next: openmoa.classifiers
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="footer-logo-icon">M</div>
+        <span class="footer-text">© 2025 OpenMOA. Open source under MIT License.</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="footer-link">GitHub</a>
+        <a href="https://openmoa.net" class="footer-link">openmoa.net</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/script.js"></script>
+</body>
+</html>
