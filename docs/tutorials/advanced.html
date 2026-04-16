@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Advanced Topics - OpenMOA Tutorials</title>
-  <meta name="description" content="Advanced topics in OpenMOA: semi-supervised learning, online continual learning, MOA integration, prediction intervals, and performance optimization.">
+  <title>Advanced Topics - OpenMOA Documentation</title>
+  <meta name="description" content="Advanced OpenMOA topics: semi-supervised learning, online continual learning, MOA integration, prediction intervals, and performance optimization.">
 
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
 
@@ -13,6 +13,136 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../assets/style.css">
+
+  <style>
+    /* ================================================================
+       Advanced Tutorial Page — Scoped Styles
+       ================================================================ */
+
+    .st-toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+      margin: 24px 0 32px;
+    }
+    .st-toc a {
+      display: block;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .st-toc a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .st-toc a span {
+      color: var(--accent);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .st-tip {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .st-tip-info {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      color: var(--text-secondary);
+    }
+    .st-tip strong { color: var(--text); }
+
+    .st-sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 36px 0;
+    }
+
+    .docs-content h2[id],
+    .docs-content h3[id] {
+      scroll-margin-top: 80px;
+    }
+
+    .param-table td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .param-table td:nth-child(2) {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .metrics-table td:nth-child(2) {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+    }
+
+    /* --- Code block headers --- */
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .code-block-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    .red    { background: #FF5F56; }
+    .yellow { background: #FFBD2E; }
+    .green  { background: #27C93F; }
+    .code-block-title {
+      margin-left: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #94A3B8;
+    }
+    .code-block pre {
+      border-radius: 0 0 12px 12px;
+      margin: 0;
+    }
+
+    /* --- Section intro cards --- */
+    .adv-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .adv-card {
+      padding: 18px 20px;
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    .adv-card h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: var(--text);
+    }
+    .adv-card p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+  </style>
 </head>
 <body>
   <!-- Navigation -->
@@ -50,141 +180,133 @@
   </nav>
 
   <div class="docs-layout">
-    <!-- Sidebar -->
     <aside class="docs-sidebar">
       <div class="docs-sidebar-section">
         <div class="docs-sidebar-title">Getting Started</div>
-        <a href="../index.html" class="docs-sidebar-link">Overview</a>
+        <a href="../quickstart.html" class="docs-sidebar-link">Quick Start Guide</a>
         <a href="../installation.html" class="docs-sidebar-link">Installation</a>
-        <a href="../quickstart.html" class="docs-sidebar-link">Quick Start</a>
+        <a href="../concepts.html" class="docs-sidebar-link">Core Concepts</a>
       </div>
-
       <div class="docs-sidebar-section">
         <div class="docs-sidebar-title">Tutorials</div>
-        <a href="streams.html" class="docs-sidebar-link">Data Streams</a>
-        <a href="classifiers.html" class="docs-sidebar-link">Classifiers</a>
-        <a href="drift.html" class="docs-sidebar-link">Concept Drift</a>
+        <a href="streams.html" class="docs-sidebar-link">Working with Data Streams</a>
+        <a href="classifiers.html" class="docs-sidebar-link">Classification Algorithms</a>
+        <a href="drift.html" class="docs-sidebar-link">Concept Drift Detection</a>
         <a href="evaluation.html" class="docs-sidebar-link">Evaluation Methods</a>
         <a href="advanced.html" class="docs-sidebar-link active">Advanced Topics</a>
       </div>
-
       <div class="docs-sidebar-section">
         <div class="docs-sidebar-title">API Reference</div>
-        <a href="../api/index.html" class="docs-sidebar-link">API Overview</a>
+        <a href="../../api/streams.html" class="docs-sidebar-link">openmoa.streams</a>
+        <a href="../../api/classifiers.html" class="docs-sidebar-link">openmoa.classifiers</a>
+        <a href="../../api/regressors.html" class="docs-sidebar-link">openmoa.regressors</a>
+        <a href="../../api/drift.html" class="docs-sidebar-link">openmoa.drift_detection</a>
+        <a href="../../api/evaluation.html" class="docs-sidebar-link">openmoa.evaluation</a>
+        <a href="../../api/utils.html" class="docs-sidebar-link">openmoa.utils</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Source Deep Dive</div>
+        <a href="../source-files/stream_wrapper.html" class="docs-sidebar-link">stream_wrapper.py</a>
       </div>
     </aside>
 
-    <!-- Content -->
     <main class="docs-content fade-in">
-      <div class="docs-header">
-        <span class="docs-breadcrumb">Tutorials</span>
-        <h1 class="docs-title">Advanced Topics</h1>
-        <p class="docs-lead">Semi-supervised learning, online continual learning, MOA integration, prediction intervals, and performance optimization.</p>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+        <span class="tag tag-tutorial">Tutorial</span>
+        <span class="tag tag-guide">~25 min read</span>
       </div>
+
+      <h1>Advanced Topics</h1>
+      <p>This tutorial covers advanced OpenMOA capabilities: semi-supervised stream learning, online continual
+        learning, integration with MOA's Java ecosystem, prediction intervals for regression, and techniques for
+        high-performance evaluation.</p>
 
       <!-- Table of Contents -->
       <div class="st-toc">
-        <div class="st-toc-title">On This Page</div>
-        <ul class="st-toc-list">
-          <li><a href="#ssl" class="st-toc-link">Semi-Supervised Learning</a></li>
-          <li><a href="#ocl" class="st-toc-link">Online Continual Learning</a></li>
-          <li><a href="#moa" class="st-toc-link">MOA Integration</a></li>
-          <li><a href="#prediction-intervals" class="st-toc-link">Prediction Intervals</a></li>
-          <li><a href="#performance" class="st-toc-link">Performance Optimization</a></li>
-        </ul>
+        <a href="#ssl"><span>1.</span> Semi-Supervised Learning</a>
+        <a href="#ocl"><span>2.</span> Online Continual Learning</a>
+        <a href="#moa"><span>3.</span> MOA Integration</a>
+        <a href="#intervals"><span>4.</span> Prediction Intervals</a>
+        <a href="#performance"><span>5.</span> Performance Optimization</a>
       </div>
 
-      <!-- ── Section 1: Semi-Supervised Learning ── -->
-      <section id="ssl">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span class="s-badge s-badge-blue">SSL</span>
-            Semi-Supervised Learning
-          </h2>
+      <!-- ============================================================
+           Section 1: Semi-Supervised Learning
+      ============================================================ -->
+      <h2 id="ssl">1. Semi-Supervised Learning</h2>
+      <p>Semi-supervised stream learning handles the realistic case where labels arrive infrequently.
+        OpenMOA's <code>ClassifierSSL</code> wraps any classifier to work with partially-labeled streams.</p>
+
+      <h3>ClassifierSSL Interface</h3>
+      <p>All SSL classifiers implement <code>ClassifierSSL</code>, which extends the standard
+        <code>Classifier</code> interface with an <code>is_labeled</code> flag in <code>learn_one</code>.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">ClassifierSSL interface</span>
         </div>
-        <p>Semi-supervised stream learning handles the realistic case where labels arrive infrequently. OpenMOA's <code>ClassifierSSL</code> wraps any classifier to work with partially-labeled streams.</p>
+        <pre><code>from openmoa.classifier import ClassifierSSL
 
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">ClassifierSSL Interface</h3>
-        <p>All SSL classifiers implement <code>ClassifierSSL</code>, which extends the standard <code>Classifier</code> interface with an <code>is_labeled</code> flag in <code>learn_one</code>.</p>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.classifier import ClassifierSSL
-
-# Any ClassifierSSL subclass exposes the same interface
 ssl_clf = SomeSSLClassifier()
 
-# Labeled instance (is_labeled=True by default)
+# Labeled instance
 ssl_clf.learn_one(x, y, is_labeled=True)
 
 # Unlabeled instance — only unsupervised update
 ssl_clf.learn_one(x, y=None, is_labeled=False)
 
-# Prediction unchanged
+# Prediction is unchanged
 y_pred = ssl_clf.predict_one(x)</code></pre>
+      </div>
+
+      <h3>prequential_ssl_evaluation</h3>
+      <p>The dedicated SSL evaluator generates a variable labeling rate, measures accuracy only on labeled
+        instances, and tracks unlabeled instance usage.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">prequential_ssl_evaluation</span>
         </div>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">prequential_ssl_evaluation</h3>
-        <p>The dedicated SSL evaluator generates a variable labeling rate, measures accuracy only on labeled instances, and tracks unlabeled instance usage.</p>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.evaluation import prequential_ssl_evaluation
+        <pre><code>from openmoa.evaluation import prequential_ssl_evaluation
 
 results = prequential_ssl_evaluation(
     stream=stream,
     model=ssl_clf,
-    labeling_rate=0.1,    # 10% of instances are labeled
+    labeling_rate=0.1,    # 10 % of instances are labeled
     n_samples=10000,
     window_size=1000,
 )</code></pre>
+      </div>
+
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>stream</td><td>Stream</td><td>Any OpenMOA stream object</td></tr>
+          <tr><td>model</td><td>ClassifierSSL</td><td>SSL-capable classifier</td></tr>
+          <tr><td>labeling_rate</td><td>float</td><td>Fraction of instances that carry labels (0–1)</td></tr>
+          <tr><td>n_samples</td><td>int</td><td>Total instances to process</td></tr>
+          <tr><td>window_size</td><td>int</td><td>Windowed accuracy reporting interval</td></tr>
+        </tbody>
+      </table>
+
+      <h3>OSNN — Online Semi-supervised Nearest Neighbor</h3>
+      <p>OSNN maintains an online prototype graph. Labeled nodes propagate labels to nearby unlabeled
+        neighbors via graph-based label propagation, enabling effective learning even at very low labeling rates.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">OSNN example</span>
         </div>
-
-        <div class="concept-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Parameter</th>
-                <th>Type</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>stream</code></td>
-                <td>Stream</td>
-                <td>Any OpenMOA stream object</td>
-              </tr>
-              <tr>
-                <td><code>model</code></td>
-                <td>ClassifierSSL</td>
-                <td>SSL-capable classifier</td>
-              </tr>
-              <tr>
-                <td><code>labeling_rate</code></td>
-                <td>float</td>
-                <td>Fraction of instances that carry labels (0–1)</td>
-              </tr>
-              <tr>
-                <td><code>n_samples</code></td>
-                <td>int</td>
-                <td>Total instances to process</td>
-              </tr>
-              <tr>
-                <td><code>window_size</code></td>
-                <td>int</td>
-                <td>Windowed accuracy reporting interval</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">OSNN — Online Semi-supervised Nearest Neighbor</h3>
-        <p>OSNN maintains an online prototype graph. Labeled nodes propagate labels to nearby unlabeled neighbors via graph-based label propagation, enabling effective learning even at very low labeling rates.</p>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.classifier import OSNN
+        <pre><code>from openmoa.classifier import OSNN
 
 model = OSNN(
     n_neighbors=5,
@@ -194,68 +316,64 @@ model = OSNN(
 results = prequential_ssl_evaluation(
     stream=stream,
     model=model,
-    labeling_rate=0.05,   # only 5% labeled
+    labeling_rate=0.05,   # only 5 % labeled
     n_samples=10000,
 )</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 2: Online Continual Learning
+      ============================================================ -->
+      <h2 id="ocl">2. Online Continual Learning</h2>
+      <p>Online Continual Learning (OCL) addresses the challenge of learning new tasks sequentially without
+        forgetting previous knowledge. OpenMOA provides a complete OCL pipeline for both classic benchmarks
+        and vision tasks.</p>
+
+      <h3>Supported Datasets</h3>
+      <table class="concept-table param-table">
+        <thead><tr><th>Dataset</th><th>Class</th><th>Tasks</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Split-MNIST</td>
+            <td>SplitMNIST</td>
+            <td>5 binary tasks</td>
+            <td>Standard OCL benchmark, digits 0–9 split by pairs</td>
+          </tr>
+          <tr>
+            <td>Split-CIFAR10</td>
+            <td>SplitCIFAR10</td>
+            <td>5 binary tasks</td>
+            <td>CIFAR-10 images split into 5 tasks</td>
+          </tr>
+          <tr>
+            <td>Split-CIFAR100</td>
+            <td>SplitCIFAR100</td>
+            <td>10 or 20 tasks</td>
+            <td>CIFAR-100 with configurable task count</td>
+          </tr>
+          <tr>
+            <td>ViT Features</td>
+            <td>ViTFeatureStream</td>
+            <td>Configurable</td>
+            <td>Pre-extracted Vision Transformer embeddings</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Task Interface</h3>
+      <p>Each OCL dataset exposes a task-based iteration interface. Tasks arrive sequentially; each task
+        contains a stream of instances from that task's classes only.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">task iteration</span>
         </div>
-      </section>
-
-      <!-- ── Section 2: Online Continual Learning ── -->
-      <section id="ocl" style="margin-top:48px;">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span class="s-badge s-badge-purple">OCL</span>
-            Online Continual Learning
-          </h2>
-        </div>
-        <p>Online Continual Learning (OCL) addresses the challenge of learning new tasks sequentially without forgetting previous knowledge. OpenMOA provides a complete OCL pipeline for both classic benchmarks and vision tasks.</p>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">Supported Datasets</h3>
-        <div class="concept-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Dataset</th>
-                <th>Class</th>
-                <th>Tasks</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Split-MNIST</td>
-                <td><code>SplitMNIST</code></td>
-                <td>5 binary tasks</td>
-                <td>Standard OCL benchmark, digits 0–9 split by pairs</td>
-              </tr>
-              <tr>
-                <td>Split-CIFAR10</td>
-                <td><code>SplitCIFAR10</code></td>
-                <td>5 binary tasks</td>
-                <td>CIFAR-10 images split into 5 tasks</td>
-              </tr>
-              <tr>
-                <td>Split-CIFAR100</td>
-                <td><code>SplitCIFAR100</code></td>
-                <td>10 or 20 tasks</td>
-                <td>CIFAR-100 with configurable task count</td>
-              </tr>
-              <tr>
-                <td>ViT Features</td>
-                <td><code>ViTFeatureStream</code></td>
-                <td>Configurable</td>
-                <td>Pre-extracted Vision Transformer embeddings</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">Task Interface</h3>
-        <p>Each OCL dataset exposes a task-based iteration interface. Tasks arrive sequentially; each task contains a stream of instances from that task's classes only.</p>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.datasets import SplitMNIST
+        <pre><code>from openmoa.datasets import SplitMNIST
 
 dataset = SplitMNIST()
 
@@ -263,14 +381,20 @@ for task_id, task_stream in dataset.tasks():
     print(f"Task {task_id}: classes = {task_stream.classes}")
     for x, y in task_stream:
         ...</code></pre>
+      </div>
+
+      <h3>ocl_train_eval_loop</h3>
+      <p>The unified OCL training loop handles task boundaries, calls the strategy's
+        <code>before_task</code> / <code>after_task</code> hooks, and accumulates the accuracy matrix.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">ocl_train_eval_loop</span>
         </div>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">ocl_train_eval_loop</h3>
-        <p>The unified OCL training loop handles task boundaries, calls the strategy's <code>before_task</code> / <code>after_task</code> hooks, and accumulates the accuracy matrix.</p>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.evaluation import ocl_train_eval_loop
+        <pre><code>from openmoa.evaluation import ocl_train_eval_loop
 from openmoa.ocl import ExperienceReplay
 
 strategy = ExperienceReplay(mem_size=200)
@@ -278,238 +402,153 @@ metrics = ocl_train_eval_loop(
     dataset=SplitMNIST(),
     strategy=strategy,
 )</code></pre>
+      </div>
+
+      <h3>OCLMetrics</h3>
+      <p>The <code>OCLMetrics</code> object returned by <code>ocl_train_eval_loop</code> provides the
+        standard continual learning metrics derived from the accuracy matrix <em>R</em>, where
+        <code>R[i][j]</code> is accuracy on task <em>j</em> after training on task <em>i</em>.</p>
+
+      <table class="concept-table metrics-table">
+        <thead><tr><th>Metric</th><th>Property</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>Accuracy Matrix</td><td>metrics.accuracy_matrix</td><td>Full R[i][j] matrix</td></tr>
+          <tr><td>Average Accuracy</td><td>metrics.avg_accuracy</td><td>Mean of final-row accuracies</td></tr>
+          <tr><td>Backward Transfer</td><td>metrics.backward_transfer</td><td>Average change in past-task accuracy after learning new tasks</td></tr>
+          <tr><td>Forward Transfer</td><td>metrics.forward_transfer</td><td>Average accuracy on future tasks before they are trained</td></tr>
+          <tr><td>Forgetting</td><td>metrics.forgetting</td><td>Average accuracy drop on previously-learned tasks</td></tr>
+          <tr><td>Anytime Accuracy</td><td>metrics.anytime_accuracy</td><td>Average accuracy over all tasks at every evaluation checkpoint</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Strategies</h3>
+      <table class="concept-table param-table">
+        <thead><tr><th>Strategy</th><th>Class</th><th>Key Parameter</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Experience Replay</td>
+            <td>ExperienceReplay</td>
+            <td>mem_size</td>
+            <td>Stores a reservoir of past examples and interleaves them during training</td>
+          </tr>
+          <tr>
+            <td>SLDA</td>
+            <td>SLDA</td>
+            <td>shrinkage</td>
+            <td>Streaming Linear Discriminant Analysis; updates class means and shared covariance</td>
+          </tr>
+          <tr>
+            <td>NCM</td>
+            <td>NCM</td>
+            <td>n_neighbors</td>
+            <td>Nearest-Class-Mean classifier; classifies by nearest stored class centroid</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">comparing strategies</span>
         </div>
+        <pre><code>from openmoa.ocl import ExperienceReplay, SLDA, NCM
 
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">OCLMetrics</h3>
-        <p>The <code>OCLMetrics</code> object returned by <code>ocl_train_eval_loop</code> provides the standard continual learning metrics derived from the accuracy matrix <em>R</em> where <code>R[i][j]</code> is accuracy on task <em>j</em> after training on task <em>i</em>.</p>
-
-        <div class="concept-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Metric</th>
-                <th>Property</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Accuracy Matrix</td>
-                <td><code>metrics.accuracy_matrix</code></td>
-                <td>Full R[i][j] matrix</td>
-              </tr>
-              <tr>
-                <td>Average Accuracy</td>
-                <td><code>metrics.avg_accuracy</code></td>
-                <td>Mean of final-row accuracies</td>
-              </tr>
-              <tr>
-                <td>Backward Transfer</td>
-                <td><code>metrics.backward_transfer</code></td>
-                <td>Average change in past-task accuracy after learning new tasks</td>
-              </tr>
-              <tr>
-                <td>Forward Transfer</td>
-                <td><code>metrics.forward_transfer</code></td>
-                <td>Average accuracy on future tasks before they are trained</td>
-              </tr>
-              <tr>
-                <td>Forgetting</td>
-                <td><code>metrics.forgetting</code></td>
-                <td>Average accuracy drop on previously-learned tasks</td>
-              </tr>
-              <tr>
-                <td>Anytime Accuracy</td>
-                <td><code>metrics.anytime_accuracy</code></td>
-                <td>Average accuracy over all tasks at every evaluation checkpoint</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">Strategies</h3>
-        <div class="concept-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Strategy</th>
-                <th>Class</th>
-                <th>Key Parameter</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Experience Replay</td>
-                <td><code>ExperienceReplay</code></td>
-                <td><code>mem_size</code></td>
-                <td>Stores a reservoir of past examples and interleaves them during training</td>
-              </tr>
-              <tr>
-                <td>SLDA</td>
-                <td><code>SLDA</code></td>
-                <td><code>shrinkage</code></td>
-                <td>Streaming Linear Discriminant Analysis; updates class means and shared covariance</td>
-              </tr>
-              <tr>
-                <td>NCM</td>
-                <td><code>NCM</code></td>
-                <td><code>n_neighbors</code></td>
-                <td>Nearest-Class-Mean classifier; classifies by nearest stored class centroid</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.ocl import ExperienceReplay, SLDA, NCM
-
-# Replay-based strategy
-er = ExperienceReplay(mem_size=200)
-metrics_er = ocl_train_eval_loop(SplitMNIST(), er)
-
-# Streaming LDA
+er   = ExperienceReplay(mem_size=200)
 slda = SLDA(shrinkage=1e-4)
-metrics_slda = ocl_train_eval_loop(SplitMNIST(), slda)
+ncm  = NCM(n_neighbors=1)
 
-# Nearest Class Mean
-ncm = NCM(n_neighbors=1)
-metrics_ncm = ocl_train_eval_loop(SplitMNIST(), ncm)
-
-# Compare strategies
-for name, m in [("ER", metrics_er), ("SLDA", metrics_slda), ("NCM", metrics_ncm)]:
+for name, strategy in [("ER", er), ("SLDA", slda), ("NCM", ncm)]:
+    m = ocl_train_eval_loop(SplitMNIST(), strategy)
     print(f"{name}: avg_acc={m.avg_accuracy:.3f}, forgetting={m.forgetting:.3f}")</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 3: MOA Integration
+      ============================================================ -->
+      <h2 id="moa">3. MOA Integration</h2>
+      <p>OpenMOA bridges the rich Java-based <strong>MOA (Massive Online Analysis)</strong> ecosystem through
+        JPype. This gives access to hundreds of MOA classifiers and detectors without leaving Python.</p>
+
+      <h3>MOAClassifier</h3>
+      <p><code>MOAClassifier</code> wraps any MOA learner using its CLI string syntax. It implements the
+        standard OpenMOA <code>Classifier</code> interface so it drops into any evaluation loop.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">MOAClassifier</span>
         </div>
-      </section>
-
-      <!-- ── Section 3: MOA Integration ── -->
-      <section id="moa" style="margin-top:48px;">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span class="s-badge s-badge-green">MOA</span>
-            MOA Integration
-          </h2>
-        </div>
-        <p>OpenMOA bridges the rich Java-based <a href="https://moa.cms.waikato.ac.nz/" target="_blank" style="color:var(--accent);">MOA (Massive Online Analysis)</a> ecosystem through JPype. This gives access to hundreds of MOA classifiers and detectors without leaving Python.</p>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">MOAClassifier</h3>
-        <p><code>MOAClassifier</code> wraps any MOA learner using its CLI string syntax. It implements the standard OpenMOA <code>Classifier</code> interface so it drops into any evaluation loop.</p>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.classifier import MOAClassifier
-
-# Wrap any MOA learner via its CLI string
-clf = MOAClassifier(
-    moa_learner="trees.HoeffdingTree -g 200 -c 0.0"
-)
-
-# Use identically to any OpenMOA classifier
+        <pre><code>from openmoa.classifier import MOAClassifier
 from openmoa.evaluation import prequential_evaluation
+
+clf = MOAClassifier(moa_learner="trees.HoeffdingTree -g 200 -c 0.0")
+
 results = prequential_evaluation(stream, clf, n_samples=10000)</code></pre>
+      </div>
+
+      <h3>MOADriftDetector</h3>
+      <p><code>MOADriftDetector</code> wraps MOA drift detectors, bridging them into OpenMOA's
+        <code>DriftDetector</code> interface.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">MOADriftDetector</span>
         </div>
+        <pre><code>from openmoa.drift import MOADriftDetector
 
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">MOADriftDetector</h3>
-        <p><code>MOADriftDetector</code> wraps MOA drift detectors the same way, bridging them into OpenMOA's <code>DriftDetector</code> interface.</p>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.drift import MOADriftDetector
-
-detector = MOADriftDetector(
-    moa_detector="drift.ADWIN -d 0.002"
-)
+detector = MOADriftDetector(moa_detector="drift.ADWIN -d 0.002")
 
 for x, y in stream:
     y_pred = clf.predict_one(x)
-    error = int(y_pred != y)
-    detector.update(error)
-    if detector.drift_detected:
+    detector.add_element(int(y_pred != y))
+    if detector.detected_change():
         print("Drift detected!")</code></pre>
+      </div>
+
+      <h3>OpenFeatureStream</h3>
+      <p><code>OpenFeatureStream</code> simulates evolving feature spaces — a key characteristic of
+        open-world streams where new sensors, modalities, or measurement types appear over time.</p>
+
+      <p><strong>Evolution patterns</strong></p>
+      <table class="concept-table param-table">
+        <thead><tr><th>Pattern</th><th>Value</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>Pyramid</td><td>"pyramid"</td><td>Features added then removed, forming a pyramid shape over time</td></tr>
+          <tr><td>Incremental</td><td>"incremental"</td><td>Features only added; feature space grows monotonically</td></tr>
+          <tr><td>Decremental</td><td>"decremental"</td><td>Features only removed; feature space shrinks monotonically</td></tr>
+          <tr><td>TDS</td><td>"tds"</td><td>Temporally-dependent sequence: features appear in correlated bursts</td></tr>
+          <tr><td>CDS</td><td>"cds"</td><td>Concept-dependent sequence: feature space tied to underlying concept</td></tr>
+          <tr><td>EDS</td><td>"eds"</td><td>Event-driven sequence: feature evolution triggered by stream events</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>Feature selection modes</strong></p>
+      <table class="concept-table param-table">
+        <thead><tr><th>Mode</th><th>Value</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>Intersection</td><td>"intersection"</td><td>Use only features present in both training and current instance</td></tr>
+          <tr><td>Union</td><td>"union"</td><td>Use all known features; fill missing with zero / mean</td></tr>
+          <tr><td>New-only</td><td>"new_only"</td><td>Use only newly appeared features for the current window</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">OpenFeatureStream</span>
         </div>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">OpenFeatureStream</h3>
-        <p>OpenMOA's <code>OpenFeatureStream</code> simulates evolving feature spaces — a key characteristic of real-world open-world streams where new sensors, modalities, or measurement types appear over time.</p>
-
-        <div class="concept-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Pattern</th>
-                <th>Value</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Pyramid</td>
-                <td><code>"pyramid"</code></td>
-                <td>Features added then removed, forming a pyramid shape over time</td>
-              </tr>
-              <tr>
-                <td>Incremental</td>
-                <td><code>"incremental"</code></td>
-                <td>Features only added, feature space grows monotonically</td>
-              </tr>
-              <tr>
-                <td>Decremental</td>
-                <td><code>"decremental"</code></td>
-                <td>Features only removed, feature space shrinks monotonically</td>
-              </tr>
-              <tr>
-                <td>TDS</td>
-                <td><code>"tds"</code></td>
-                <td>Temporally-dependent sequence: features appear in correlated bursts</td>
-              </tr>
-              <tr>
-                <td>CDS</td>
-                <td><code>"cds"</code></td>
-                <td>Concept-dependent sequence: feature space tied to underlying concept</td>
-              </tr>
-              <tr>
-                <td>EDS</td>
-                <td><code>"eds"</code></td>
-                <td>Event-driven sequence: feature evolution triggered by stream events</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <p style="margin-top:16px;">Feature selection modes control how classifiers handle instances with missing or new features:</p>
-
-        <div class="concept-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Mode</th>
-                <th>Value</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Intersection</td>
-                <td><code>"intersection"</code></td>
-                <td>Use only features present in both training and current instance</td>
-              </tr>
-              <tr>
-                <td>Union</td>
-                <td><code>"union"</code></td>
-                <td>Use all known features; fill missing with zero / mean</td>
-              </tr>
-              <tr>
-                <td>New-only</td>
-                <td><code>"new_only"</code></td>
-                <td>Use only newly appeared features for the current window</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.stream import OpenFeatureStream
+        <pre><code>from openmoa.stream import OpenFeatureStream
 
 stream = OpenFeatureStream(
     base_stream="generators.SEAGenerator",
@@ -519,71 +558,76 @@ stream = OpenFeatureStream(
     n_features_max=20,
     evolution_speed=500,   # features change every 500 instances
 )</code></pre>
+      </div>
+
+      <h3>Lazy Java Loading</h3>
+      <p>JPype and the MOA JVM are loaded on first use — not at import time. Importing OpenMOA is
+        instant even without a JVM; Java initializes only when a <code>MOAClassifier</code>,
+        <code>MOADriftDetector</code>, or <code>OpenFeatureStream</code> is first instantiated.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">lazy JVM startup</span>
         </div>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">Lazy Java Loading</h3>
-        <p>JPype and the MOA JVM are loaded on first use — not at import time. This means importing OpenMOA is instant even without a JVM, and Java initializes only when a <code>MOAClassifier</code>, <code>MOADriftDetector</code>, or <code>OpenFeatureStream</code> is first instantiated.</p>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>import openmoa                          # instant — no JVM started
+        <pre><code>import openmoa                          # instant — no JVM started
 
 from openmoa.classifier import MOAClassifier
 clf = MOAClassifier("trees.HoeffdingTree")  # JVM starts here</code></pre>
+      </div>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 4: Prediction Intervals
+      ============================================================ -->
+      <h2 id="intervals">4. Prediction Intervals</h2>
+      <p>For regression tasks, OpenMOA supports prediction intervals alongside point estimates.
+        Regressors that implement interval prediction return a 3-tuple instead of a scalar.</p>
+
+      <h3>Output Format</h3>
+      <p>An interval-capable regressor's <code>predict_one</code> returns <code>(lower, point, upper)</code>:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">interval output</span>
         </div>
-      </section>
-
-      <!-- ── Section 4: Prediction Intervals ── -->
-      <section id="prediction-intervals" style="margin-top:48px;">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span class="s-badge s-badge-amber">Regression</span>
-            Prediction Intervals
-          </h2>
-        </div>
-        <p>For regression tasks, OpenMOA supports prediction intervals alongside point estimates. Regressors that implement interval prediction return a 3-tuple instead of a scalar.</p>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">Output Format</h3>
-        <p>An interval-capable regressor's <code>predict_one</code> returns <code>(lower, point, upper)</code>:</p>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>lower, point, upper = regressor.predict_one(x)
+        <pre><code>lower, point, upper = regressor.predict_one(x)
 # lower  — lower confidence bound
 # point  — point estimate (same as a standard regressor)
 # upper  — upper confidence bound</code></pre>
+      </div>
+
+      <h3>Evaluators</h3>
+      <p>Two evaluators handle interval predictions; both accept the 3-tuple output directly.</p>
+
+      <table class="concept-table param-table">
+        <thead><tr><th>Class</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>PredictionIntervalEvaluator</td>
+            <td>Cumulative evaluator — accumulates statistics over the full stream</td>
+          </tr>
+          <tr>
+            <td>PredictionIntervalWindowedEvaluator</td>
+            <td>Windowed evaluator — reports metrics over a sliding window of recent instances</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">interval evaluation loop</span>
         </div>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">Evaluators</h3>
-        <p>Two evaluators handle interval predictions. Both accept the 3-tuple output directly.</p>
-
-        <div class="concept-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Class</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>PredictionIntervalEvaluator</code></td>
-                <td>Cumulative evaluator — accumulates statistics over the full stream</td>
-              </tr>
-              <tr>
-                <td><code>PredictionIntervalWindowedEvaluator</code></td>
-                <td>Windowed evaluator — reports metrics over a sliding window of recent instances</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.evaluation import (
-    PredictionIntervalEvaluator,
-    PredictionIntervalWindowedEvaluator,
-)
+        <pre><code>from openmoa.evaluation import PredictionIntervalWindowedEvaluator
 
 evaluator = PredictionIntervalWindowedEvaluator(window_size=1000)
 
@@ -593,111 +637,76 @@ for x, y in stream:
     regressor.learn_one(x, y)
 
 metrics = evaluator.get_metrics()</code></pre>
+      </div>
+
+      <h3>Interval Metrics</h3>
+      <table class="concept-table metrics-table">
+        <thead><tr><th>Metric</th><th>Key</th><th>Interpretation</th></tr></thead>
+        <tbody>
+          <tr><td>Coverage (PICP)</td><td>metrics.picp</td><td>Fraction of true values falling within [lower, upper]; target = nominal level (e.g. 0.90)</td></tr>
+          <tr><td>Mean Interval Width</td><td>metrics.mean_width</td><td>Average width of prediction intervals; smaller = more precise</td></tr>
+          <tr><td>PINAW</td><td>metrics.pinaw</td><td>Interval width normalized by the target range</td></tr>
+          <tr><td>Point RMSE</td><td>metrics.point_rmse</td><td>RMSE of the point estimate only</td></tr>
+          <tr><td>Point MAE</td><td>metrics.point_mae</td><td>MAE of the point estimate only</td></tr>
+        </tbody>
+      </table>
+
+      <hr class="st-sep">
+
+      <!-- ============================================================
+           Section 5: Performance Optimization
+      ============================================================ -->
+      <h2 id="performance">5. Performance Optimization</h2>
+      <p>OpenMOA provides several mechanisms to accelerate evaluation and training on large-scale streams.</p>
+
+      <h3>Fast Evaluation Mode</h3>
+      <p>Fast mode uses MOA's native <code>EfficientEvaluationLoops</code> — the entire prequential loop
+        runs in Java, avoiding Python overhead per instance. It activates automatically when both
+        conditions are met:</p>
+
+      <table class="concept-table param-table">
+        <thead><tr><th>Condition</th><th>Requirement</th></tr></thead>
+        <tbody>
+          <tr><td>Classifier</td><td>Must be a <code>MOAClassifier</code> (backed by a Java MOA learner)</td></tr>
+          <tr><td>Stream</td><td>Must be a <code>MOAStream</code> or any stream with a native MOA generator</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">fast mode — MOA + MOA</span>
         </div>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">Interval Metrics</h3>
-        <div class="concept-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Metric</th>
-                <th>Key</th>
-                <th>Interpretation</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Coverage</td>
-                <td><code>coverage</code></td>
-                <td>Fraction of true values falling within [lower, upper]; target = nominal level (e.g. 0.90)</td>
-              </tr>
-              <tr>
-                <td>Mean Interval Width</td>
-                <td><code>mean_width</code></td>
-                <td>Average width of prediction intervals; smaller = more precise</td>
-              </tr>
-              <tr>
-                <td>PICP</td>
-                <td><code>picp</code></td>
-                <td>Prediction Interval Coverage Probability; same as coverage, formal name</td>
-              </tr>
-              <tr>
-                <td>PINAW</td>
-                <td><code>pinaw</code></td>
-                <td>Prediction Interval Normalized Average Width; width normalized by target range</td>
-              </tr>
-              <tr>
-                <td>Point RMSE</td>
-                <td><code>point_rmse</code></td>
-                <td>RMSE of the point estimate only</td>
-              </tr>
-              <tr>
-                <td>Point MAE</td>
-                <td><code>point_mae</code></td>
-                <td>MAE of the point estimate only</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- ── Section 5: Performance Optimization ── -->
-      <section id="performance" style="margin-top:48px;">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span class="s-badge s-badge-red">Performance</span>
-            Performance Optimization
-          </h2>
-        </div>
-        <p>OpenMOA provides several mechanisms to accelerate evaluation and training for large-scale streams.</p>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">Fast Evaluation Mode</h3>
-        <p>Fast mode uses MOA's native <code>EfficientEvaluationLoops</code> — the entire prequential loop runs in Java, avoiding Python overhead per instance. It is automatically activated when both conditions are met:</p>
-
-        <div class="concept-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Condition</th>
-                <th>Requirement</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Classifier</td>
-                <td>Must be a <code>MOAClassifier</code> (backed by a Java MOA learner)</td>
-              </tr>
-              <tr>
-                <td>Stream</td>
-                <td>Must be a <code>MOAStream</code> or any stream with a native MOA generator</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.classifier import MOAClassifier
+        <pre><code>from openmoa.classifier import MOAClassifier
 from openmoa.stream import MOAStream
 from openmoa.evaluation import prequential_evaluation
 
-# Both MOA — fast mode activates automatically
-clf = MOAClassifier("trees.HoeffdingTree")
+clf    = MOAClassifier("trees.HoeffdingTree")
 stream = MOAStream("generators.SEAGenerator -f 2")
 
+# Both MOA — fast mode activates automatically
 results = prequential_evaluation(
     stream=stream,
     model=clf,
-    n_samples=1_000_000,   # fast mode handles millions of instances
+    n_samples=1_000_000,
 )</code></pre>
+      </div>
+
+      <h3>Batch Learning</h3>
+      <p><code>BatchClassifier</code> wraps any scikit-learn compatible classifier for stream evaluation.
+        It collects instances into mini-batches before calling the underlying learner's
+        <code>partial_fit</code>.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">BatchClassifier</span>
         </div>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">Batch Learning</h3>
-        <p><code>BatchClassifier</code> wraps any scikit-learn compatible classifier for stream evaluation. It collects instances into mini-batches before calling the underlying learner's <code>partial_fit</code>.</p>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.classifier import BatchClassifier
+        <pre><code>from openmoa.classifier import BatchClassifier
 from sklearn.linear_model import SGDClassifier
 
 clf = BatchClassifier(
@@ -706,93 +715,73 @@ clf = BatchClassifier(
 )
 
 results = prequential_evaluation(stream, clf, n_samples=50000)</code></pre>
+      </div>
+
+      <table class="concept-table param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>classifier</td><td>sklearn estimator</td><td>Any estimator with a <code>partial_fit</code> method</td></tr>
+          <tr><td>batch_size</td><td>int</td><td>Number of instances accumulated before calling <code>partial_fit</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Multi-Learner Single-Pass</h3>
+      <p>When benchmarking multiple classifiers, pass a list of models to <code>prequential_evaluation</code>.
+        The stream is iterated only once and all models are updated simultaneously — cutting total evaluation
+        time roughly by the number of models.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot red"></div>
+          <div class="code-block-dot yellow"></div>
+          <div class="code-block-dot green"></div>
+          <span class="code-block-title">multi-learner single-pass</span>
         </div>
-
-        <div class="concept-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Parameter</th>
-                <th>Type</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>classifier</code></td>
-                <td>sklearn estimator</td>
-                <td>Any estimator with a <code>partial_fit</code> method</td>
-              </tr>
-              <tr>
-                <td><code>batch_size</code></td>
-                <td>int</td>
-                <td>Number of instances accumulated before calling <code>partial_fit</code></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">Multi-Learner Single-Pass</h3>
-        <p>When benchmarking multiple classifiers, use <code>prequential_evaluation</code> with a list of models. The stream is iterated only once and all models are updated simultaneously, cutting total evaluation time roughly by the number of models.</p>
-
-        <div class="code-block">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <pre><code>from openmoa.classifier import HoeffdingTree, NaiveBayes, KNN
-from openmoa.evaluation import prequential_evaluation
+        <pre><code>from openmoa.classifier import HoeffdingTree, NaiveBayes, KNN
 
 models = [HoeffdingTree(), NaiveBayes(), KNN(n_neighbors=5)]
 
 # Single pass — all models evaluated in one stream iteration
 results = prequential_evaluation(
     stream=stream,
-    model=models,          # pass a list
+    model=models,
     n_samples=100000,
     window_size=1000,
 )</code></pre>
-        </div>
-
-        <h3 style="font-size:17px; font-weight:600; color:var(--text); margin:28px 0 12px;">Performance Summary</h3>
-        <div class="concept-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Technique</th>
-                <th>When to Use</th>
-                <th>Typical Speedup</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Fast Mode (MOA native loop)</td>
-                <td>MOAClassifier + MOAStream, &gt;100k instances</td>
-                <td>10–50×</td>
-              </tr>
-              <tr>
-                <td>BatchClassifier</td>
-                <td>sklearn learners needing mini-batch updates</td>
-                <td>2–5×</td>
-              </tr>
-              <tr>
-                <td>Multi-Learner Single-Pass</td>
-                <td>Benchmarking N models simultaneously</td>
-                <td>~N×</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- docs-nav -->
-      <div class="docs-nav">
-        <a href="evaluation.html" class="docs-nav-prev">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-          <div>
-            <div class="docs-nav-label">Previous</div>
-            <div class="docs-nav-title">Evaluation Methods</div>
-          </div>
-        </a>
-        <div></div>
       </div>
+
+      <h3>Performance Summary</h3>
+      <table class="concept-table">
+        <thead><tr><th>Technique</th><th>When to Use</th><th>Typical Speedup</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Fast Mode (MOA native loop)</td>
+            <td>MOAClassifier + MOAStream, &gt;100 k instances</td>
+            <td>10–50×</td>
+          </tr>
+          <tr>
+            <td>BatchClassifier</td>
+            <td>sklearn learners needing mini-batch updates</td>
+            <td>2–5×</td>
+          </tr>
+          <tr>
+            <td>Multi-Learner Single-Pass</td>
+            <td>Benchmarking N models simultaneously</td>
+            <td>~N×</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Navigation -->
+      <div class="docs-nav">
+        <a href="evaluation.html" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Previous: Evaluation Methods
+        </a>
+      </div>
+
     </main>
   </div>
 
