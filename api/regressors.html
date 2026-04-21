@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>openmoa.regressors — API Reference</title>
+  <meta name="description" content="Complete API reference for OpenMOA's original regressors — FESLRegressor and OASFRegressor for evolving feature streams.">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/style.css">
+
+  <style>
+    /* ================================================================
+       API Reference — Shared Theme (Emerald)
+       ================================================================ */
+    .docs-content code { color: #059669; }
+    [data-theme="dark"] .docs-content code { color: #34D399; }
+    .docs-content h2[id], .docs-content h3[id] { scroll-margin-top: 80px; }
+
+    .api-toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 6px 12px;
+      margin: 20px 0 32px;
+      padding: 20px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      border-left: 4px solid #10B981;
+    }
+    .api-toc-group { grid-column: 1 / -1; margin-top: 10px; }
+    .api-toc-group:first-child { margin-top: 0; }
+    .api-toc-group-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.6px; color: var(--text-secondary); margin-bottom: 4px;
+    }
+    .api-toc-link {
+      display: block; padding: 4px 8px; font-size: 13px;
+      font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);
+      text-decoration: none; border-radius: 4px; transition: all 0.15s;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .api-toc-link:hover { background: var(--bg-tertiary); color: #10B981; }
+
+    .api-sep { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+    .api-section-title {
+      font-size: 20px; font-weight: 700; color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      padding-bottom: 10px; border-bottom: 2px solid var(--border);
+      margin-bottom: 24px; margin-top: 40px;
+    }
+    .api-section-title:first-of-type { margin-top: 0; }
+
+    .api-entity {
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; margin: 28px 0 0;
+    }
+    .api-entity-header {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+      padding: 14px 20px; background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border);
+    }
+    .api-entity-name { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 600; color: var(--text); }
+    .api-entity-body { padding: 20px; }
+
+    .api-badge {
+      display: inline-block; padding: 2px 9px; border-radius: 4px;
+      font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.3px; flex-shrink: 0;
+    }
+    .api-badge-class   { background: #D1FAE5; color: #065F46; }
+    .api-badge-sparse  { background: #DBEAFE; color: #1E40AF; }
+    .api-badge-reg     { background: #F3E8FF; color: #6B21A8; }
+    [data-theme="dark"] .api-badge-class  { background: #064E3B; color: #6EE7B7; }
+    [data-theme="dark"] .api-badge-sparse { background: #1E3A5F; color: #93C5FD; }
+    [data-theme="dark"] .api-badge-reg    { background: #3B0764; color: #D8B4FE; }
+
+    .api-meta { font-size: 13px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
+    .api-meta-sep { margin: 0 6px; opacity: 0.4; }
+
+    .api-sig {
+      background: var(--code-bg); border-radius: 8px;
+      padding: 16px 20px; margin: 0 0 16px; overflow-x: auto;
+    }
+    .api-sig pre { margin: 0; background: none; padding: 0; border-radius: 0; font-size: 13px; line-height: 1.8; color: var(--code-text); }
+    .api-sig-label { font-size: 11px; color: #475569; font-family: 'JetBrains Mono', monospace; margin-bottom: 6px; }
+
+    .api-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+
+    .api-param-table, .api-method-table {
+      width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px;
+    }
+    .api-param-table th, .api-method-table th {
+      background: var(--bg-tertiary); font-weight: 600; color: var(--text);
+      padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .api-param-table td, .api-method-table td {
+      padding: 9px 14px; border-bottom: 1px solid var(--border);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .api-param-table td:first-child, .api-method-table td:first-child {
+      font-family: 'JetBrains Mono', monospace; color: #059669; white-space: nowrap;
+    }
+    [data-theme="dark"] .api-param-table td:first-child,
+    [data-theme="dark"] .api-method-table td:first-child { color: #34D399; }
+    .api-param-table td:nth-child(2), .api-method-table td:nth-child(2) {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary);
+    }
+
+    .api-sub-heading {
+      font-size: 14px; font-weight: 600; color: var(--text);
+      margin: 18px 0 6px; font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .api-note { padding: 12px 16px; border-radius: 8px; font-size: 13px; line-height: 1.7; margin: 12px 0; }
+    .api-note-info { background: #D1FAE5; border-left: 3px solid #10B981; color: #065F46; }
+    .api-note-warn { background: #FEF3C7; border-left: 3px solid #F59E0B; color: #92400E; }
+    [data-theme="dark"] .api-note-info { background: #064E3B33; border-left-color: #34D399; color: #6EE7B7; }
+    [data-theme="dark"] .api-note-warn { background: #78350F33; border-left-color: #FBBF24; color: #FDE68A; }
+    .api-note strong { color: inherit; font-weight: 700; }
+
+    .api-import-block { background: var(--code-bg); border-radius: 12px; overflow: hidden; margin: 16px 0 24px; }
+    .api-import-header {
+      display: flex; align-items: center; gap: 8px; padding: 10px 16px;
+      background: rgba(16,185,129,0.1); border-bottom: 1px solid rgba(16,185,129,0.2);
+    }
+    .api-import-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .d1 { background: #FF5F56; } .d2 { background: #FFBD2E; } .d3 { background: #27CA40; }
+    .api-import-label { font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #34D399; margin-left: 6px; }
+    .api-import-block pre { margin: 0; background: none; padding: 16px 20px; border-radius: 0; font-size: 13px; line-height: 1.8; }
+
+    /* ── Comparison table ── */
+    .diff-table {
+      width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px;
+    }
+    .diff-table th {
+      background: var(--bg-tertiary); font-weight: 600; color: var(--text);
+      padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .diff-table td {
+      padding: 9px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary);
+    }
+    .diff-table td:first-child {
+      font-family: 'JetBrains Mono', monospace; color: #059669; white-space: nowrap;
+    }
+    [data-theme="dark"] .diff-table td:first-child { color: #34D399; }
+
+    /* ── Scope notice ── */
+    .scope-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+      margin: 16px 0 24px;
+    }
+    .scope-card {
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .scope-card code {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+    .scope-card span { color: var(--text-secondary); font-size: 12px; }
+    .scope-card.supported { border-left: 3px solid #10B981; }
+    .scope-card.unsupported { border-left: 3px solid var(--border); opacity: 0.65; }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="../index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+    <div class="navbar-links">
+      <a href="../index.html" class="navbar-link">Home</a>
+      <a href="../docs/index.html" class="navbar-link active">Documentation</a>
+      <a href="../blog/index.html" class="navbar-link">Blog</a>
+      <a href="../contact.html" class="navbar-link">Contact</a>
+    </div>
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+  </nav>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Getting Started</div>
+        <a href="../docs/quickstart.html" class="docs-sidebar-link">Quick Start Guide</a>
+        <a href="../docs/installation.html" class="docs-sidebar-link">Installation</a>
+        <a href="../docs/concepts.html" class="docs-sidebar-link">Core Concepts</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Tutorials</div>
+        <a href="../docs/tutorials/streams.html" class="docs-sidebar-link">Working with Data Streams</a>
+        <a href="../docs/tutorials/classifiers.html" class="docs-sidebar-link">Classification Algorithms</a>
+        <a href="../docs/tutorials/drift.html" class="docs-sidebar-link">Concept Drift Detection</a>
+        <a href="../docs/tutorials/evaluation.html" class="docs-sidebar-link">Evaluation Methods</a>
+        <a href="../docs/tutorials/advanced.html" class="docs-sidebar-link">Advanced Topics</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">API Reference</div>
+        <a href="streams.html" class="docs-sidebar-link">openmoa.streams</a>
+        <a href="classifiers.html" class="docs-sidebar-link">openmoa.classifiers</a>
+        <a href="regressors.html" class="docs-sidebar-link active">openmoa.regressors</a>
+        <a href="drift.html" class="docs-sidebar-link">openmoa.drift_detection</a>
+        <a href="evaluation.html" class="docs-sidebar-link">openmoa.evaluation</a>
+        <a href="utils.html" class="docs-sidebar-link">openmoa.utils</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Source Deep Dive</div>
+        <a href="../docs/source-files/stream_wrapper.html" class="docs-sidebar-link">stream_wrapper.py</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content fade-in">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
+        <span class="tag" style="background:#D1FAE5;color:#065F46;">API Reference</span>
+        <span class="tag tag-guide">2 Original Algorithms</span>
+      </div>
+
+      <h1 style="font-family:'JetBrains Mono',monospace; font-size:1.9rem;">openmoa.regressors</h1>
+      <p>API reference for OpenMOA's original regression algorithms. Both regressors are designed for streams with evolving feature spaces, extending their classification counterparts (FESL and OASF) to continuous target prediction.</p>
+
+      <!-- ── TOC ── -->
+      <div class="api-toc">
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">Original Regressors</div>
+          <a href="#fesl" class="api-toc-link">FESLRegressor</a>
+          <a href="#oasf" class="api-toc-link">OASFRegressor</a>
+        </div>
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">Scope</div>
+          <a href="#scope" class="api-toc-link">algorithm coverage</a>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §1  FESLRegressor
+      ══════════════════════════════════════════ -->
+      <h2 id="fesl" class="api-section-title">§1 &nbsp; FESLRegressor</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">FESLRegressor</span>
+          <span class="api-badge api-badge-reg">regression</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/regressor/_fesl_regressor.py &nbsp;·&nbsp; Inheritance: Regressor</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc"><strong style="color:var(--text);">Full name:</strong> Feature Evolvable Streaming Learning — Regression</p>
+          <p class="api-desc">FESL regression handles feature-space transitions by maintaining two linear models, one per feature space (S1 and S2). During an overlap window straddling the transition point, it accumulates instances from both spaces and learns a mapping matrix M: S2 → S1 via Ridge Regression. After the transition, predictions are a weighted ensemble: <code>ŷ = α1·w1·x1 + α2·w2·M·x2</code>, where ensemble weights are updated based on per-model squared loss.</p>
+
+          <div class="api-sub-heading">Constructor</div>
+          <div class="api-sig">
+            <div class="api-sig-label">signature</div>
+            <pre>FESLRegressor(
+    schema: Schema,
+    s1_feature_indices: list[int],
+    s2_feature_indices: list[int],
+    overlap_size: int = 50,
+    switch_point: int = 500,
+    ensemble_method: str = "combination",
+    learning_rate_scale: float = 1.0,
+    random_seed: int = 1,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>required</td><td>Stream schema</td></tr>
+              <tr><td>s1_feature_indices</td><td>list[int]</td><td>required</td><td>Feature indices for the first (original) feature space S1</td></tr>
+              <tr><td>s2_feature_indices</td><td>list[int]</td><td>required</td><td>Feature indices for the second (new) feature space S2</td></tr>
+              <tr><td>overlap_size</td><td>int</td><td>50</td><td>Number of instances in the overlap buffer used to learn the mapping matrix M</td></tr>
+              <tr><td>switch_point</td><td>int</td><td>500</td><td>Instance index at which the feature space transition begins</td></tr>
+              <tr><td>ensemble_method</td><td>str</td><td>"combination"</td><td><code>"combination"</code>: weighted ensemble of both models;&nbsp;&nbsp;<code>"selection"</code>: use the better-performing model only</td></tr>
+              <tr><td>learning_rate_scale</td><td>float</td><td>1.0</td><td>Scales the learning rate during weight updates</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>w1</td><td>ndarray</td><td>Weight vector for feature space S1</td></tr>
+              <tr><td>w2</td><td>ndarray</td><td>Weight vector for feature space S2</td></tr>
+              <tr><td>M</td><td>ndarray</td><td>Mapping matrix from S2 to S1 (learned via Ridge Regression during overlap)</td></tr>
+              <tr><td>alpha1</td><td>float</td><td>Ensemble weight for model 1</td></tr>
+              <tr><td>alpha2</td><td>float</td><td>Ensemble weight for model 2</td></tr>
+              <tr><td>d1</td><td>int</td><td>Dimensionality of S1</td></tr>
+              <tr><td>d2</td><td>int</td><td>Dimensionality of S2</td></tr>
+              <tr><td>B</td><td>int</td><td>Overlap buffer size</td></tr>
+              <tr><td>T1</td><td>int</td><td>Switch point instance index</td></tr>
+              <tr><td>overlap_X1</td><td>list</td><td>Buffered S1 features during overlap period</td></tr>
+              <tr><td>overlap_X2</td><td>list</td><td>Buffered S2 features during overlap period</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>train</td><td>(instance: Instance) → None</td><td>None</td><td>Updates weight vectors via squared loss gradient; during overlap period accumulates buffer; when buffer full learns mapping matrix M and updates ensemble weights</td></tr>
+              <tr><td>predict</td><td>(instance: Instance) → float</td><td>float</td><td><code>"combination"</code>: returns α1·w1·x1 + α2·w2·M·x2;&nbsp;&nbsp;<code>"selection"</code>: returns prediction from the better-performing model only</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §2  OASFRegressor
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="oasf" class="api-section-title">§2 &nbsp; OASFRegressor</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">OASFRegressor</span>
+          <span class="api-badge api-badge-reg">regression</span>
+          <span class="api-badge api-badge-sparse">sparse</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/regressor/_oasf_regressor.py &nbsp;·&nbsp; Inheritance: Regressor</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc"><strong style="color:var(--text);">Full name:</strong> Online Active Sparse Feature Learning — Regression</p>
+          <p class="api-desc">OASF regression extends the classification ring-buffer architecture to continuous targets using a Passive-Aggressive ε-insensitive loss (PA-R). It adds CUR matrix decomposition regularization (<code>eta</code>) that constrains the weight matrix relative to the recent feature window <code>X_cur</code>, improving generalization under feature-space changes. The weight matrix W auto-expands for incremental feature streams and shrinks logically for decremental ones.</p>
+
+          <div class="api-sub-heading">Constructor</div>
+          <div class="api-sig">
+            <div class="api-sig-label">signature</div>
+            <pre>OASFRegressor(
+    schema: Schema,
+    lambda_param: float = 0.01,
+    mu: float = 10.0,
+    eta: float = 1.0,
+    L: int = 100,
+    d_max: int = 1000,
+    random_seed: int = 1,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>required</td><td>Stream schema</td></tr>
+              <tr><td>lambda_param</td><td>float</td><td>0.01</td><td>L₁,₂ sparsity shrinkage threshold</td></tr>
+              <tr><td>mu</td><td>float</td><td>10.0</td><td>PA penalty parameter (controls update step size; regression default is larger than classification)</td></tr>
+              <tr><td>eta</td><td>float</td><td>1.0</td><td>CUR regularization coefficient — strength of feature-window constraint</td></tr>
+              <tr><td>L</td><td>int</td><td>100</td><td>Sliding window length (number of weight vector columns in ring buffer)</td></tr>
+              <tr><td>d_max</td><td>int</td><td>1000</td><td>Pre-allocated maximum feature dimension</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>W</td><td>ndarray (d_max, L)</td><td>Ring buffer of weight vectors</td></tr>
+              <tr><td>X_cur</td><td>ndarray</td><td>Feature window used for CUR regularization</td></tr>
+              <tr><td>current_dim</td><td>int</td><td>Current feature dimensionality</td></tr>
+              <tr><td>lambda_param</td><td>float</td><td>L₁,₂ sparsity threshold</td></tr>
+              <tr><td>mu</td><td>float</td><td>PA penalty parameter</td></tr>
+              <tr><td>eta</td><td>float</td><td>CUR regularization coefficient</td></tr>
+              <tr><td>L</td><td>int</td><td>Sliding window size</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>train</td><td>(instance: Instance) → None</td><td>None</td><td>Selects incremental or decremental PA-R update based on feature-space change; applies L₁,₂ sparsity shrinkage; updates CUR feature window <code>X_cur</code></td></tr>
+              <tr><td>predict</td><td>(instance: Instance) → float</td><td>float</td><td>Linear prediction using the latest weight column in the ring buffer</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Comparison with OASFClassifier</div>
+          <table class="diff-table">
+            <thead><tr><th>Item</th><th>OASFClassifier</th><th>OASFRegressor</th></tr></thead>
+            <tbody>
+              <tr><td>Loss function</td><td>Hinge loss (PA)</td><td>ε-insensitive loss (PA-R)</td></tr>
+              <tr><td>Default mu</td><td>1.0</td><td>10.0</td></tr>
+              <tr><td>Extra regularization</td><td>None</td><td>CUR matrix decomposition (eta)</td></tr>
+              <tr><td>Output</td><td>Class label (int)</td><td>Continuous value (float)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           Algorithm Coverage
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="scope" class="api-section-title">Algorithm Coverage</h2>
+
+      <p style="font-size:14px; color:var(--text-secondary);">Of the 10 original OpenMOA algorithms, only 2 implement regression. The remaining 8 are classification-only.</p>
+
+      <div class="scope-grid">
+        <div class="scope-card supported">
+          <code>FESLRegressor</code>
+          <span>Regression ✓</span>
+        </div>
+        <div class="scope-card supported">
+          <code>OASFRegressor</code>
+          <span>Regression ✓</span>
+        </div>
+        <div class="scope-card unsupported">
+          <code>RSOLClassifier</code>
+          <span>Classification only</span>
+        </div>
+        <div class="scope-card unsupported">
+          <code>FOBOSClassifier</code>
+          <span>Classification only</span>
+        </div>
+        <div class="scope-card unsupported">
+          <code>FTRLClassifier</code>
+          <span>Classification only</span>
+        </div>
+        <div class="scope-card unsupported">
+          <code>OVFMClassifier</code>
+          <span>Classification only</span>
+        </div>
+        <div class="scope-card unsupported">
+          <code>OSLMFClassifier</code>
+          <span>Classification only</span>
+        </div>
+        <div class="scope-card unsupported">
+          <code>ORF3VClassifier</code>
+          <span>Classification only</span>
+        </div>
+        <div class="scope-card unsupported">
+          <code>OLD3SClassifier</code>
+          <span>Classification only</span>
+        </div>
+        <div class="scope-card unsupported">
+          <code>OWSSClassifier</code>
+          <span>Classification only</span>
+        </div>
+      </div>
+
+      <div class="api-note api-note-info">
+        <strong>CapyMOA regressors:</strong> OpenMOA also exposes CapyMOA regression algorithms (FIMTDD, ORTO, SOKNL, etc.) via the same <code>Regressor</code> interface. See the <a href="https://capymoa.org/api/regressor.html" target="_blank" style="color:#059669;">CapyMOA API Reference</a> for their documentation.
+      </div>
+
+      <!-- Navigation -->
+      <div class="docs-nav" style="margin-top:48px;">
+        <a href="classifiers.html" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Previous: openmoa.classifiers
+        </a>
+        <a href="drift.html" class="btn btn-secondary">
+          Next: openmoa.drift_detection
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="footer-logo-icon">M</div>
+        <span class="footer-text">© 2025 OpenMOA. Open source under MIT License.</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="footer-link">GitHub</a>
+        <a href="https://openmoa.net" class="footer-link">openmoa.net</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/script.js"></script>
+</body>
+</html>
