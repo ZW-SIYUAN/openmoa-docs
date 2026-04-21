@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>openmoa.classifiers — API Reference</title>
+  <meta name="description" content="Complete API reference for the 10 original classifiers in OpenMOA — dynamic feature spaces, sparse data, semi-supervised learning, and deep lifelong learning.">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%230EA5E9'/><stop offset='100%25' stop-color='%238B5CF6'/></linearGradient></defs><text x='50' y='68' font-family='system-ui' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/style.css">
+
+  <style>
+    /* ================================================================
+       API Reference — Shared Theme (Emerald)
+       ================================================================ */
+    .docs-content code { color: #059669; }
+    [data-theme="dark"] .docs-content code { color: #34D399; }
+    .docs-content h2[id], .docs-content h3[id] { scroll-margin-top: 80px; }
+
+    /* ── TOC ── */
+    .api-toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 6px 12px;
+      margin: 20px 0 32px;
+      padding: 20px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      border-left: 4px solid #10B981;
+    }
+    .api-toc-group { grid-column: 1 / -1; margin-top: 10px; }
+    .api-toc-group:first-child { margin-top: 0; }
+    .api-toc-group-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.6px; color: var(--text-secondary); margin-bottom: 4px;
+    }
+    .api-toc-link {
+      display: block; padding: 4px 8px; font-size: 13px;
+      font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);
+      text-decoration: none; border-radius: 4px; transition: all 0.15s;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .api-toc-link:hover { background: var(--bg-tertiary); color: #10B981; }
+
+    .api-sep { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+    .api-section-title {
+      font-size: 20px; font-weight: 700; color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      padding-bottom: 10px; border-bottom: 2px solid var(--border);
+      margin-bottom: 24px; margin-top: 40px;
+    }
+    .api-section-title:first-of-type { margin-top: 0; }
+
+    /* ── Class entity block ── */
+    .api-entity {
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; margin: 28px 0 0;
+    }
+    .api-entity-header {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+      padding: 14px 20px; background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border);
+    }
+    .api-entity-name { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 600; color: var(--text); }
+    .api-entity-body { padding: 20px; }
+
+    /* ── Badges ── */
+    .api-badge {
+      display: inline-block; padding: 2px 9px; border-radius: 4px;
+      font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.3px; flex-shrink: 0;
+    }
+    .api-badge-class    { background: #D1FAE5; color: #065F46; }
+    .api-badge-torch    { background: #FEE2E2; color: #991B1B; }
+    .api-badge-sparse   { background: #DBEAFE; color: #1E40AF; }
+    .api-badge-dense    { background: #F3E8FF; color: #6B21A8; }
+    .api-badge-binary   { background: #FEF3C7; color: #92400E; }
+    .api-badge-multi    { background: #D1FAE5; color: #065F46; }
+    [data-theme="dark"] .api-badge-class  { background: #064E3B; color: #6EE7B7; }
+    [data-theme="dark"] .api-badge-torch  { background: #7F1D1D; color: #FCA5A5; }
+    [data-theme="dark"] .api-badge-sparse { background: #1E3A5F; color: #93C5FD; }
+    [data-theme="dark"] .api-badge-dense  { background: #3B0764; color: #D8B4FE; }
+    [data-theme="dark"] .api-badge-binary { background: #78350F; color: #FDE68A; }
+    [data-theme="dark"] .api-badge-multi  { background: #064E3B; color: #6EE7B7; }
+
+    .api-meta { font-size: 13px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
+    .api-meta-sep { margin: 0 6px; opacity: 0.4; }
+
+    /* ── Signature ── */
+    .api-sig {
+      background: var(--code-bg); border-radius: 8px;
+      padding: 16px 20px; margin: 0 0 16px; overflow-x: auto;
+    }
+    .api-sig pre { margin: 0; background: none; padding: 0; border-radius: 0; font-size: 13px; line-height: 1.8; color: var(--code-text); }
+    .api-sig-label { font-size: 11px; color: #475569; font-family: 'JetBrains Mono', monospace; margin-bottom: 6px; }
+
+    .api-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+
+    /* ── Tables ── */
+    .api-param-table, .api-method-table {
+      width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px;
+    }
+    .api-param-table th, .api-method-table th {
+      background: var(--bg-tertiary); font-weight: 600; color: var(--text);
+      padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .api-param-table td, .api-method-table td {
+      padding: 9px 14px; border-bottom: 1px solid var(--border);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .api-param-table td:first-child, .api-method-table td:first-child {
+      font-family: 'JetBrains Mono', monospace; color: #059669; white-space: nowrap;
+    }
+    [data-theme="dark"] .api-param-table td:first-child,
+    [data-theme="dark"] .api-method-table td:first-child { color: #34D399; }
+    .api-param-table td:nth-child(2), .api-method-table td:nth-child(2) {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary);
+    }
+
+    .api-sub-heading {
+      font-size: 14px; font-weight: 600; color: var(--text);
+      margin: 18px 0 6px; font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* ── Notes ── */
+    .api-note { padding: 12px 16px; border-radius: 8px; font-size: 13px; line-height: 1.7; margin: 12px 0; }
+    .api-note-info { background: #D1FAE5; border-left: 3px solid #10B981; color: #065F46; }
+    .api-note-warn { background: #FEF3C7; border-left: 3px solid #F59E0B; color: #92400E; }
+    .api-note-red  { background: #FEE2E2; border-left: 3px solid #EF4444; color: #991B1B; }
+    [data-theme="dark"] .api-note-info { background: #064E3B33; border-left-color: #34D399; color: #6EE7B7; }
+    [data-theme="dark"] .api-note-warn { background: #78350F33; border-left-color: #FBBF24; color: #FDE68A; }
+    [data-theme="dark"] .api-note-red  { background: #7F1D1D33; border-left-color: #F87171; color: #FCA5A5; }
+    .api-note strong { color: inherit; font-weight: 700; }
+
+    /* ── Code example block ── */
+    .api-import-block { background: var(--code-bg); border-radius: 12px; overflow: hidden; margin: 16px 0 24px; }
+    .api-import-header {
+      display: flex; align-items: center; gap: 8px; padding: 10px 16px;
+      background: rgba(16,185,129,0.1); border-bottom: 1px solid rgba(16,185,129,0.2);
+    }
+    .api-import-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .d1 { background: #FF5F56; } .d2 { background: #FFBD2E; } .d3 { background: #27CA40; }
+    .api-import-label { font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #34D399; margin-left: 6px; }
+    .api-import-block pre { margin: 0; background: none; padding: 16px 20px; border-radius: 0; font-size: 13px; line-height: 1.8; }
+
+    /* ── Quick overview table ── */
+    .overview-table {
+      width: 100%; border-collapse: collapse; margin: 16px 0 28px; font-size: 13px;
+      background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    }
+    .overview-table th {
+      background: var(--bg-tertiary); font-weight: 600; color: var(--text);
+      padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .overview-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+    .overview-table tr:last-child td { border-bottom: none; }
+    .overview-table td:first-child { font-family: 'JetBrains Mono', monospace; color: #059669; white-space: nowrap; }
+    [data-theme="dark"] .overview-table td:first-child { color: #34D399; }
+    .overview-table a { color: #059669; text-decoration: none; }
+    [data-theme="dark"] .overview-table a { color: #34D399; }
+    .overview-table a:hover { text-decoration: underline; }
+
+    /* ── Architecture mini-block ── */
+    .arch-table {
+      width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 13px;
+    }
+    .arch-table th {
+      background: var(--bg-tertiary); font-weight: 600; color: var(--text);
+      padding: 8px 14px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .arch-table td { padding: 8px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    .arch-table td:first-child { font-family: 'JetBrains Mono', monospace; color: #059669; white-space: nowrap; }
+    [data-theme="dark"] .arch-table td:first-child { color: #34D399; }
+
+    /* ── Phase state machine table ── */
+    .state-table {
+      width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 13px;
+    }
+    .state-table th {
+      background: var(--bg-tertiary); font-weight: 600; color: var(--text);
+      padding: 8px 14px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .state-table td { padding: 8px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    .state-table td:first-child { font-family: 'JetBrains Mono', monospace; color: #059669; white-space: nowrap; }
+    [data-theme="dark"] .state-table td:first-child { color: #34D399; }
+
+    /* ── Reference tag ── */
+    .ref-tag {
+      display: inline-block; padding: 2px 10px; border-radius: 4px;
+      font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif;
+      background: var(--bg-tertiary); border: 1px solid var(--border);
+      color: var(--text-secondary); margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="../index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">M</div>
+      <span class="navbar-logo-text">OpenMOA</span>
+    </a>
+    <div class="navbar-links">
+      <a href="../index.html" class="navbar-link">Home</a>
+      <a href="../docs/index.html" class="navbar-link active">Documentation</a>
+      <a href="../blog/index.html" class="navbar-link">Blog</a>
+      <a href="../contact.html" class="navbar-link">Contact</a>
+    </div>
+    <div class="navbar-actions">
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="btn-icon" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+  </nav>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Getting Started</div>
+        <a href="../docs/quickstart.html" class="docs-sidebar-link">Quick Start Guide</a>
+        <a href="../docs/installation.html" class="docs-sidebar-link">Installation</a>
+        <a href="../docs/concepts.html" class="docs-sidebar-link">Core Concepts</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Tutorials</div>
+        <a href="../docs/tutorials/streams.html" class="docs-sidebar-link">Working with Data Streams</a>
+        <a href="../docs/tutorials/classifiers.html" class="docs-sidebar-link">Classification Algorithms</a>
+        <a href="../docs/tutorials/drift.html" class="docs-sidebar-link">Concept Drift Detection</a>
+        <a href="../docs/tutorials/evaluation.html" class="docs-sidebar-link">Evaluation Methods</a>
+        <a href="../docs/tutorials/advanced.html" class="docs-sidebar-link">Advanced Topics</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">API Reference</div>
+        <a href="streams.html" class="docs-sidebar-link">openmoa.streams</a>
+        <a href="classifiers.html" class="docs-sidebar-link active">openmoa.classifiers</a>
+        <a href="regressors.html" class="docs-sidebar-link">openmoa.regressors</a>
+        <a href="drift.html" class="docs-sidebar-link">openmoa.drift_detection</a>
+        <a href="evaluation.html" class="docs-sidebar-link">openmoa.evaluation</a>
+        <a href="utils.html" class="docs-sidebar-link">openmoa.utils</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Source Deep Dive</div>
+        <a href="../docs/source-files/stream_wrapper.html" class="docs-sidebar-link">stream_wrapper.py</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content fade-in">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
+        <span class="tag" style="background:#D1FAE5;color:#065F46;">API Reference</span>
+        <span class="tag tag-guide">10 Original Algorithms</span>
+      </div>
+
+      <h1 style="font-family:'JetBrains Mono',monospace; font-size:1.9rem;">openmoa.classifiers</h1>
+      <p>Complete API reference for the 10 original classifiers introduced in OpenMOA. These algorithms address challenging real-world stream learning scenarios including dynamic feature spaces, sparse data, mixed data types, semi-supervised learning, and deep lifelong learning.</p>
+
+      <!-- ── TOC ── -->
+      <div class="api-toc">
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">Quick Reference</div>
+          <a href="#overview" class="api-toc-link">overview table</a>
+        </div>
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">Sparse Classifiers</div>
+          <a href="#fesl" class="api-toc-link">FESLClassifier</a>
+          <a href="#oasf" class="api-toc-link">OASFClassifier</a>
+          <a href="#rsol" class="api-toc-link">RSOLClassifier</a>
+          <a href="#fobos" class="api-toc-link">FOBOSClassifier</a>
+          <a href="#ftrl" class="api-toc-link">FTRLClassifier</a>
+        </div>
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">Dense / Mixed Classifiers</div>
+          <a href="#ovfm" class="api-toc-link">OVFMClassifier</a>
+          <a href="#oslmf" class="api-toc-link">OSLMFClassifier</a>
+          <a href="#orf3v" class="api-toc-link">ORF3VClassifier</a>
+        </div>
+        <div class="api-toc-group">
+          <div class="api-toc-group-label">Deep Learning (PyTorch)</div>
+          <a href="#old3s" class="api-toc-link">OLD3SClassifier</a>
+          <a href="#owss" class="api-toc-link">OWSSClassifier</a>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §0  Quick Overview
+      ══════════════════════════════════════════ -->
+      <h2 id="overview" class="api-section-title">§0 &nbsp; Quick Overview</h2>
+
+      <table class="overview-table">
+        <thead>
+          <tr>
+            <th>Classifier</th>
+            <th>Algorithm</th>
+            <th>Task</th>
+            <th>Input</th>
+            <th>PyTorch</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="#fesl">FESLClassifier</a></td>
+            <td>Feature Evolvable SL <span class="ref-tag">NeurIPS 2017</span></td>
+            <td>Binary</td>
+            <td>Sparse</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><a href="#oasf">OASFClassifier</a></td>
+            <td>Online Active Sparse Features <span class="ref-tag">2024</span></td>
+            <td>Binary</td>
+            <td>Sparse</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><a href="#rsol">RSOLClassifier</a></td>
+            <td>Robust Sparse Online Learning <span class="ref-tag">SDM 2024</span></td>
+            <td>Binary</td>
+            <td>Sparse</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><a href="#fobos">FOBOSClassifier</a></td>
+            <td>Forward-Backward Splitting <span class="ref-tag">JMLR 2009</span></td>
+            <td>Binary / Multi</td>
+            <td>Sparse</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><a href="#ftrl">FTRLClassifier</a></td>
+            <td>Follow the Regularized Leader <span class="ref-tag">AISTATS 2011</span></td>
+            <td>Binary / Multi</td>
+            <td>Sparse</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><a href="#ovfm">OVFMClassifier</a></td>
+            <td>Variable Feature Spaces, Mixed Data <span class="ref-tag">ICDM 2021</span></td>
+            <td>Binary</td>
+            <td>Dense</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><a href="#oslmf">OSLMFClassifier</a></td>
+            <td>Semi-supervised Mixed Features <span class="ref-tag">AAAI 2023</span></td>
+            <td>Binary</td>
+            <td>Dense</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><a href="#orf3v">ORF3VClassifier</a></td>
+            <td>Online Random Feature Forests <span class="ref-tag">AAAI 2023</span></td>
+            <td>Multi-class</td>
+            <td>Dense / Sparse</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><a href="#old3s">OLD3SClassifier</a></td>
+            <td>Deep Lifelong Learning <span class="ref-tag">TKDE 2024</span></td>
+            <td>Binary / Multi</td>
+            <td>Dense</td>
+            <td><strong style="color:#EF4444;">Yes</strong></td>
+          </tr>
+          <tr>
+            <td><a href="#owss">OWSSClassifier</a></td>
+            <td>Open-World Soft Sensing <span class="ref-tag">ICDM 2024</span></td>
+            <td>Multi-class</td>
+            <td>Dense</td>
+            <td><strong style="color:#EF4444;">Yes</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="api-note api-note-info">
+        <strong>CapyMOA classifiers:</strong> OpenMOA also exposes all CapyMOA classifiers (HoeffdingTree, NaiveBayes, KNN, SAMkNN, ARF, etc.) via the same interface. See the <a href="https://capymoa.org/api/classifier.html" target="_blank" style="color:#059669;">CapyMOA API Reference</a> for their full documentation.
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §1  FESLClassifier
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="fesl" class="api-section-title">§1 &nbsp; FESLClassifier</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">FESLClassifier</span>
+          <span class="api-badge api-badge-binary">binary</span>
+          <span class="api-badge api-badge-sparse">sparse</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/classifier/_fesl_classifier.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc"><strong style="color:var(--text);">Full name:</strong> Feature Evolvable Streaming Learning &nbsp;·&nbsp; Hou et al., NeurIPS 2017</p>
+          <p class="api-desc">FESL detects feature-space shifts by measuring the Jaccard distance between consecutive active feature index sets (threshold &lt; 0.8). It maintains two sparse linear models (<code>w_curr</code>, <code>w_old</code>). During a transition, it accumulates instances in an overlap buffer and learns a linear mapping matrix M (via Ridge Regression) projecting new features onto old ones. Final prediction is a weighted ensemble: <code>y = μ_curr · f_curr(x) + μ_old · f_old(M·x)</code>.</p>
+
+          <div class="api-sub-heading">Constructor</div>
+          <div class="api-sig">
+            <div class="api-sig-label">signature</div>
+            <pre>FESLClassifier(
+    schema: Schema,
+    alpha: float = 0.1,
+    lambda_: float = 0.1,
+    window_size: int = 100,
+    random_seed: int = 1,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>required</td><td>Stream schema</td></tr>
+              <tr><td>alpha</td><td>float</td><td>0.1</td><td>Learning rate for logistic gradient updates</td></tr>
+              <tr><td>lambda_</td><td>float</td><td>0.1</td><td>L2 regularization strength for mapping matrix Ridge Regression</td></tr>
+              <tr><td>window_size</td><td>int</td><td>100</td><td>Overlap buffer size — instances to accumulate before learning the mapping matrix</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>w_curr</td><td>dict</td><td>Sparse current model weights <code>{feature_id: weight}</code></td></tr>
+              <tr><td>w_old</td><td>dict</td><td>Sparse previous model weights</td></tr>
+              <tr><td>M_struct</td><td>dict | None</td><td>Mapping matrix: <code>{'matrix': ndarray(D_new, D_old), 'new_map': {...}, 'old_ids': [...]}</code></td></tr>
+              <tr><td>current_indices_set</td><td>set</td><td>Active feature indices in current stage</td></tr>
+              <tr><td>overlap_buffer</td><td>list</td><td>Buffered sparse feature dicts during transition</td></tr>
+              <tr><td>mu_curr</td><td>float</td><td>Ensemble weight for current model (initialized 0.5)</td></tr>
+              <tr><td>mu_old</td><td>float</td><td>Ensemble weight for old model (initialized 0.5)</td></tr>
+              <tr><td>t</td><td>int</td><td>Instance counter</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>train</td><td>(instance: Instance) → None</td><td>None</td><td>Detects feature shift via Jaccard similarity; buffers instances during overlap; learns M when buffer is full; updates w_curr via logistic gradient; updates ensemble weights via log-loss</td></tr>
+              <tr><td>predict</td><td>(instance: Instance) → int</td><td>int</td><td>Returns 0 or 1; threshold at predict_proba()[1] &gt; 0.5</td></tr>
+              <tr><td>predict_proba</td><td>(instance: Instance) → ndarray</td><td>ndarray (2,)</td><td>Returns [P(y=0), P(y=1)] via logistic sigmoid of ensemble logit</td></tr>
+            </tbody>
+          </table>
+          <div class="api-note api-note-warn"><strong>Constraints:</strong> Binary classification only. Sparse input required. Computing M requires a dense (D_new × D_old) matrix — may cause MemoryError on very high-dimensional streams.</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §2  OASFClassifier
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="oasf" class="api-section-title">§2 &nbsp; OASFClassifier</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">OASFClassifier</span>
+          <span class="api-badge api-badge-binary">binary</span>
+          <span class="api-badge api-badge-sparse">sparse</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/classifier/_oasf_classifier.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc"><strong style="color:var(--text);">Full name:</strong> Online Active Sparse Feature Learning &nbsp;·&nbsp; Chen et al., 2024</p>
+          <p class="api-desc">OASF uses Passive-Aggressive (PA) updates for incremental and decremental feature spaces (Theorems 1 &amp; 2). It maintains a ring-buffer weight matrix W of size (n_features, L), applying L₁,₂-norm group sparsity shrinkage on each update. The ring buffer avoids expensive full-matrix copies. W auto-expands to handle arbitrarily high-dimensional streams.</p>
+
+          <div class="api-sub-heading">Constructor</div>
+          <div class="api-sig">
+            <pre>OASFClassifier(
+    schema: Schema,
+    lambda_param: float = 0.01,
+    mu: float = 1.0,
+    L: int = 100,
+    random_seed: int = 1,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>required</td><td>Stream schema</td></tr>
+              <tr><td>lambda_param</td><td>float</td><td>0.01</td><td>L₁,₂ shrinkage threshold — controls sparsity level</td></tr>
+              <tr><td>mu</td><td>float</td><td>1.0</td><td>PA margin parameter — aggressiveness of weight updates</td></tr>
+              <tr><td>L</td><td>int</td><td>100</td><td>Sliding window length — number of weight vector columns</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>W</td><td>ndarray (n_features, L)</td><td>Ring buffer of weight vectors</td></tr>
+              <tr><td>_ptr</td><td>int</td><td>Ring-buffer write pointer (0 to L-1)</td></tr>
+              <tr><td>current_dim</td><td>int</td><td>Current feature dimensionality</td></tr>
+              <tr><td>t</td><td>int</td><td>Instance counter</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>train</td><td>(instance: Instance) → None</td><td>None</td><td>PA update <code>w_new = w_s + γ·y·x_t</code>; applies L₁,₂ sparsity shrinkage; advances ring pointer; auto-expands W if needed</td></tr>
+              <tr><td>predict</td><td>(instance: Instance) → int</td><td>int</td><td>Returns 0 or 1</td></tr>
+              <tr><td>predict_proba</td><td>(instance: Instance) → ndarray</td><td>ndarray (2,)</td><td>Returns [P(y=0), P(y=1)] using latest weight column + logistic sigmoid</td></tr>
+              <tr><td>get_sparsity</td><td>() → float</td><td>float</td><td>Fraction of near-zero values in latest weight column; range [0, 1]</td></tr>
+            </tbody>
+          </table>
+          <div class="api-note api-note-warn"><strong>Constraints:</strong> Binary classification only. Sparse input required.</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §3  RSOLClassifier
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="rsol" class="api-section-title">§3 &nbsp; RSOLClassifier</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">RSOLClassifier</span>
+          <span class="api-badge api-badge-binary">binary</span>
+          <span class="api-badge api-badge-sparse">sparse</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/classifier/_rsol_classifier.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc"><strong style="color:var(--text);">Full name:</strong> Robust Sparse Online Learning &nbsp;·&nbsp; Chen et al., SDM 2024</p>
+          <p class="api-desc">RSOL shares the same ring-buffer and L₁,₂ sparsity architecture as OASF but uses a significantly larger default <code>lambda_param</code> (50.0 vs. 0.01) for stronger sparsity, and a larger default window <code>L=1000</code>. Designed for robustness to feature-space changes with emphasis on aggressive feature pruning.</p>
+
+          <div class="api-sub-heading">Constructor</div>
+          <div class="api-sig">
+            <pre>RSOLClassifier(
+    schema: Schema,
+    lambda_param: float = 50.0,
+    mu: float = 1.0,
+    L: int = 1000,
+    random_seed: int = 1,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>required</td><td>Stream schema</td></tr>
+              <tr><td>lambda_param</td><td>float</td><td>50.0</td><td>L₁,₂ shrinkage threshold (much higher than OASF — stronger sparsity)</td></tr>
+              <tr><td>mu</td><td>float</td><td>1.0</td><td>PA margin parameter</td></tr>
+              <tr><td>L</td><td>int</td><td>1000</td><td>Sliding window length</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>W</td><td>ndarray (n_features, L)</td><td>Ring buffer of weight vectors</td></tr>
+              <tr><td>_ptr</td><td>int</td><td>Ring-buffer write pointer</td></tr>
+              <tr><td>current_dim</td><td>int</td><td>Current feature dimensionality</td></tr>
+              <tr><td>t</td><td>int</td><td>Instance counter</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>train</td><td>(instance: Instance) → None</td><td>None</td><td>PA update; L₁,₂ sparsity shrinkage; auto-expands W</td></tr>
+              <tr><td>predict</td><td>(instance: Instance) → int</td><td>int</td><td>Returns 0 or 1</td></tr>
+              <tr><td>predict_proba</td><td>(instance: Instance) → ndarray</td><td>ndarray (2,)</td><td>Returns [P(y=0), P(y=1)]</td></tr>
+              <tr><td>get_sparsity</td><td>() → float</td><td>float</td><td>Fraction of near-zero weights in latest column</td></tr>
+            </tbody>
+          </table>
+          <div class="api-note api-note-warn"><strong>Constraints:</strong> Binary classification only. Sparse input required.</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §4  FOBOSClassifier
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="fobos" class="api-section-title">§4 &nbsp; FOBOSClassifier</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">FOBOSClassifier</span>
+          <span class="api-badge api-badge-multi">binary / multi</span>
+          <span class="api-badge api-badge-sparse">sparse</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/classifier/_fobos_classifier.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc"><strong style="color:var(--text);">Full name:</strong> Forward-Backward Splitting &nbsp;·&nbsp; Duchi &amp; Singer, JMLR 2009</p>
+          <p class="api-desc">FOBOS combines a forward gradient step with a proximal operator for online regularization. Supports L1 (sparse), L2 (ridge), L1+L2 (elastic net), or no regularization. Supports binary (logistic loss) and multi-class (softmax loss). Weight matrix auto-expands for dynamic feature streams. Learning rate decays as <code>α/√t</code> (sqrt schedule) or <code>α/t</code> (linear schedule).</p>
+
+          <div class="api-sub-heading">Constructor</div>
+          <div class="api-sig">
+            <pre>FOBOSClassifier(
+    schema: Schema,
+    alpha: float = 1.0,
+    lambda_: float = 0.001,
+    regularization: str = "l1",
+    step_schedule: str = "sqrt",
+    random_seed: int = 1,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>required</td><td>Stream schema</td></tr>
+              <tr><td>alpha</td><td>float</td><td>1.0</td><td>Base learning rate</td></tr>
+              <tr><td>lambda_</td><td>float</td><td>0.001</td><td>Regularization strength</td></tr>
+              <tr><td>regularization</td><td>str</td><td>"l1"</td><td>Regularization type: <code>"l1"</code> (L1 soft-threshold), <code>"l2"</code> (scaled), <code>"l1_l2"</code> (group), <code>"none"</code></td></tr>
+              <tr><td>step_schedule</td><td>str</td><td>"sqrt"</td><td>Learning rate decay: <code>"sqrt"</code> → η = α/√t;&nbsp;&nbsp;<code>"linear"</code> → η = α/t</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>W</td><td>ndarray (n_features, n_outputs)</td><td>Weight matrix; n_outputs=1 for binary, n_classes for multi-class</td></tr>
+              <tr><td>n_classes</td><td>int</td><td>Number of classes</td></tr>
+              <tr><td>task_type</td><td>str</td><td>"binary" or "multiclass"</td></tr>
+              <tr><td>n_features</td><td>int</td><td>Current feature count</td></tr>
+              <tr><td>t</td><td>int</td><td>Instance counter</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>train</td><td>(instance: Instance) → None</td><td>None</td><td>Gradient step (logistic/softmax); applies proximal operator; auto-expands W</td></tr>
+              <tr><td>predict</td><td>(instance: Instance) → int</td><td>int</td><td>Returns 0/1 (binary) or argmax (multi-class)</td></tr>
+              <tr><td>predict_proba</td><td>(instance: Instance) → ndarray</td><td>ndarray</td><td>Binary: (2,); Multi-class: (n_classes,) softmax probabilities</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §5  FTRLClassifier
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="ftrl" class="api-section-title">§5 &nbsp; FTRLClassifier</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">FTRLClassifier</span>
+          <span class="api-badge api-badge-multi">binary / multi</span>
+          <span class="api-badge api-badge-sparse">sparse</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/classifier/_ftrl_classifier.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc"><strong style="color:var(--text);">Full name:</strong> Follow the Regularized Leader — Proximal &nbsp;·&nbsp; McMahan, AISTATS 2011</p>
+          <p class="api-desc">FTRL-Proximal maintains per-coordinate adaptive learning rates via three arrays: <code>z</code> (gradient accumulator), <code>n</code> (squared-gradient sum), and <code>w</code> (weights). The per-coordinate learning rate is <code>(β + √n[i]) / α + L2</code>, enabling features updated rarely to receive larger steps. L1 sparsification: features where <code>|z[i]| ≤ L1</code> are zeroed. Arrays auto-expand for dynamic feature streams.</p>
+
+          <div class="api-sub-heading">Constructor</div>
+          <div class="api-sig">
+            <pre>FTRLClassifier(
+    schema: Schema,
+    alpha: float = 0.1,
+    beta: float = 1.0,
+    l1: float = 1.0,
+    l2: float = 1.0,
+    random_seed: int = 1,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>required</td><td>Stream schema</td></tr>
+              <tr><td>alpha</td><td>float</td><td>0.1</td><td>FTRL learning rate coefficient</td></tr>
+              <tr><td>beta</td><td>float</td><td>1.0</td><td>Per-coordinate adaptation term (smoothing)</td></tr>
+              <tr><td>l1</td><td>float</td><td>1.0</td><td>L1 threshold — features with |z| ≤ l1 are set to zero</td></tr>
+              <tr><td>l2</td><td>float</td><td>1.0</td><td>L2 regularization coefficient</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>z</td><td>ndarray (n_features, n_outputs)</td><td>Gradient accumulator (float64)</td></tr>
+              <tr><td>n</td><td>ndarray (n_features, n_outputs)</td><td>Squared-gradient sum (float64)</td></tr>
+              <tr><td>w</td><td>ndarray (n_features, n_outputs)</td><td>Current weight matrix (float64)</td></tr>
+              <tr><td>n_classes</td><td>int</td><td>Number of classes</td></tr>
+              <tr><td>task_type</td><td>str</td><td>"binary" or "multiclass"</td></tr>
+              <tr><td>n_features</td><td>int</td><td>Current feature count</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>train</td><td>(instance: Instance) → None</td><td>None</td><td>FTRL core update: <code>n_new = n + grad²; σ = (√n_new − √n)/α; z_new = z + grad − σ·w</code>; proximal step: <code>w[i] = −(z[i]−sign(z[i])·l1)/((β+√n[i])/α+l2)</code> if <code>|z[i]| &gt; l1</code> else 0</td></tr>
+              <tr><td>predict</td><td>(instance: Instance) → int</td><td>int</td><td>Binary: 1 if linear_pred &gt; 0 else 0; Multi-class: argmax</td></tr>
+              <tr><td>predict_proba</td><td>(instance: Instance) → ndarray</td><td>ndarray</td><td>Binary: (2,); Multi-class: softmax (n_classes,)</td></tr>
+              <tr><td>get_sparsity</td><td>() → float</td><td>float</td><td>Fraction of near-zero weights (|w| &lt; 1e-10)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §6  OVFMClassifier
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="ovfm" class="api-section-title">§6 &nbsp; OVFMClassifier</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">OVFMClassifier</span>
+          <span class="api-badge api-badge-binary">binary</span>
+          <span class="api-badge api-badge-dense">dense</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/classifier/_ovfm_classifier.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc"><strong style="color:var(--text);">Full name:</strong> Online Learning in Variable Feature Spaces with Mixed Data &nbsp;·&nbsp; He et al., ICDM 2021</p>
+          <p class="api-desc">OVFM handles streams with mixed feature types (continuous + ordinal) and missing values caused by evolving feature spaces. It uses a Gaussian Copula EM algorithm to transform mixed data into a shared latent space, then trains dual classifiers: <code>w_obs</code> (observed space) and <code>w_lat</code> (latent space). Batch-based EM updates run every <code>batch_size</code> instances. The ensemble weight between the two classifiers is updated exponentially based on cumulative loss.</p>
+
+          <div class="api-sub-heading">Constructor</div>
+          <div class="api-sig">
+            <pre>OVFMClassifier(
+    schema: Schema,
+    window_size: int = 200,
+    batch_size: int = 50,
+    evolution_pattern: str = "vfs",
+    decay_coef: float = 0.5,
+    num_ord_updates: int = 2,
+    max_ord_levels: int = 14,
+    ensemble_weight: float = 0.5,
+    learning_rate: float = 0.01,
+    l1_lambda: float = 0.0,
+    l2_lambda: float = 0.01,
+    sparsity_threshold: float = 0.01,
+    random_seed: int = 1,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>required</td><td>Stream schema</td></tr>
+              <tr><td>window_size</td><td>int</td><td>200</td><td>Gaussian Copula ECDF sliding window size</td></tr>
+              <tr><td>batch_size</td><td>int</td><td>50</td><td>Instances to accumulate before each EM + SGD update</td></tr>
+              <tr><td>evolution_pattern</td><td>str</td><td>"vfs"</td><td>Feature evolution type: <code>"vfs"</code>, <code>"tds"</code>, <code>"cds"</code>, <code>"eds"</code></td></tr>
+              <tr><td>decay_coef</td><td>float</td><td>0.5</td><td>Exponential decay factor for online covariance update</td></tr>
+              <tr><td>num_ord_updates</td><td>int</td><td>2</td><td>Ordinal imputation iterations per E-step</td></tr>
+              <tr><td>max_ord_levels</td><td>int</td><td>14</td><td>Features with ≤ max_ord_levels unique values are treated as ordinal</td></tr>
+              <tr><td>ensemble_weight</td><td>float</td><td>0.5</td><td>Initial ensemble weight for observed-space classifier</td></tr>
+              <tr><td>learning_rate</td><td>float</td><td>0.01</td><td>SGD learning rate for both classifiers</td></tr>
+              <tr><td>l1_lambda</td><td>float</td><td>0.0</td><td>L1 regularization strength</td></tr>
+              <tr><td>l2_lambda</td><td>float</td><td>0.01</td><td>L2 regularization strength</td></tr>
+              <tr><td>sparsity_threshold</td><td>float</td><td>0.01</td><td>Weights below this are zeroed (sparsification)</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>_w_obs</td><td>ndarray (d+1,)</td><td>Observed-space weights with bias</td></tr>
+              <tr><td>_w_lat</td><td>ndarray (d+1,)</td><td>Latent-space weights with bias</td></tr>
+              <tr><td>_sigma</td><td>ndarray (d, d)</td><td>Correlation matrix from Gaussian Copula</td></tr>
+              <tr><td>_cont_indices</td><td>ndarray bool</td><td>Mask for continuous features</td></tr>
+              <tr><td>_ord_indices</td><td>ndarray bool</td><td>Mask for ordinal features</td></tr>
+              <tr><td>_transform_function</td><td>OnlineTransformFunction</td><td>Marginal ECDF/quantile helper</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>train</td><td>(instance: Instance) → None</td><td>None</td><td>Accumulates instances; every batch_size: E-step (impute latent Z) → M-step (update Σ) → SGD on both classifiers; updates feature type masks; updates ensemble weight; sparsifies weights</td></tr>
+              <tr><td>predict</td><td>(instance: Instance) → int</td><td>int</td><td>Returns 1 if predict_proba()[1] &gt; 0.5</td></tr>
+              <tr><td>predict_proba</td><td>(instance: Instance) → ndarray</td><td>ndarray (2,)</td><td>Transforms x to latent z via copula; ensemble prediction: <code>w_ens·score_obs + (1−w_ens)·score_lat</code>; applies logistic sigmoid</td></tr>
+            </tbody>
+          </table>
+          <div class="api-note api-note-warn"><strong>Constraints:</strong> Binary classification only. Dense input. Covariance matrix is O(d²) — unsuitable for very high-dimensional streams.</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §7  OSLMFClassifier
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="oslmf" class="api-section-title">§7 &nbsp; OSLMFClassifier</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">OSLMFClassifier</span>
+          <span class="api-badge api-badge-binary">binary</span>
+          <span class="api-badge api-badge-dense">dense</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/classifier/_oslmf_classifier.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc"><strong style="color:var(--text);">Full name:</strong> Online Semi-supervised Learning with Mix-Typed Streaming Features &nbsp;·&nbsp; Wu et al., AAAI 2023</p>
+          <p class="api-desc">OSLMF extends OVFM with semi-supervised label propagation. It uses a Gaussian Copula for mixed-data imputation and a Density Peak Clustering algorithm to propagate labels from labeled to unlabeled instances within the buffer. Dual classifiers (<code>w_obs</code>, <code>w_lat</code>) are trained with pseudo-labels from density-peak assignment.</p>
+
+          <div class="api-sub-heading">Constructor</div>
+          <div class="api-sig">
+            <pre>OSLMFClassifier(
+    schema: Schema,
+    window_size: int = 200,
+    buffer_size: int = 200,
+    batch_size: int = 50,
+    learning_rate: float = 0.01,
+    decay_coef: float = 0.5,
+    max_ord_levels: int = 14,
+    ensemble_weight: float = 0.5,
+    l2_lambda: float = 0.001,
+    random_seed: int = 1,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>required</td><td>Stream schema</td></tr>
+              <tr><td>window_size</td><td>int</td><td>200</td><td>Gaussian Copula ECDF window size</td></tr>
+              <tr><td>buffer_size</td><td>int</td><td>200</td><td>Density-Peak buffer size (instances retained for label propagation)</td></tr>
+              <tr><td>batch_size</td><td>int</td><td>50</td><td>Batch size for EM updates</td></tr>
+              <tr><td>learning_rate</td><td>float</td><td>0.01</td><td>SGD learning rate</td></tr>
+              <tr><td>decay_coef</td><td>float</td><td>0.5</td><td>Covariance exponential decay factor</td></tr>
+              <tr><td>max_ord_levels</td><td>int</td><td>14</td><td>Ordinal detection threshold</td></tr>
+              <tr><td>ensemble_weight</td><td>float</td><td>0.5</td><td>Initial ensemble weight</td></tr>
+              <tr><td>l2_lambda</td><td>float</td><td>0.001</td><td>L2 regularization strength</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>_copula</td><td>GaussianCopula</td><td>Gaussian Copula transformer for ECDF normalization</td></tr>
+              <tr><td>_density_peaks</td><td>DensityPeakClustering</td><td>Label propagation via density-peak structure</td></tr>
+              <tr><td>_w_obs</td><td>ndarray (d+1,)</td><td>Observed-space weights with bias</td></tr>
+              <tr><td>_w_lat</td><td>ndarray (d+1,)</td><td>Latent-space weights with bias</td></tr>
+              <tr><td>_cont_indices</td><td>ndarray bool</td><td>Continuous feature mask</td></tr>
+              <tr><td>_ord_indices</td><td>ndarray bool</td><td>Ordinal feature mask</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>train</td><td>(instance: Instance) → None</td><td>None</td><td>Updates Copula window (per-instance); accumulates batch; when full: copula EM + density-peak label propagation + SGD on both classifiers</td></tr>
+              <tr><td>predict</td><td>(instance: Instance) → int</td><td>int</td><td>Returns 1 if predict_proba()[1] &gt; 0.5</td></tr>
+              <tr><td>predict_proba</td><td>(instance: Instance) → ndarray</td><td>ndarray (2,)</td><td>Transforms to latent z, reconstructs missing features; ensemble prediction</td></tr>
+            </tbody>
+          </table>
+          <div class="api-note api-note-warn"><strong>Constraints:</strong> Binary classification only. Dense input. Distance matrix is O(buffer²) — large buffer_size increases compute cost.</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §8  ORF3VClassifier
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="orf3v" class="api-section-title">§8 &nbsp; ORF3VClassifier</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">ORF3VClassifier</span>
+          <span class="api-badge api-badge-multi">multi-class</span>
+          <span class="api-badge api-badge-dense">dense / sparse</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/classifier/_orf3v_classifier.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc"><strong style="color:var(--text);">Full name:</strong> Online Random Feature Forests for Varying Feature Spaces &nbsp;·&nbsp; Schreckenberger et al., AAAI 2023</p>
+          <p class="api-desc">ORF3V builds an independent decision stump forest for each feature. Per-feature forests predict class distributions, weighted by each feature's accuracy history. Handles dynamic feature spaces naturally — forests are initialized lazily after <code>grace_period</code> instances and new feature forests are created when new features appear. Stumps are periodically replaced by newly generated candidates with better Gini gain.</p>
+
+          <div class="api-sub-heading">Constructor</div>
+          <div class="api-sig">
+            <pre>ORF3VClassifier(
+    schema: Schema,
+    n_stumps: int = 10,
+    alpha: float = 0.1,
+    grace_period: int = 100,
+    replacement_interval: int = 100,
+    replacement_strategy: str = "oldest",
+    window_size: int = 200,
+    delta: float = 0.001,
+    compression: float = 1000,
+    d_max: int = 1000,
+    enable_pruning: bool = False,
+    random_seed: int = 1,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>required</td><td>Stream schema</td></tr>
+              <tr><td>n_stumps</td><td>int</td><td>10</td><td>Number of decision stumps per feature forest</td></tr>
+              <tr><td>alpha</td><td>float</td><td>0.1</td><td>Weight decay rate for per-forest accuracy updates</td></tr>
+              <tr><td>grace_period</td><td>int</td><td>100</td><td>Instances to observe before initializing forests</td></tr>
+              <tr><td>replacement_interval</td><td>int</td><td>100</td><td>Instances between stump replacement rounds</td></tr>
+              <tr><td>replacement_strategy</td><td>str</td><td>"oldest"</td><td>Stump replacement strategy: <code>"oldest"</code> or <code>"random"</code></td></tr>
+              <tr><td>window_size</td><td>int</td><td>200</td><td>Sliding window for feature presence tracking</td></tr>
+              <tr><td>delta</td><td>float</td><td>0.001</td><td>Hoeffding bound confidence parameter (used if enable_pruning=True)</td></tr>
+              <tr><td>compression</td><td>float</td><td>1000</td><td>t-digest compression parameter (reserved for future use)</td></tr>
+              <tr><td>d_max</td><td>int</td><td>1000</td><td>Maximum expected number of features</td></tr>
+              <tr><td>enable_pruning</td><td>bool</td><td>False</td><td>Enable Hoeffding-bound-based feature pruning</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>feature_forests</td><td>dict</td><td><code>{feature_id: FeatureForest}</code> — one forest per observed feature</td></tr>
+              <tr><td>weights</td><td>dict</td><td><code>{feature_id: float}</code> — per-forest prediction weight</td></tr>
+              <tr><td>feature_stats</td><td>dict</td><td><code>{feature_id: FeatureStats}</code> — per-feature statistics for stump generation</td></tr>
+              <tr><td>first_occurrence</td><td>dict</td><td><code>{feature_id: int}</code> — time step of first appearance</td></tr>
+              <tr><td>t</td><td>int</td><td>Instance counter</td></tr>
+              <tr><td>n_classes</td><td>int</td><td>Number of classes</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>train</td><td>(instance: Instance) → None</td><td>None</td><td>Updates FeatureStats; initializes forests after grace period; replaces stumps every replacement_interval; creates new forests for newly observed features; updates per-forest weights</td></tr>
+              <tr><td>predict</td><td>(instance: Instance) → int</td><td>int</td><td>Returns class with highest aggregate score</td></tr>
+              <tr><td>predict_proba</td><td>(instance: Instance) → ndarray</td><td>ndarray (n_classes,)</td><td>Normalizes aggregate class scores: <code>score = Σ weight[f] · forest[f].predict(x[f])</code></td></tr>
+            </tbody>
+          </table>
+          <div class="api-note api-note-info"><strong>Note:</strong> Supports multi-class. Dense or sparse input — uses <code>instance.feature_indices</code> attribute if present (set by <code>OpenFeatureStream</code>).</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §9  OLD3SClassifier
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="old3s" class="api-section-title">§9 &nbsp; OLD3SClassifier</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">OLD3SClassifier</span>
+          <span class="api-badge api-badge-multi">binary / multi</span>
+          <span class="api-badge api-badge-dense">dense</span>
+          <span class="api-badge api-badge-torch">PyTorch</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/classifier/_old3s_classifier.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc"><strong style="color:var(--text);">Full name:</strong> Online Learning Deep models from Data of Double Streams &nbsp;·&nbsp; Lian et al., IEEE TKDE 2024</p>
+          <p class="api-desc">OLD3S supports lifelong learning across multiple sequential feature-space transitions. It maintains a Variational Autoencoder (VAE) for feature extraction and a Hedge Backpropagation (HBP) MLP for classification. A reactive state machine detects three phases — STABLE, OVERLAP, STABLE_NEW — and applies knowledge distillation during OVERLAP to align new and old latent spaces. Ensemble weights between current and previous models are updated exponentially based on prediction loss.</p>
+
+          <div class="api-sub-heading">Constructor</div>
+          <div class="api-sig">
+            <pre>OLD3SClassifier(
+    schema: Schema,
+    latent_dim: int = 20,
+    hidden_dim: int = 128,
+    num_hbp_layers: int = 3,
+    learning_rate: float = 0.001,
+    beta: float = 0.99,
+    eta: float = 0.01,
+    random_seed: int = 1,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>required</td><td>Stream schema</td></tr>
+              <tr><td>latent_dim</td><td>int</td><td>20</td><td>VAE bottleneck dimensionality</td></tr>
+              <tr><td>hidden_dim</td><td>int</td><td>128</td><td>Hidden units in VAE encoder/decoder and HBP MLP</td></tr>
+              <tr><td>num_hbp_layers</td><td>int</td><td>3</td><td>Number of HBP MLP layers (each has its own exit classifier)</td></tr>
+              <tr><td>learning_rate</td><td>float</td><td>0.001</td><td>Adam optimizer learning rate</td></tr>
+              <tr><td>beta</td><td>float</td><td>0.99</td><td>HBP weight decay rate — controls contribution of later layers</td></tr>
+              <tr><td>eta</td><td>float</td><td>0.01</td><td>Ensemble update rate — speed of weight shift between current and previous models</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>model_curr</td><td>dict | None</td><td>Current model bundle: <code>{vae, clf, opt_vae, opt_clf, hbp_weights, dim}</code></td></tr>
+              <tr><td>model_prev</td><td>dict | None</td><td>Previous model bundle (active during OVERLAP phase)</td></tr>
+              <tr><td>w_curr</td><td>float</td><td>Ensemble weight for current model</td></tr>
+              <tr><td>w_prev</td><td>float</td><td>Ensemble weight for previous model</td></tr>
+              <tr><td>curr_indices</td><td>ndarray | None</td><td>Feature indices for current space</td></tr>
+              <tr><td>prev_indices</td><td>ndarray | None</td><td>Feature indices for previous space</td></tr>
+              <tr><td>is_overlap</td><td>bool</td><td>True during OVERLAP transition phase</td></tr>
+              <tr><td>device</td><td>torch.device</td><td>'cuda' if available, else 'cpu'</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Internal model components</div>
+          <table class="arch-table">
+            <thead><tr><th>Component</th><th>Architecture</th></tr></thead>
+            <tbody>
+              <tr><td>VAE_Shallow</td><td>Encoder: Linear(d, hidden) + ReLU → μ, logvar; Linear(hidden, latent) · Decoder: Linear(latent, hidden) + ReLU + Linear(hidden, d) + Sigmoid</td></tr>
+              <tr><td>HBPMLP</td><td>Multi-layer ReLU network; exit classifier at each layer; forward returns list of logits</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>train</td><td>(instance: Instance) → None</td><td>None</td><td>Detects phase (STABLE / OVERLAP / STABLE_NEW); trains appropriate models; applies alignment loss during OVERLAP; updates ensemble weights</td></tr>
+              <tr><td>predict</td><td>(instance: Instance) → int</td><td>int</td><td>Returns argmax of predict_proba()</td></tr>
+              <tr><td>predict_proba</td><td>(instance: Instance) → ndarray</td><td>ndarray (n_classes,)</td><td>Encodes features via VAE → HBP prediction; ensemble with model_prev during OVERLAP</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Phase state machine</div>
+          <table class="state-table">
+            <thead><tr><th>State</th><th>Trigger</th><th>Behavior</th></tr></thead>
+            <tbody>
+              <tr><td>STABLE</td><td>No previous model or stable feature set</td><td>Train model_curr only (VAE + classifier)</td></tr>
+              <tr><td>OVERLAP</td><td>New feature set is superset of current</td><td>model_prev ← model_curr; create new model_curr; train both; apply KD alignment loss</td></tr>
+              <tr><td>STABLE_NEW</td><td>Feature set shrinks below prev+curr size</td><td>model_prev ← None; return to STABLE</td></tr>
+            </tbody>
+          </table>
+          <div class="api-note api-note-red"><strong>Requires PyTorch.</strong> Binary and multi-class supported. Dense input only.</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           §10  OWSSClassifier
+      ══════════════════════════════════════════ -->
+      <hr class="api-sep">
+      <h2 id="owss" class="api-section-title">§10 &nbsp; OWSSClassifier</h2>
+
+      <div class="api-entity">
+        <div class="api-entity-header">
+          <span class="api-badge api-badge-class">class</span>
+          <span class="api-entity-name">OWSSClassifier</span>
+          <span class="api-badge api-badge-multi">multi-class</span>
+          <span class="api-badge api-badge-dense">dense</span>
+          <span class="api-badge api-badge-torch">PyTorch</span>
+          <span class="api-meta"><span class="api-meta-sep">·</span> src/openmoa/classifier/_owss_classifier.py</span>
+        </div>
+        <div class="api-entity-body">
+          <p class="api-desc"><strong style="color:var(--text);">Full name:</strong> Online Learning from Open-World Soft Sensing &nbsp;·&nbsp; Lian et al., ICDM 2024</p>
+          <p class="api-desc">OWSS uses a bipartite graph neural network (GNN) where nodes represent features and instances, and edges encode feature-instance relationships. Learnable feature embeddings capture universal feature representations shared across instances. A Feature Reconstruction Loss (Eq. 2) aligns the latent GNN output back toward the initial embedding, preventing representational drift. Updates are batch-based using a sliding window buffer.</p>
+
+          <div class="api-sub-heading">Constructor</div>
+          <div class="api-sig">
+            <pre>OWSSClassifier(
+    schema: Schema,
+    window_size: int = 100,
+    hidden_dim: int = 32,
+    learning_rate: float = 0.01,
+    rec_weight: float = 0.1,
+    sparsity_threshold: float = 0.05,
+    random_seed: int = 1,
+)</pre>
+          </div>
+          <table class="api-param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>schema</td><td>Schema</td><td>required</td><td>Stream schema</td></tr>
+              <tr><td>window_size</td><td>int</td><td>100</td><td>Buffer size before each GNN update</td></tr>
+              <tr><td>hidden_dim</td><td>int</td><td>32</td><td>Feature embedding dimensionality (GNN hidden size)</td></tr>
+              <tr><td>learning_rate</td><td>float</td><td>0.01</td><td>Adam optimizer learning rate</td></tr>
+              <tr><td>rec_weight</td><td>float</td><td>0.1</td><td>β: weight of reconstruction loss relative to classification loss</td></tr>
+              <tr><td>sparsity_threshold</td><td>float</td><td>0.05</td><td>Edge pruning threshold — feature-instance edges where |X_ij| &lt; threshold are removed from the graph</td></tr>
+              <tr><td>random_seed</td><td>int</td><td>1</td><td>RNG seed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Attributes</div>
+          <table class="api-method-table">
+            <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>model</td><td>OWSSNetwork</td><td>Bipartite GNN model</td></tr>
+              <tr><td>optimizer</td><td>optim.Adam</td><td>Model optimizer</td></tr>
+              <tr><td>n_features</td><td>int</td><td>Current feature count</td></tr>
+              <tr><td>max_features</td><td>int</td><td>Allocated embedding pool size: <code>max(1000, 2 · n_features)</code></td></tr>
+              <tr><td>device</td><td>torch.device</td><td>'cuda' or 'cpu'</td></tr>
+              <tr><td>stats_min</td><td>ndarray | None</td><td>Online per-feature minimum (for normalization)</td></tr>
+              <tr><td>stats_max</td><td>ndarray | None</td><td>Online per-feature maximum</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Internal model components</div>
+          <table class="arch-table">
+            <thead><tr><th>Component</th><th>Architecture</th></tr></thead>
+            <tbody>
+              <tr><td>feature_embeddings</td><td>nn.Parameter shape (max_features, hidden_dim) — learnable universal feature representations</td></tr>
+              <tr><td>input_projector</td><td>nn.Linear(1, hidden_dim) — projects scalar feature values to embedding space</td></tr>
+              <tr><td>BipartiteGraphConv</td><td>Θ ∈ (hidden, hidden); forward: ReLU(adj @ x @ Θ) + dropout</td></tr>
+              <tr><td>classifier</td><td>Linear(hidden, hidden//2) + ReLU + Linear(hidden//2, n_classes)</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Methods</div>
+          <table class="api-method-table">
+            <thead><tr><th>Method</th><th>Signature</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>train</td><td>(instance: Instance) → None</td><td>None</td><td>Accumulates in buffer; when buffer ≥ window_size: normalizes, builds bipartite adjacency, forward pass, computes <code>loss_cls + rec_weight · loss_rec</code>, backpropagates</td></tr>
+              <tr><td>predict</td><td>(instance: Instance) → int</td><td>int</td><td>Returns argmax of predict_proba()</td></tr>
+              <tr><td>predict_proba</td><td>(instance: Instance) → ndarray</td><td>ndarray (n_classes,)</td><td>Normalizes input; builds adjacency; GNN forward pass; softmax</td></tr>
+            </tbody>
+          </table>
+
+          <div class="api-sub-heading">Loss function</div>
+          <div class="api-sig">
+            <pre>L_total = CrossEntropyLoss(logits, y) + rec_weight · MSELoss(latent_z, initial_z.detach())</pre>
+          </div>
+          <p class="api-desc" style="margin-top:8px;">Where <code>initial_z</code> = instance nodes before GNN refinement, and <code>latent_z</code> = after. The reconstruction term (Eq. 2) prevents feature embeddings from drifting arbitrarily.</p>
+          <div class="api-note api-note-red"><strong>Requires PyTorch.</strong> Multi-class classification only. Dense input only.</div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="docs-nav" style="margin-top:48px;">
+        <a href="streams.html" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Previous: openmoa.streams
+        </a>
+        <a href="regressors.html" class="btn btn-secondary">
+          Next: openmoa.regressors
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="footer-logo-icon">M</div>
+        <span class="footer-text">© 2025 OpenMOA. Open source under MIT License.</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/ZW-SIYUAN/OpenMOA" target="_blank" class="footer-link">GitHub</a>
+        <a href="https://openmoa.net" class="footer-link">openmoa.net</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/script.js"></script>
+</body>
+</html>
